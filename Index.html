@@ -12,20 +12,24 @@
         .result-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
         .result-value { font-size: 16px; font-weight: bold; color: #007bff; }
         .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        th { background-color: #f4f4f4; }
     </style>
 </head>
 <body>
 
     <h2>3:12 Utdelningskalkylator</h2>
+
+    <h3>1️⃣ Kapital efter försäljning och utdelning per år</h3>
     
     <p><strong>Nuvarande värde på bolaget:</strong> <span id="nuvarde"></span></p>
 
     <div class="checkbox-container">
         <input type="checkbox" id="daligtNuvarde" onchange="uppdateraNuvarde()">
         <label for="daligtNuvarde">Dåligt värde (3 000 000 kr)</label>
+    </div>
+
+    <div class="checkbox-container">
+        <input type="checkbox" id="betalaHuslan" onchange="uppdateraBeräkningar()">
+        <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
     </div>
 
     <div class="slider-container">
@@ -40,21 +44,11 @@
         <span class="slider-value" id="avkastningValue">10%</span>
     </div>
 
-    <div class="result" id="resultAktieutdelning"></div>
-    <div class="result" id="resultFörsäljning"></div>
+    <label for="huslan">Nuvarande huslån (kr):</label>
+    <input type="number" id="huslan" value="2000000" oninput="uppdateraBeräkningar()">
 
-    <!-- Tabell för historisk avkastning -->
-    <h3>Historisk avkastning</h3>
-    <table>
-        <tr>
-            <th>År</th>
-            <th>Avkastning (%)</th>
-        </tr>
-        <tr><td>2021</td><td>+27,04%</td></tr>
-        <tr><td>2022</td><td>-27,91%</td></tr>
-        <tr><td>2023</td><td>+34,07%</td></tr>
-        <tr><td>2024</td><td>+26,42%</td></tr>
-    </table>
+    <div class="result" id="resultFörsäljning"></div>
+    <div class="result" id="resultAktieutdelning"></div>
 
     <script>
         let normaltNuvarde = 6855837;
@@ -75,44 +69,63 @@
         function uppdateraBeräkningar() {
             let multipel = parseFloat(document.getElementById("multipel").value);
             let avkastning = parseFloat(document.getElementById("avkastning").value) / 100;
+            let huslan = parseFloat(document.getElementById("huslan").value);
+            let betalaHuslan = document.getElementById("betalaHuslan").checked;
 
             document.getElementById("multipelValue").textContent = multipel.toFixed(1);
             document.getElementById("avkastningValue").textContent = (avkastning * 100).toFixed(0) + "%";
 
             let försäljningspris = nuvarde * multipel;
-            let totalAvkastning = försäljningspris * avkastning;
+            let exitKapital = betalaHuslan ? försäljningspris - (huslan / 0.5) : försäljningspris;
+
+            let totalAvkastningJust = exitKapital * avkastning;
+            let totalAvkastningOjust = försäljningspris * avkastning;
 
             let gränsbelopp = 209550;
             let skattLåg = 0.20;
             let skattHög = 0.50;
 
-            let bruttoLåg = Math.min(totalAvkastning, gränsbelopp);
-            let bruttoHög = totalAvkastning > gränsbelopp ? totalAvkastning - gränsbelopp : 0;
+            function beräknaUtdelning(totalAvkastning) {
+                let bruttoLåg = Math.min(totalAvkastning, gränsbelopp);
+                let bruttoHög = totalAvkastning > gränsbelopp ? totalAvkastning - gränsbelopp : 0;
+                let nettoLåg = bruttoLåg * (1 - skattLåg);
+                let nettoHög = bruttoHög * (1 - skattHög);
+                let totalNetto = nettoLåg + nettoHög;
+                return { bruttoLåg, bruttoHög, nettoLåg, nettoHög, totalNetto };
+            }
 
-            let nettoLåg = bruttoLåg * (1 - skattLåg);
-            let nettoHög = bruttoHög * (1 - skattHög);
-            let totalNetto = nettoLåg + nettoHög;
-
-            document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
-
-            document.getElementById("resultAktieutdelning").innerHTML = `
-                <div class="box">
-                    <p class="result-title">Aktieutdelning</p>
-                    <p><strong>Brutto utdelning:</strong> ${formatNumber(totalAvkastning)}</p>
-                    <p><strong>Inom gränsbelopp (20% skatt):</strong> ${formatNumber(bruttoLåg)} → Netto: ${formatNumber(nettoLåg)}</p>
-                    <p><strong>Över gränsbelopp (50% skatt):</strong> ${formatNumber(bruttoHög)} → Netto: ${formatNumber(nettoHög)}</p>
-                    <p><strong>Totalt netto utdelning:</strong> ${formatNumber(totalNetto)}</p>
-                </div>
-            `;
+            let utdelningJust = beräknaUtdelning(totalAvkastningJust);
+            let utdelningOjust = beräknaUtdelning(totalAvkastningOjust);
+            let skillnad = utdelningOjust.totalNetto - utdelningJust.totalNetto;
 
             document.getElementById("resultFörsäljning").innerHTML = `
                 <div class="box">
-                    <p class="result-title">Kapital efter försäljning</p>
-                    <p><strong>Nuvarande värde:</strong> ${formatNumber(nuvarde)}</p>
-                    <p><strong>Multipel:</strong> ${multipel.toFixed(1)}</p>
-                    <p><strong>Försäljningsvärde:</strong> ${formatNumber(försäljningspris)}</p>
+                    <p class="result-title">${betalaHuslan ? "Exitbelopp när huslån är betalat 🏡" : "Exitbelopp"}</p>
+                    <p><strong>${formatNumber(exitKapital)}</strong></p>
                 </div>
             `;
+
+            let aktieutdelningHtml = `
+                <div class="box">
+                    <p class="result-title">Aktieutdelning</p>
+                    <p>Brutto: ${formatNumber(totalAvkastningJust)}</p>
+                    <p>Inom gränsbelopp (20% skatt): ${formatNumber(utdelningJust.bruttoLåg)} → Netto: ${formatNumber(utdelningJust.nettoLåg)}</p>
+                    <p>Över gränsbelopp (50% skatt): ${formatNumber(utdelningJust.bruttoHög)} → Netto: ${formatNumber(utdelningJust.nettoHög)}</p>
+                    <p><strong>Totalt netto utdelning:</strong> ${formatNumber(utdelningJust.totalNetto)}</p>
+            `;
+
+            if (betalaHuslan) {
+                aktieutdelningHtml += `
+                    <p><strong>Utan att betala huslån:</strong></p>
+                    <p>Totalt netto utdelning: ${formatNumber(utdelningOjust.totalNetto)}</p>
+                `;
+                if (skillnad > 0) {
+                    aktieutdelningHtml += `<p><strong>Skillnad:</strong> ${formatNumber(skillnad)}</p>`;
+                }
+            }
+
+            aktieutdelningHtml += `</div>`;
+            document.getElementById("resultAktieutdelning").innerHTML = aktieutdelningHtml;
         }
 
         window.onload = function() {
