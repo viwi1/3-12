@@ -12,22 +12,41 @@
         .box { border: 1px solid #ccc; padding: 15px; margin-top: 10px; background: #f9f9f9; }
         .result-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
         .result-value { font-size: 16px; font-weight: bold; color: #007bff; }
+
+        /* Helt ny styling för checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .checkbox-container input {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+        }
+        .checkbox-container label {
+            font-size: 16px;
+            cursor: pointer;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
 
     <h2>3:12 Utdelningskalkylator</h2>
 
-    <!-- Multipel och avkastning -->
     <h3>1️⃣ Kapital efter försäljning och utdelning per år</h3>
     
     <label>Nuvarande värde på bolaget:</label>
     <input type="text" id="nuvarde" readonly>
 
-    <div class="slider-container">
-    <label for="daligtNuvarde">Dåligt nuvärde (3 000 000 kr)</label>
-    <input type="checkbox" id="daligtNuvarde" onchange="uppdateraNuvarde()">
-</div>
+    <!-- FIXAD CHECKBOX SEKTOR -->
+    <div class="checkbox-container">
+        <input type="checkbox" id="daligtNuvarde" onchange="uppdateraNuvarde()">
+        <label for="daligtNuvarde">Dåligt nuvärde (3 000 000 kr)</label>
+    </div>
 
     <div class="slider-container">
         <label for="multipel">Multipel:</label>
@@ -41,12 +60,13 @@
         <span class="slider-value" id="avkastningValue">10%</span>
     </div>
 
+    <div class="result" id="resultNettoMultipel"></div>
     <div class="result" id="resultFörsäljning"></div>
 
     <script>
-        let normaltNuvarde = 6855837; // Normalt värde
-        let daligtNuvarde = 3000000; // Dåligt värde
-        let nuvarde = normaltNuvarde; // Standardvärde vid start
+        let normaltNuvarde = 6855837;
+        let daligtNuvarde = 3000000;
+        let nuvarde = normaltNuvarde;
 
         function formatNumber(num) {
             return num.toLocaleString("sv-SE") + " kr";
@@ -56,7 +76,7 @@
             let checkbox = document.getElementById("daligtNuvarde");
             nuvarde = checkbox.checked ? daligtNuvarde : normaltNuvarde;
             document.getElementById("nuvarde").value = formatNumber(nuvarde);
-            uppdateraBeräkningar(); // Uppdatera beräkningarna med nya värdet
+            uppdateraBeräkningar();
         }
 
         function uppdateraBeräkningar() {
@@ -81,6 +101,13 @@
             let nettoHög = bruttoHög * (1 - skattHög);
             let totalNetto = nettoLåg + nettoHög;
 
+            document.getElementById("resultNettoMultipel").innerHTML = `
+                <div class="box">
+                    <p class="result-title">Totalt netto per år</p>
+                    <p><strong>Netto utdelning per år:</strong> <span class="result-value">${formatNumber(totalNetto)}</span></p>
+                </div>
+            `;
+
             document.getElementById("resultFörsäljning").innerHTML = `
                 <div class="box">
                     <p class="result-title">Kapital efter försäljning</p>
@@ -88,30 +115,9 @@
                     <p><strong>Multipel:</strong> <span class="result-value">${multipel.toFixed(1)}</span></p>
                     <p><strong>Försäljningsvärde:</strong> <span class="result-value">${formatNumber(försäljningspris)}</span></p>
                 </div>
-
-                <div class="box">
-                    <p class="result-title">Årlig utdelning baserat på avkastning</p>
-                    <p><strong>Avkastning:</strong> <span class="result-value">${(avkastning * 100).toFixed(0)}%</span></p>
-                    <p><strong>Brutto totalt:</strong> <span class="result-value">${formatNumber(totalAvkastning)}</span></p>
-                </div>
-
-                <div class="box">
-                    <p class="result-title">Fördelning av utdelningen</p>
-                    <p><strong>Inom gränsbeloppet (20% skatt):</strong> <span class="result-value">${formatNumber(bruttoLåg)}</span></p>
-                    <p><strong>Netto efter skatt:</strong> <span class="result-value">${formatNumber(nettoLåg)}</span></p>
-                    <hr>
-                    <p><strong>Över gränsbeloppet (50% skatt):</strong> <span class="result-value">${formatNumber(bruttoHög)}</span></p>
-                    <p><strong>Netto efter skatt:</strong> <span class="result-value">${formatNumber(nettoHög)}</span></p>
-                </div>
-
-                <div class="box">
-                    <p class="result-title">Totalt netto per år</p>
-                    <p><strong>Netto utdelning per år:</strong> <span class="result-value">${formatNumber(totalNetto)}</span></p>
-                </div>
             `;
         }
 
-        // Kör första beräkningen direkt vid sidladdning
         window.onload = function() {
             uppdateraNuvarde();
             uppdateraBeräkningar();
