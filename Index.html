@@ -10,18 +10,18 @@
         .slider-value { width: 60px; margin-left: 10px; font-weight: bold; }
         .box { border: 1px solid #ccc; padding: 15px; margin-top: 10px; background: #f9f9f9; }
         .result-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-        .result-value { font-size: 16px; font-weight: bold; color: #ff7bff; }
+        .result-value { font-size: 16px; font-weight: bold; color: #007bff; }
         .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #f4f4f4; }
     </style>
 </head>
 <body>
 
     <h2>3:12 Utdelningskalkylator</h2>
-
-    <p><strong>Startvärde på aktierna:</strong> <span id="nuvarde"></span></p>
+    
+    <p><strong>Nuvarande värde på bolaget:</strong> <span id="nuvarde"></span></p>
 
     <div class="checkbox-container">
         <input type="checkbox" id="daligtNuvarde" onchange="uppdateraNuvarde()">
@@ -43,9 +43,13 @@
     <div class="result" id="resultAktieutdelning"></div>
     <div class="result" id="resultFörsäljning"></div>
 
+    <!-- Tabell för historisk avkastning -->
     <h3>Historisk avkastning</h3>
     <table>
-        <tr><th>År</th><th>Avkastning</th></tr>
+        <tr>
+            <th>År</th>
+            <th>Avkastning (%)</th>
+        </tr>
         <tr><td>2021</td><td>+27,04%</td></tr>
         <tr><td>2022</td><td>-27,91%</td></tr>
         <tr><td>2023</td><td>+34,07%</td></tr>
@@ -89,15 +93,24 @@
             let nettoHög = bruttoHög * (1 - skattHög);
             let totalNetto = nettoLåg + nettoHög;
 
+            document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
+
             document.getElementById("resultAktieutdelning").innerHTML = `
                 <div class="box">
                     <p class="result-title">Aktieutdelning</p>
-                    <table>
-                        <tr><th>Typ</th><th>Brutto</th><th>Netto</th></tr>
-                        <tr><td>Inom gränsbelopp (20% skatt)</td><td>${formatNumber(bruttoLåg)}</td><td>${formatNumber(nettoLåg)}</td></tr>
-                        <tr><td>Över gränsbelopp (50% skatt)</td><td>${formatNumber(bruttoHög)}</td><td>${formatNumber(nettoHög)}</td></tr>
-                        <tr><td><strong>Totalt</strong></td><td><strong>${formatNumber(totalAvkastning)}</strong></td><td><strong>${formatNumber(totalNetto)}</strong></td></tr>
-                    </table>
+                    <p><strong>Brutto utdelning:</strong> ${formatNumber(totalAvkastning)}</p>
+                    <p><strong>Inom gränsbelopp (20% skatt):</strong> ${formatNumber(bruttoLåg)} → Netto: ${formatNumber(nettoLåg)}</p>
+                    <p><strong>Över gränsbelopp (50% skatt):</strong> ${formatNumber(bruttoHög)} → Netto: ${formatNumber(nettoHög)}</p>
+                    <p><strong>Totalt netto utdelning:</strong> ${formatNumber(totalNetto)}</p>
+                </div>
+            `;
+
+            document.getElementById("resultFörsäljning").innerHTML = `
+                <div class="box">
+                    <p class="result-title">Kapital efter försäljning</p>
+                    <p><strong>Nuvarande värde:</strong> ${formatNumber(nuvarde)}</p>
+                    <p><strong>Multipel:</strong> ${multipel.toFixed(1)}</p>
+                    <p><strong>Försäljningsvärde:</strong> ${formatNumber(försäljningspris)}</p>
                 </div>
             `;
         }
