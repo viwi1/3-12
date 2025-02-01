@@ -6,46 +6,26 @@
     <title>3:12 Utdelningskalkylator</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-        input, button { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
         .slider-container { display: flex; align-items: center; margin-bottom: 10px; }
         .slider-value { width: 60px; margin-left: 10px; font-weight: bold; }
         .box { border: 1px solid #ccc; padding: 15px; margin-top: 10px; background: #f9f9f9; }
         .result-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-        .result-value { font-size: 16px; font-weight: bold; color: #007bff; }
-
-        /* Helt ny styling för checkbox */
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .checkbox-container input {
-            width: 20px;
-            height: 20px;
-            margin: 0;
-        }
-        .checkbox-container label {
-            font-size: 16px;
-            cursor: pointer;
-            user-select: none;
-        }
+        .result-value { font-size: 16px; font-weight: bold; color: #ff7bff; }
+        .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
 
     <h2>3:12 Utdelningskalkylator</h2>
 
-    <h3>1️⃣ Kapital efter försäljning och utdelning per år</h3>
-    
-    <label>Nuvarande värde på bolaget:</label>
-    <input type="text" id="nuvarde" readonly>
+    <p><strong>Startvärde på aktierna:</strong> <span id="nuvarde"></span></p>
 
-    <!-- FIXAD CHECKBOX SEKTOR -->
     <div class="checkbox-container">
         <input type="checkbox" id="daligtNuvarde" onchange="uppdateraNuvarde()">
-        <label for="daligtNuvarde">Dåligt nuvärde (3 000 000 kr)</label>
+        <label for="daligtNuvarde">Dåligt värde (3 000 000 kr)</label>
     </div>
 
     <div class="slider-container">
@@ -60,8 +40,17 @@
         <span class="slider-value" id="avkastningValue">10%</span>
     </div>
 
-    <div class="result" id="resultNettoMultipel"></div>
+    <div class="result" id="resultAktieutdelning"></div>
     <div class="result" id="resultFörsäljning"></div>
+
+    <h3>Historisk avkastning</h3>
+    <table>
+        <tr><th>År</th><th>Avkastning</th></tr>
+        <tr><td>2021</td><td>+27,04%</td></tr>
+        <tr><td>2022</td><td>-27,91%</td></tr>
+        <tr><td>2023</td><td>+34,07%</td></tr>
+        <tr><td>2024</td><td>+26,42%</td></tr>
+    </table>
 
     <script>
         let normaltNuvarde = 6855837;
@@ -75,7 +64,7 @@
         function uppdateraNuvarde() {
             let checkbox = document.getElementById("daligtNuvarde");
             nuvarde = checkbox.checked ? daligtNuvarde : normaltNuvarde;
-            document.getElementById("nuvarde").value = formatNumber(nuvarde);
+            document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
             uppdateraBeräkningar();
         }
 
@@ -85,7 +74,6 @@
 
             document.getElementById("multipelValue").textContent = multipel.toFixed(1);
             document.getElementById("avkastningValue").textContent = (avkastning * 100).toFixed(0) + "%";
-            document.getElementById("nuvarde").value = formatNumber(nuvarde);
 
             let försäljningspris = nuvarde * multipel;
             let totalAvkastning = försäljningspris * avkastning;
@@ -101,26 +89,21 @@
             let nettoHög = bruttoHög * (1 - skattHög);
             let totalNetto = nettoLåg + nettoHög;
 
-            document.getElementById("resultNettoMultipel").innerHTML = `
+            document.getElementById("resultAktieutdelning").innerHTML = `
                 <div class="box">
-                    <p class="result-title">Totalt netto per år</p>
-                    <p><strong>Netto utdelning per år:</strong> <span class="result-value">${formatNumber(totalNetto)}</span></p>
-                </div>
-            `;
-
-            document.getElementById("resultFörsäljning").innerHTML = `
-                <div class="box">
-                    <p class="result-title">Kapital efter försäljning</p>
-                    <p><strong>Nuvarande värde:</strong> <span class="result-value">${formatNumber(nuvarde)}</span></p>
-                    <p><strong>Multipel:</strong> <span class="result-value">${multipel.toFixed(1)}</span></p>
-                    <p><strong>Försäljningsvärde:</strong> <span class="result-value">${formatNumber(försäljningspris)}</span></p>
+                    <p class="result-title">Aktieutdelning</p>
+                    <table>
+                        <tr><th>Typ</th><th>Brutto</th><th>Netto</th></tr>
+                        <tr><td>Inom gränsbelopp (20% skatt)</td><td>${formatNumber(bruttoLåg)}</td><td>${formatNumber(nettoLåg)}</td></tr>
+                        <tr><td>Över gränsbelopp (50% skatt)</td><td>${formatNumber(bruttoHög)}</td><td>${formatNumber(nettoHög)}</td></tr>
+                        <tr><td><strong>Totalt</strong></td><td><strong>${formatNumber(totalAvkastning)}</strong></td><td><strong>${formatNumber(totalNetto)}</strong></td></tr>
+                    </table>
                 </div>
             `;
         }
 
         window.onload = function() {
             uppdateraNuvarde();
-            uppdateraBeräkningar();
         };
     </script>
 
