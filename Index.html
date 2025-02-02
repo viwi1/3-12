@@ -5,13 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>3:12 Utdelningskalkylator</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-    .slider-container { display: flex; align-items: center; margin-bottom: 10px; }
-    .slider-value { width: 60px; margin-left: 10px; font-weight: bold; }
-    .box { border: 1px solid #ccc; padding: 15px; margin-top: 10px; background: #f9f9f9; }
-    .result-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-    .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    label { display: block; margin-top: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 650px;
+      margin: auto;
+      padding: 20px;
+    }
+    .slider-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .slider-value {
+      width: 60px;
+      margin-left: 10px;
+      font-weight: bold;
+    }
+    .box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-top: 10px;
+      background: #f9f9f9;
+    }
+    .result-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    /* Modal (popup) */
+    .modal {
+      display: none;            
+      position: fixed; 
+      z-index: 999; 
+      left: 0; 
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 8% auto; 
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%; 
+      max-width: 600px; 
+      border-radius: 4px;
+      text-align: left;
+      position: relative;
+      max-height: 80vh; /* Skrollbar om det blir för högt */
+      overflow-y: auto;
+    }
+    .close {
+      color: #aaa;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      top: 10px; 
+      right: 15px; 
+    }
+    .close:hover {
+      color: #000;
+    }
   </style>
 </head>
 <body>
@@ -28,9 +94,9 @@
   <!-- 2) Multipel -->
   <div class="slider-container">
     <label for="multipel">Multipel:</label>
-    <!-- OBS! step=0.1 om du vill kunna välja decimaler internt -->
     <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="1.5" oninput="uppdateraBeräkningar()" />
-    <span class="slider-value" id="multipelValue">1</span>
+    <!-- Visar multiplikatorn med en decimal -->
+    <span class="slider-value" id="multipelValue">1.5</span>
   </div>
 
   <!-- 3) Val av att betala huslån -->
@@ -39,30 +105,15 @@
     <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
   </div>
 
-  <!-- 4) Huslån + IBB -->
-  <label for="huslan">Nuvarande huslån (kr):</label>
-  <input type="number" id="huslan" value="2000000" oninput="uppdateraBeräkningar()"/>
-
-  <label for="ibb">Inkomstbasbelopp (IBB) för året:</label>
-  <input type="number" id="ibb" value="80600" oninput="uppdateraBeräkningar()"/>
-  <p>
-    <a
-      href="https://www.pensionsmyndigheten.se/forsta-din-pension/om-pensionssystemet/sa-beraknas-din-pension-basbelopp-berakningsfaktorer-och-varderegler"
-      target="_blank"
-      >Kolla upp årets IBB här</a
-    >
-  </p>
-
-  <!-- 5) Visning av gränsvärde, försäljningsresultat och aktieutdelning -->
-  <p><strong>Gränsvärde (IBB × 2,75):</strong> <span id="gransvarde"></span></p>
+  <!-- 4) Exit-belopp (resultat) -->
   <div class="result" id="resultFörsäljning"></div>
 
-  <!-- Här lägger vi fast HTML-strukturen för aktieutdelnings-rutan, inkl slider -->
+  <!-- 5) Rutan för aktieutdelning, inkl klickbar IBB -->
   <div class="result" id="resultAktieutdelning">
     <div class="box">
       <p class="result-title">Aktieutdelning</p>
 
-      <!-- Flyttad slider för avkastning – men hårdkodad i HTML: -->
+      <!-- Slider för avkastning -->
       <div class="slider-container">
         <label for="avkastning">Avkastning (% per år):</label>
         <input
@@ -76,6 +127,16 @@
         />
         <span class="slider-value" id="avkastningValue">10%</span>
       </div>
+
+      <!-- Klickbar IBB-belopp -->
+      <p>
+        <strong>Aktuellt IBB:</strong>
+        <span 
+          id="ibbLabel"
+          style="cursor:pointer; text-decoration:underline;"
+          onclick="openModalIBB()"
+        ></span>
+      </p>
 
       <p>Brutto: <span id="brutto"></span></p>
       <p>
@@ -92,7 +153,6 @@
         <strong>Totalt netto utdelning:</strong>
         <span id="totaltNetto"></span>
       </p>
-      <!-- Endast synlig om ”Betala huslån” är ikryssad -->
       <div id="utdelningHuslan" style="display:none;">
         <p>
           <strong>Utan att betala huslån:</strong>
@@ -106,18 +166,121 @@
     </div>
   </div>
 
+  <!-- 6) Modal för EGET 3:12-gränsvärde -->
+  <div id="myModal312" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal312()">&times;</span>
+      <h3>Ändra eget 3:12-gränsvärde</h3>
+      <label for="popupGransvarde312">Ange önskat bruttobelopp för 20% skatt:</label>
+      <input 
+        type="number" 
+        id="popupGransvarde312" 
+        oninput="updateUserGransvarde312()" 
+        style="width: 200px;" 
+      />
+      <button style="margin-top:10px;" onclick="closeModal312()">OK</button>
+    </div>
+  </div>
+
+  <!-- 7) Modal för huslånet -->
+  <div id="myModalHuslan" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModalHuslan()">&times;</span>
+      <h3>Ställ in ditt huslån</h3>
+      <label for="popupHuslan">Nuvarande huslån (kr):</label>
+      <input 
+        type="number"
+        id="popupHuslan"
+        oninput="updateHuslan()"
+        style="width: 200px;"
+      />
+      <button style="margin-top:10px;" onclick="closeModalHuslan()">OK</button>
+    </div>
+  </div>
+
+  <!-- 8) Modal för IBB -->
+  <div id="myModalIBB" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModalIBB()">&times;</span>
+      <h3>Ställ in IBB (Inkomstbasbelopp)</h3>
+      <label for="popupIBB">Aktuellt IBB (kr):</label>
+      <input 
+        type="number"
+        id="popupIBB"
+        oninput="updateIBB()"
+        style="width: 200px;"
+      />
+      <button style="margin-top:10px;" onclick="closeModalIBB()">OK</button>
+    </div>
+  </div>
+
   <script>
-    // Ursprungsdata
+    // Globala variabler
+    let userGransvarde312 = 684166; 
+    let huslan = 2000000;          
     let normaltNuvarde = 6855837;
     let daligtNuvarde = 3000000;
     let nuvarde = normaltNuvarde;
+    let ibb = 80600; // standard
 
-    // Format med avrundning till heltal, svenska tusentalsavgränsare
+    // Format: avrunda heltal + svensk tusentalsavgränsare
     function formatNumber(num) {
       return Math.round(num).toLocaleString("sv-SE") + " kr";
     }
 
-    // Slår ihop den traditionella beräkningen av utdelning
+    // ====== Modal huslån ======
+    function openModalHuslan() {
+      document.getElementById("popupHuslan").value = huslan;
+      document.getElementById("myModalHuslan").style.display = "block";
+    }
+    function closeModalHuslan() {
+      document.getElementById("myModalHuslan").style.display = "none";
+    }
+    function updateHuslan() {
+      let val = parseFloat(document.getElementById("popupHuslan").value);
+      if (isNaN(val)) val = 2000000;
+      huslan = val;
+      uppdateraBeräkningar();
+    }
+
+    // ====== Modal 3:12 ======
+    function openModal312() {
+      document.getElementById("popupGransvarde312").value = userGransvarde312;
+      document.getElementById("myModal312").style.display = "block";
+    }
+    function closeModal312() {
+      document.getElementById("myModal312").style.display = "none";
+    }
+    function updateUserGransvarde312() {
+      let val = parseFloat(document.getElementById("popupGransvarde312").value);
+      if (isNaN(val)) val = 684166; 
+      userGransvarde312 = val;
+      uppdateraBeräkningar();
+    }
+
+    // ====== Modal IBB ======
+    function openModalIBB() {
+      document.getElementById("popupIBB").value = ibb;
+      document.getElementById("myModalIBB").style.display = "block";
+    }
+    function closeModalIBB() {
+      document.getElementById("myModalIBB").style.display = "none";
+    }
+    function updateIBB() {
+      let val = parseFloat(document.getElementById("popupIBB").value);
+      if (isNaN(val)) val = 80600;
+      ibb = val;
+      uppdateraBeräkningar();
+    }
+
+    // ====== Nuvarande värde ======
+    function uppdateraNuvarde() {
+      let checkbox = document.getElementById("daligtNuvarde");
+      nuvarde = checkbox.checked ? daligtNuvarde : normaltNuvarde;
+      uppdateraBeräkningar();
+    }
+
+    // ====== Utdelningsberäkning ======
     function beräknaUtdelning(totalAvkastning, gransvarde, skattLåg, skattHög) {
       let bruttoLåg = Math.min(totalAvkastning, gransvarde);
       let bruttoHög = totalAvkastning > gransvarde ? totalAvkastning - gransvarde : 0;
@@ -127,84 +290,94 @@
       return { bruttoLåg, bruttoHög, nettoLåg, nettoHög, totalNetto };
     }
 
-    // Växlar mellan normalt värde och dåligt värde
-    function uppdateraNuvarde() {
-      let checkbox = document.getElementById("daligtNuvarde");
-      nuvarde = checkbox.checked ? daligtNuvarde : normaltNuvarde;
-      document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
-      uppdateraBeräkningar();
-    }
-
+    // ====== Huvudkalkyl ======
     function uppdateraBeräkningar() {
-      // Hämta multipel (med decimals i koden) men vi visar som heltal
+      // Multipel
       let multipel = parseFloat(document.getElementById("multipel").value);
+      document.getElementById("multipelValue").textContent = multipel.toFixed(1);
 
-      // Hämta avkastningsprocent (heltal), men beräkna decimalt
-      let avkastningRange = document.getElementById("avkastning");
-      let avkastningProcent = parseInt(avkastningRange.value, 10); 
+      // Avkastning
+      let avkastningProcent = parseInt(document.getElementById("avkastning").value, 10);
       let avkastning = avkastningProcent / 100;
-
-      // Hämta huslån, IBB och om man vill betala huslån
-      let huslan = parseFloat(document.getElementById("huslan").value);
-      let ibb = parseFloat(document.getElementById("ibb").value);
-      let betalaHuslan = document.getElementById("betalaHuslan").checked;
-
-      // Visa multipeln som heltal (avrundat)
-      document.getElementById("multipelValue").textContent = Math.round(multipel).toString();
-      // Visa avkastningsprocent utan decimaler
       document.getElementById("avkastningValue").textContent = avkastningProcent + "%";
 
-      // Räkna fram gränsvärde
-      let gransvarde = ibb * 2.75;
-      document.getElementById("gransvarde").textContent = formatNumber(gransvarde);
+      // Sätt rubrik 
+      document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
 
-      // Försäljningspris (ev. decimal i multipel men rundas ej i själva multiplikationen)
+      let betalaHuslan = document.getElementById("betalaHuslan").checked;
       let försäljningspris = nuvarde * multipel;
       let exitKapital = försäljningspris;
 
-      // Skattesatser
       let skattLåg = 0.20;
       let skattHög = 0.50;
 
-      // Uträkning för att betala av huslånet
-      let nettoLåg = gransvarde * (1 - skattLåg); 
-      let lånebehovEfterLågSkatt = huslan - nettoLåg;
+      // Beräkna hushantering
+      let nettolag = userGransvarde312 * (1 - skattLåg);
+      let lånebehovEfterLågSkatt = huslan - nettolag;
       let bruttoHögBehov = lånebehovEfterLågSkatt / (1 - skattHög);
-      let totaltBruttoFörLån = gransvarde + bruttoHögBehov;
-      let nettoTotalt = nettoLåg + lånebehovEfterLågSkatt;
+      let totaltBruttoFörLån = userGransvarde312 + bruttoHögBehov;
 
-      // Om man valt att betala huslånet direkt
       if (betalaHuslan) {
         exitKapital -= totaltBruttoFörLån;
       }
 
-      // Skriv ut resultat för försäljning
-      let htmlFörsäljning = `
-        <div class="box">
-          <p class="result-title">${betalaHuslan ? "Exitbelopp efter huslånsbetalning 🏡" : "Exitbelopp"}</p>
-          <p><strong>${formatNumber(exitKapital)}</strong></p>
-      `;
+      // Bygg HTML för exit
+      let htmlExit = `<div class="box">`;
       if (betalaHuslan) {
-        htmlFörsäljning += `
+        htmlExit += `
+          <p class="result-title">Exitbelopp efter huslånsbetalning 🏡</p>
+          <p><strong>${formatNumber(exitKapital)}</strong></p>
+
+          <!-- Här är det klickbara huslån -->
+          <p>
+            <strong>Aktuellt huslån:</strong>
+            <span
+              style="cursor:pointer; text-decoration:underline;"
+              onclick="openModalHuslan()"
+            >
+              ${formatNumber(huslan)}
+            </span>
+          </p>
+
           <p><strong>Uträkning av huslånsbetalning:</strong></p>
           <p>Bruttobelopp som krävs: ${formatNumber(totaltBruttoFörLån)}</p>
-          <p>- Gränsvärde 3:12 (20% skatt): ${formatNumber(gransvarde)} → Netto: ${formatNumber(nettoLåg)}</p>
-          <p>- Resterande belopp (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lånebehovEfterLågSkatt)}</p>
-          <p><strong>Totalt netto använt för lån:</strong> ${formatNumber(nettoTotalt)}</p>
+          <p>
+            - Eget 3:12-gränsvärde (20% skatt):
+            <span
+              style="color:blue; text-decoration:underline; cursor:pointer;"
+              onclick="openModal312()"
+            >
+              ${formatNumber(userGransvarde312)}
+            </span>
+            → Netto: ${formatNumber(nettolag)}
+          </p>
+          <p>
+            - Resterande belopp (50% skatt):
+            ${formatNumber(bruttoHögBehov)} → Netto:
+            ${formatNumber(lånebehovEfterLågSkatt)}
+          </p>
+        `;
+      } else {
+        htmlExit += `
+          <p class="result-title">Exitbelopp</p>
+          <p><strong>${formatNumber(exitKapital)}</strong></p>
         `;
       }
-      htmlFörsäljning += `</div>`;
-      document.getElementById("resultFörsäljning").innerHTML = htmlFörsäljning;
+      htmlExit += `</div>`;
 
-      // Beräkna utdelning beroende på exitKapital
-      let totalAvkastningJust = exitKapital * avkastning;   // Om huslånet betalats
-      let totalAvkastningOjust = försäljningspris * avkastning; // Om huslånet ej betalats alls
+      document.getElementById("resultFörsäljning").innerHTML = htmlExit;
 
+      // Gränsvärde för utdelning
+      let gransvarde = ibb * 2.75;
+
+      // Utdelningsberäkning
+      let totalAvkastningJust = exitKapital * avkastning;
+      let totalAvkastningOjust = försäljningspris * avkastning;
       let utdelningJust = beräknaUtdelning(totalAvkastningJust, gransvarde, skattLåg, skattHög);
       let utdelningOjust = beräknaUtdelning(totalAvkastningOjust, gransvarde, skattLåg, skattHög);
       let skillnad = utdelningOjust.totalNetto - utdelningJust.totalNetto;
 
-      // Fyll i värden i aktieutdelnings-rutan
+      // Fyll i utdelningsrutan
       document.getElementById("brutto").textContent = formatNumber(totalAvkastningJust);
       document.getElementById("inomGransvardeBrutto").textContent = formatNumber(utdelningJust.bruttoLåg);
       document.getElementById("inomGransvardeNetto").textContent = formatNumber(utdelningJust.nettoLåg);
@@ -212,7 +385,6 @@
       document.getElementById("overGransvardeNetto").textContent = formatNumber(utdelningJust.nettoHög);
       document.getElementById("totaltNetto").textContent = formatNumber(utdelningJust.totalNetto);
 
-      // Om man har bockat i att betala huslån visar vi även ”utan att betala huslån”
       let utdHuslanDiv = document.getElementById("utdelningHuslan");
       if (betalaHuslan) {
         utdHuslanDiv.style.display = "block";
@@ -221,11 +393,14 @@
       } else {
         utdHuslanDiv.style.display = "none";
       }
+
+      // Sätt text för klickbart IBB
+      document.getElementById("ibbLabel").textContent = formatNumber(ibb);
     }
 
-    // Init
+    // Sidstart
     window.onload = function() {
-      uppdateraNuvarde();
+      uppdateraBeräkningar();
     };
   </script>
 </body>
