@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>3:12 Utdelningskalkylator</title>
   <style>
     body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
@@ -11,67 +11,113 @@
     .box { border: 1px solid #ccc; padding: 15px; margin-top: 10px; background: #f9f9f9; }
     .result-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
     .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    label { display: block; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <h2>3:12 Utdelningskalkylator</h2>
+  <h3>Kapital efter försäljning och utdelning per år</h3>
 
-  <h3>1️⃣ Kapital efter försäljning och utdelning per år</h3>
-  
+  <!-- 1) Värde på bolaget -->
   <p><strong>Nuvarande värde på bolaget:</strong> <span id="nuvarde"></span></p>
-
   <div class="checkbox-container">
-    <input type="checkbox" id="daligtNuvarde" onchange="uppdateraNuvarde()">
-    <label for="daligtNuvarde">Dåligt värde (3 000 000 kr)</label>
+    <input type="checkbox" id="daligtNuvarde" onchange="uppdateraNuvarde()" />
+    <label for="daligtNuvarde">3 000 000 kr</label>
   </div>
 
-  <div class="checkbox-container">
-    <input type="checkbox" id="betalaHuslan" onchange="uppdateraBeräkningar()">
-    <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit (med 3:12-optimering)</label>
-  </div>
-
+  <!-- 2) Multipel -->
   <div class="slider-container">
     <label for="multipel">Multipel:</label>
-    <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="1.5" oninput="uppdateraBeräkningar()">
-    <span class="slider-value" id="multipelValue">1.5</span>
+    <!-- OBS! step=0.1 om du vill kunna välja decimaler internt -->
+    <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="1.5" oninput="uppdateraBeräkningar()" />
+    <span class="slider-value" id="multipelValue">1</span>
   </div>
 
-  <!-- Slider för avkastning -->
-  <div class="slider-container">
-    <label for="avkastning">Avkastning (% per år):</label>
-    <input type="range" id="avkastning" min="1" max="30" step="1" value="10" oninput="uppdateraBeräkningar()">
-    <span class="slider-value" id="avkastningValue">10%</span>
+  <!-- 3) Val av att betala huslån -->
+  <div class="checkbox-container">
+    <input type="checkbox" id="betalaHuslan" onchange="uppdateraBeräkningar()" />
+    <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
   </div>
 
+  <!-- 4) Huslån + IBB -->
   <label for="huslan">Nuvarande huslån (kr):</label>
-  <input type="number" id="huslan" value="2000000" oninput="uppdateraBeräkningar()">
+  <input type="number" id="huslan" value="2000000" oninput="uppdateraBeräkningar()"/>
 
   <label for="ibb">Inkomstbasbelopp (IBB) för året:</label>
-  <input type="number" id="ibb" value="80600" oninput="uppdateraBeräkningar()">
-  <p><a href="https://www.pensionsmyndigheten.se/forsta-din-pension/om-pensionssystemet/sa-beraknas-din-pension-basbelopp-berakningsfaktorer-och-varderegler" target="_blank">Kolla upp årets IBB här</a></p>
+  <input type="number" id="ibb" value="80600" oninput="uppdateraBeräkningar()"/>
+  <p>
+    <a
+      href="https://www.pensionsmyndigheten.se/forsta-din-pension/om-pensionssystemet/sa-beraknas-din-pension-basbelopp-berakningsfaktorer-och-varderegler"
+      target="_blank"
+      >Kolla upp årets IBB här</a
+    >
+  </p>
 
+  <!-- 5) Visning av gränsvärde, försäljningsresultat och aktieutdelning -->
   <p><strong>Gränsvärde (IBB × 2,75):</strong> <span id="gransvarde"></span></p>
-
   <div class="result" id="resultFörsäljning"></div>
-  <div class="result" id="resultAktieutdelning"></div>
+
+  <!-- Här lägger vi fast HTML-strukturen för aktieutdelnings-rutan, inkl slider -->
+  <div class="result" id="resultAktieutdelning">
+    <div class="box">
+      <p class="result-title">Aktieutdelning</p>
+
+      <!-- Flyttad slider för avkastning – men hårdkodad i HTML: -->
+      <div class="slider-container">
+        <label for="avkastning">Avkastning (% per år):</label>
+        <input
+          type="range"
+          id="avkastning"
+          min="1"
+          max="30"
+          step="1"
+          value="10"
+          oninput="uppdateraBeräkningar()"
+        />
+        <span class="slider-value" id="avkastningValue">10%</span>
+      </div>
+
+      <p>Brutto: <span id="brutto"></span></p>
+      <p>
+        Inom gränsvärde (20% skatt):
+        <span id="inomGransvardeBrutto"></span>
+        → Netto: <span id="inomGransvardeNetto"></span>
+      </p>
+      <p>
+        Över gränsvärde (50% skatt):
+        <span id="overGransvardeBrutto"></span>
+        → Netto: <span id="overGransvardeNetto"></span>
+      </p>
+      <p>
+        <strong>Totalt netto utdelning:</strong>
+        <span id="totaltNetto"></span>
+      </p>
+      <!-- Endast synlig om ”Betala huslån” är ikryssad -->
+      <div id="utdelningHuslan" style="display:none;">
+        <p>
+          <strong>Utan att betala huslån:</strong>
+          <span id="utdelningOjust"></span>
+        </p>
+        <p>
+          <strong>Skillnad:</strong>
+          <span id="utdelningSkillnad"></span>
+        </p>
+      </div>
+    </div>
+  </div>
 
   <script>
+    // Ursprungsdata
     let normaltNuvarde = 6855837;
     let daligtNuvarde = 3000000;
     let nuvarde = normaltNuvarde;
 
+    // Format med avrundning till heltal, svenska tusentalsavgränsare
     function formatNumber(num) {
-      return num.toLocaleString("sv-SE") + " kr";
+      return Math.round(num).toLocaleString("sv-SE") + " kr";
     }
 
-    function uppdateraNuvarde() {
-      let checkbox = document.getElementById("daligtNuvarde");
-      nuvarde = checkbox.checked ? daligtNuvarde : normaltNuvarde;
-      document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
-      uppdateraBeräkningar();
-    }
-
+    // Slår ihop den traditionella beräkningen av utdelning
     function beräknaUtdelning(totalAvkastning, gransvarde, skattLåg, skattHög) {
       let bruttoLåg = Math.min(totalAvkastning, gransvarde);
       let bruttoHög = totalAvkastning > gransvarde ? totalAvkastning - gransvarde : 0;
@@ -81,74 +127,106 @@
       return { bruttoLåg, bruttoHög, nettoLåg, nettoHög, totalNetto };
     }
 
+    // Växlar mellan normalt värde och dåligt värde
+    function uppdateraNuvarde() {
+      let checkbox = document.getElementById("daligtNuvarde");
+      nuvarde = checkbox.checked ? daligtNuvarde : normaltNuvarde;
+      document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
+      uppdateraBeräkningar();
+    }
+
     function uppdateraBeräkningar() {
+      // Hämta multipel (med decimals i koden) men vi visar som heltal
       let multipel = parseFloat(document.getElementById("multipel").value);
-      let avkastning = parseFloat(document.getElementById("avkastning").value) / 100;
+
+      // Hämta avkastningsprocent (heltal), men beräkna decimalt
+      let avkastningRange = document.getElementById("avkastning");
+      let avkastningProcent = parseInt(avkastningRange.value, 10); 
+      let avkastning = avkastningProcent / 100;
+
+      // Hämta huslån, IBB och om man vill betala huslån
       let huslan = parseFloat(document.getElementById("huslan").value);
       let ibb = parseFloat(document.getElementById("ibb").value);
       let betalaHuslan = document.getElementById("betalaHuslan").checked;
 
-      document.getElementById("multipelValue").textContent = multipel.toFixed(1);
-      document.getElementById("avkastningValue").textContent = (avkastning * 100).toFixed(0) + "%";
+      // Visa multipeln som heltal (avrundat)
+      document.getElementById("multipelValue").textContent = Math.round(multipel).toString();
+      // Visa avkastningsprocent utan decimaler
+      document.getElementById("avkastningValue").textContent = avkastningProcent + "%";
 
+      // Räkna fram gränsvärde
       let gransvarde = ibb * 2.75;
       document.getElementById("gransvarde").textContent = formatNumber(gransvarde);
 
+      // Försäljningspris (ev. decimal i multipel men rundas ej i själva multiplikationen)
       let försäljningspris = nuvarde * multipel;
       let exitKapital = försäljningspris;
+
+      // Skattesatser
       let skattLåg = 0.20;
       let skattHög = 0.50;
 
+      // Uträkning för att betala av huslånet
       let nettoLåg = gransvarde * (1 - skattLåg); 
       let lånebehovEfterLågSkatt = huslan - nettoLåg;
       let bruttoHögBehov = lånebehovEfterLågSkatt / (1 - skattHög);
       let totaltBruttoFörLån = gransvarde + bruttoHögBehov;
       let nettoTotalt = nettoLåg + lånebehovEfterLågSkatt;
 
+      // Om man valt att betala huslånet direkt
       if (betalaHuslan) {
         exitKapital -= totaltBruttoFörLån;
       }
 
-      document.getElementById("resultFörsäljning").innerHTML = `
+      // Skriv ut resultat för försäljning
+      let htmlFörsäljning = `
         <div class="box">
           <p class="result-title">${betalaHuslan ? "Exitbelopp efter huslånsbetalning 🏡" : "Exitbelopp"}</p>
           <p><strong>${formatNumber(exitKapital)}</strong></p>
-          ${betalaHuslan ? `
-            <p><strong>Uträkning av huslånsbetalning:</strong></p>
-            <p>Bruttobelopp som krävs: ${formatNumber(totaltBruttoFörLån)}</p>
-            <p>- Gränsvärde 3:12 (20% skatt): ${formatNumber(gransvarde)} → Netto: ${formatNumber(nettoLåg)}</p>
-            <p>- Resterande belopp (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lånebehovEfterLågSkatt)}</p>
-            <p><strong>Totalt netto använt för lån:</strong> ${formatNumber(nettoTotalt)}</p>
-          ` : ""}
-        </div>
       `;
+      if (betalaHuslan) {
+        htmlFörsäljning += `
+          <p><strong>Uträkning av huslånsbetalning:</strong></p>
+          <p>Bruttobelopp som krävs: ${formatNumber(totaltBruttoFörLån)}</p>
+          <p>- Gränsvärde 3:12 (20% skatt): ${formatNumber(gransvarde)} → Netto: ${formatNumber(nettoLåg)}</p>
+          <p>- Resterande belopp (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lånebehovEfterLågSkatt)}</p>
+          <p><strong>Totalt netto använt för lån:</strong> ${formatNumber(nettoTotalt)}</p>
+        `;
+      }
+      htmlFörsäljning += `</div>`;
+      document.getElementById("resultFörsäljning").innerHTML = htmlFörsäljning;
 
-      let totalAvkastningJust = exitKapital * avkastning;
-      let totalAvkastningOjust = försäljningspris * avkastning;
+      // Beräkna utdelning beroende på exitKapital
+      let totalAvkastningJust = exitKapital * avkastning;   // Om huslånet betalats
+      let totalAvkastningOjust = försäljningspris * avkastning; // Om huslånet ej betalats alls
 
       let utdelningJust = beräknaUtdelning(totalAvkastningJust, gransvarde, skattLåg, skattHög);
       let utdelningOjust = beräknaUtdelning(totalAvkastningOjust, gransvarde, skattLåg, skattHög);
       let skillnad = utdelningOjust.totalNetto - utdelningJust.totalNetto;
 
-      document.getElementById("resultAktieutdelning").innerHTML = `
-        <div class="box">
-          <p class="result-title">Aktieutdelning</p>
-          <p>Brutto: ${formatNumber(totalAvkastningJust)}</p>
-          <p>Inom gränsvärde (20% skatt): ${formatNumber(Math.min(totalAvkastningJust, gransvarde))} → Netto: ${formatNumber(Math.min(totalAvkastningJust, gransvarde) * (1 - skattLåg))}</p>
-          <p>Över gränsvärde (50% skatt): ${formatNumber(totalAvkastningJust > gransvarde ? totalAvkastningJust - gransvarde : 0)} → Netto: ${formatNumber(totalAvkastningJust > gransvarde ? (totalAvkastningJust - gransvarde) * (1 - skattHög) : 0)}</p>
-          <p><strong>Totalt netto utdelning:</strong> ${formatNumber(utdelningJust.totalNetto)}</p>
-          ${betalaHuslan ? `
-            <p><strong>Utan att betala huslån:</strong> ${formatNumber(utdelningOjust.totalNetto)}</p>
-            <p><strong>Skillnad:</strong> ${formatNumber(skillnad)}</p>
-          ` : ""}
-        </div>
-      `;
+      // Fyll i värden i aktieutdelnings-rutan
+      document.getElementById("brutto").textContent = formatNumber(totalAvkastningJust);
+      document.getElementById("inomGransvardeBrutto").textContent = formatNumber(utdelningJust.bruttoLåg);
+      document.getElementById("inomGransvardeNetto").textContent = formatNumber(utdelningJust.nettoLåg);
+      document.getElementById("overGransvardeBrutto").textContent = formatNumber(utdelningJust.bruttoHög);
+      document.getElementById("overGransvardeNetto").textContent = formatNumber(utdelningJust.nettoHög);
+      document.getElementById("totaltNetto").textContent = formatNumber(utdelningJust.totalNetto);
+
+      // Om man har bockat i att betala huslån visar vi även ”utan att betala huslån”
+      let utdHuslanDiv = document.getElementById("utdelningHuslan");
+      if (betalaHuslan) {
+        utdHuslanDiv.style.display = "block";
+        document.getElementById("utdelningOjust").textContent = formatNumber(utdelningOjust.totalNetto);
+        document.getElementById("utdelningSkillnad").textContent = formatNumber(skillnad);
+      } else {
+        utdHuslanDiv.style.display = "none";
+      }
     }
 
+    // Init
     window.onload = function() {
       uppdateraNuvarde();
     };
   </script>
-
 </body>
 </html>
