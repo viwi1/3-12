@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huslånekostnader per år</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h2 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #ddd;
+        }
+        input {
+            padding: 5px;
+            margin: 5px;
+            width: 100px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Huslånekostnader per år</h2>
+
+    <h3>Ange lånebelopp och räntor</h3>
+    <label>Startvärde Lån 1 (SEK): </label>
+    <input type="number" id="lanebelopp1" value="1043100" step="1000"><br>
+    <label>Startvärde Lån 2 (SEK): </label>
+    <input type="number" id="lanebelopp2" value="1042200" step="1000"><br>
+
+    <label>Fast ränta Lån 1 (%): </label>
+    <input type="number" id="ranta1" value="3.44" step="0.01"><br>
+    <label>Fast ränta Lån 2 (%): </label>
+    <input type="number" id="ranta2" value="3.19" step="0.01"><br>
+
+    <h3>Amortering</h3>
+    <label><input type="checkbox" id="amorteringCheckbox" checked> Amortera lånen</label><br>
+    <label>Amortering Lån 1 (SEK/mån): </label>
+    <input type="number" id="amortering1" value="900" step="100"><br>
+    <label>Amortering Lån 2 (SEK/mån): </label>
+    <input type="number" id="amortering2" value="900" step="100"><br>
+
+    <table id="lanTabell">
+        <thead>
+            <tr>
+                <th>År</th>
+                <th>Räntekostnad Lån 1</th>
+                <th>Amortering Lån 1</th>
+                <th>Räntekostnad Lån 2</th>
+                <th>Amortering Lån 2</th>
+                <th>Total räntekostnad</th>
+                <th>Total amortering</th>
+                <th>Totalkostnad per år</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        document.querySelectorAll("input").forEach(input => input.addEventListener("input", beraknaLan));
+
+        function beraknaLan() {
+            let lanebelopp1 = parseInt(document.getElementById("lanebelopp1").value);
+            let lanebelopp2 = parseInt(document.getElementById("lanebelopp2").value);
+            let ranta1 = parseFloat(document.getElementById("ranta1").value) / 100;
+            let ranta2 = parseFloat(document.getElementById("ranta2").value) / 100;
+            let amorteringAktiverad = document.getElementById("amorteringCheckbox").checked;
+            let amortering1 = amorteringAktiverad ? parseInt(document.getElementById("amortering1").value) * 12 : 0;
+            let amortering2 = amorteringAktiverad ? parseInt(document.getElementById("amortering2").value) * 12 : 0;
+
+            let tableBody = document.querySelector("#lanTabell tbody");
+            tableBody.innerHTML = "";
+
+            let startÅr = 2025;
+            let slutÅr = 2030;
+
+            for (let år = startÅr; år < slutÅr; år++) {
+                let rantekostnad1 = Math.round(lanebelopp1 * ranta1);
+                let rantekostnad2 = Math.round(lanebelopp2 * ranta2);
+
+                if (lanebelopp1 - amortering1 < 0) amortering1 = lanebelopp1;
+                if (lanebelopp2 - amortering2 < 0) amortering2 = lanebelopp2;
+
+                let totalRantekostnad = rantekostnad1 + rantekostnad2;
+                let totalAmortering = amortering1 + amortering2;
+                let totalÅrskostnad = totalRantekostnad + totalAmortering;
+
+                let row = `<tr>
+                    <td>${år}</td>
+                    <td>${rantekostnad1.toLocaleString()} SEK</td>
+                    <td>${amortering1.toLocaleString()} SEK</td>
+                    <td>${rantekostnad2.toLocaleString()} SEK</td>
+                    <td>${amortering2.toLocaleString()} SEK</td>
+                    <td>${totalRantekostnad.toLocaleString()} SEK</td>
+                    <td>${totalAmortering.toLocaleString()} SEK</td>
+                    <td>${totalÅrskostnad.toLocaleString()} SEK</td>
+                </tr>`;
+
+                tableBody.innerHTML += row;
+
+                lanebelopp1 = Math.max(0, lanebelopp1 - amortering1);
+                lanebelopp2 = Math.max(0, lanebelopp2 - amortering2);
+            }
+        }
+
+        beraknaLan();
+    </script>
+
+</body>
+</html>
