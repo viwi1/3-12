@@ -37,6 +37,13 @@
     <span class="slider-value" id="multipelValue">1.5</span>
   </div>
 
+  <!-- Slider för avkastning -->
+  <div class="slider-container">
+    <label for="avkastning">Avkastning (% per år):</label>
+    <input type="range" id="avkastning" min="1" max="30" step="1" value="10" oninput="uppdateraBeräkningar()">
+    <span class="slider-value" id="avkastningValue">10%</span>
+  </div>
+
   <label for="huslan">Nuvarande huslån (kr):</label>
   <input type="number" id="huslan" value="2000000" oninput="uppdateraBeräkningar()">
 
@@ -76,11 +83,13 @@
 
     function uppdateraBeräkningar() {
       let multipel = parseFloat(document.getElementById("multipel").value);
+      let avkastning = parseFloat(document.getElementById("avkastning").value) / 100;
       let huslan = parseFloat(document.getElementById("huslan").value);
       let ibb = parseFloat(document.getElementById("ibb").value);
       let betalaHuslan = document.getElementById("betalaHuslan").checked;
 
       document.getElementById("multipelValue").textContent = multipel.toFixed(1);
+      document.getElementById("avkastningValue").textContent = (avkastning * 100).toFixed(0) + "%";
 
       let gransvarde = ibb * 2.75;
       document.getElementById("gransvarde").textContent = formatNumber(gransvarde);
@@ -90,7 +99,6 @@
       let skattLåg = 0.20;
       let skattHög = 0.50;
 
-      // Beräkna för huslånsbetalning enligt 3:12
       let nettoLåg = gransvarde * (1 - skattLåg); 
       let lånebehovEfterLågSkatt = huslan - nettoLåg;
       let bruttoHögBehov = lånebehovEfterLågSkatt / (1 - skattHög);
@@ -100,14 +108,6 @@
       if (betalaHuslan) {
         exitKapital -= totaltBruttoFörLån;
       }
-
-      // Exitkapital används som underlag vid 3:12-beräkning av utdelning
-      let totalAvkastningJust = exitKapital * 0.1;    // Beräknad bruttoavkastning med huslån betalt
-      let totalAvkastningOjust = försäljningspris * 0.1; // Beräknad bruttoavkastning utan huslånsbetalning
-
-      let utdelningJust = beräknaUtdelning(totalAvkastningJust, gransvarde, skattLåg, skattHög);
-      let utdelningOjust = beräknaUtdelning(totalAvkastningOjust, gransvarde, skattLåg, skattHög);
-      let skillnad = utdelningOjust.totalNetto - utdelningJust.totalNetto;
 
       document.getElementById("resultFörsäljning").innerHTML = `
         <div class="box">
@@ -123,24 +123,26 @@
         </div>
       `;
 
-      let aktieutdelningHtml = `
+      let totalAvkastningJust = exitKapital * avkastning;
+      let totalAvkastningOjust = försäljningspris * avkastning;
+
+      let utdelningJust = beräknaUtdelning(totalAvkastningJust, gransvarde, skattLåg, skattHög);
+      let utdelningOjust = beräknaUtdelning(totalAvkastningOjust, gransvarde, skattLåg, skattHög);
+      let skillnad = utdelningOjust.totalNetto - utdelningJust.totalNetto;
+
+      document.getElementById("resultAktieutdelning").innerHTML = `
         <div class="box">
           <p class="result-title">Aktieutdelning</p>
           <p>Brutto: ${formatNumber(totalAvkastningJust)}</p>
           <p>Inom gränsvärde (20% skatt): ${formatNumber(Math.min(totalAvkastningJust, gransvarde))} → Netto: ${formatNumber(Math.min(totalAvkastningJust, gransvarde) * (1 - skattLåg))}</p>
           <p>Över gränsvärde (50% skatt): ${formatNumber(totalAvkastningJust > gransvarde ? totalAvkastningJust - gransvarde : 0)} → Netto: ${formatNumber(totalAvkastningJust > gransvarde ? (totalAvkastningJust - gransvarde) * (1 - skattHög) : 0)}</p>
           <p><strong>Totalt netto utdelning:</strong> ${formatNumber(utdelningJust.totalNetto)}</p>
+          ${betalaHuslan ? `
+            <p><strong>Utan att betala huslån:</strong> ${formatNumber(utdelningOjust.totalNetto)}</p>
+            <p><strong>Skillnad:</strong> ${formatNumber(skillnad)}</p>
+          ` : ""}
+        </div>
       `;
-
-      if (betalaHuslan) {
-        aktieutdelningHtml += `
-          <p><strong>Utan att betala huslån:</strong> ${formatNumber(utdelningOjust.totalNetto)}</p>
-          <p><strong>Skillnad:</strong> ${formatNumber(skillnad)}</p>
-        `;
-      }
-
-      aktieutdelningHtml += `</div>`;
-      document.getElementById("resultAktieutdelning").innerHTML = aktieutdelningHtml;
     }
 
     window.onload = function() {
