@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>3:12 Utdelningskalkylator – Fungerande Exitruta & Popups</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Nuvarande värde -->
+<p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
+<div class="checkbox-container">
+  <input type="checkbox" id="daligtNuvarde" onchange="uppdateraNuvarde()">
+  <label for="daligtNuvarde">3 000 000 kr</label>
+</div>
+
+<!-- Multipel -->
+<div class="slider-container">
+  <label for="multipel">Multipel:</label>
+  <input 
+    type="range" 
+    id="multipel" 
+    min="1.1" max="4" step="0.1"
+    value="2.8"
+    oninput="uppdateraBeräkningar()"
+  >
+  <span class="slider-value" id="multipelValue">1.5</span>
+</div>
+
+<!-- Checkbox huslån -->
+<div class="checkbox-container">
+  <input type="checkbox" id="betalaHuslan" onchange="uppdateraBeräkningar()" checked>
+  <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
+</div>
+
+<!-- Exitruta -->
+<div id="resultFörsäljning"></div>
+
+<!-- Utdelning -->
+<div id="resultAktieutdelning">
+  <div class="box">
+    <p class="result-title">Aktieutdelning</p>
+    <div class="slider-container">
+      <label for="avkastning">Avkastning (% per år):</label>
+      <input 
+        type="range" 
+        id="avkastning" 
+        min="1" max="30" step="1"
+        value="10"
+        oninput="uppdateraBeräkningar()"
+      >
+      <span class="slider-value" id="avkastningValue">10%</span>
+    </div>
+    <p>Brutto: <span id="brutto"></span></p>
+    <p>
+      Inom gränsvärde (20% skatt): 
+      <span class="link-like" id="inomGransvardeBrutto" onclick="openOverlayIBB()"></span>
+      → Netto: <span id="inomGransvardeNetto"></span>
+    </p>
+    <p>
+      Över gränsvärde (50% skatt): 
+      <span id="overGransvardeBrutto"></span>
+      → Netto: <span id="overGransvardeNetto"></span>
+    </p>
+    <p>
+      <strong>Totalt netto utdelning:</strong>
+      <span id="totaltNetto"></span>
+    </p>
+  </div>
+</div>
+
+<!-- Script -->
+<script src="js/state.js"></script>
+<script src="js/main.js"></script>
+<script src="js/exitberakning.js"></script>
+<script src="js/huslanmodul.js"></script>
+<script src="js/utgiftsmodul.js"></script>
+</body>
+</html>
