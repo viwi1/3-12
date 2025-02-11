@@ -77,10 +77,8 @@
 </head>
 <body>
 
-<h3>Kapital efter försäljning och utdelning per år</h3>
-
 <!-- Nuvarande värde -->
-<p><strong>Nuvarande värde på bolaget:</strong> <span id="nuvarde"></span></p>
+<p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
 <div class="checkbox-container">
   <input type="checkbox" id="daligtNuvarde" onchange="uppdateraNuvarde()">
   <label for="daligtNuvarde">3 000 000 kr</label>
@@ -93,7 +91,7 @@
     type="range" 
     id="multipel" 
     min="1.1" max="4" step="0.1"
-    value="1.5"
+    value="2.8"
     oninput="uppdateraBeräkningar()"
   >
   <span class="slider-value" id="multipelValue">1.5</span>
@@ -101,7 +99,7 @@
 
 <!-- Checkbox huslån -->
 <div class="checkbox-container">
-  <input type="checkbox" id="betalaHuslan" onchange="uppdateraBeräkningar()">
+  <input type="checkbox" id="betalaHuslan" onchange="uppdateraBeräkningar()" checked>
   <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
 </div>
 
