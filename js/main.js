@@ -1,10 +1,11 @@
 import { updateState, getState } from "./state.js";
 import { uppdateraBeräkningar } from "./exitberakning.js"; // 🔥 IMPORTERA FUNKTIONEN
 
-// ✅ Formateringsfunktion (exporteras också)
-export function formatNumber(num) {
+// ✅ Formateringsfunktion (exporteras korrekt)
+function formatNumber(num) {
     return Math.round(num).toLocaleString("sv-SE") + " kr";
 }
+export { formatNumber };
 
 // 🏁 Säkerställ att startvärde syns vid sidladdning
 document.addEventListener("DOMContentLoaded", function () {
