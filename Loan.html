@@ -61,6 +61,7 @@
         <thead>
             <tr>
                 <th>År</th>
+                <th>Låneskuld vid årets början</th>
                 <th>Räntekostnad Lån 1</th>
                 <th>Amortering Lån 1</th>
                 <th>Räntekostnad Lån 2</th>
@@ -93,6 +94,8 @@
             let slutÅr = 2030;
 
             for (let år = startÅr; år < slutÅr; år++) {
+                let skuldbörjan = lanebelopp1 + lanebelopp2; // Låneskuld vid årets början
+
                 let rantekostnad1 = Math.round(lanebelopp1 * ranta1);
                 let rantekostnad2 = Math.round(lanebelopp2 * ranta2);
 
@@ -105,6 +108,7 @@
 
                 let row = `<tr>
                     <td>${år}</td>
+                    <td>${skuldbörjan.toLocaleString()} SEK</td>
                     <td>${rantekostnad1.toLocaleString()} SEK</td>
                     <td>${amortering1.toLocaleString()} SEK</td>
                     <td>${rantekostnad2.toLocaleString()} SEK</td>
