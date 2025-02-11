@@ -1,0 +1,79 @@
+body {
+  font-family: Arial, sans-serif;
+  max-width: 650px;
+  margin: 20px auto;
+  padding: 10px;
+}
+
+.slider-container {
+  display: flex; 
+  align-items: center; 
+  margin-bottom: 10px;
+}
+
+.slider-value {
+  width: 60px; 
+  margin-left: 10px; 
+  font-weight: bold;
+}
+
+.checkbox-container {
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  margin-bottom: 10px;
+}
+
+.box {
+  border: 1px solid #ccc;
+  padding: 15px; 
+  margin-top: 10px; 
+  background: #f9f9f9;
+}
+
+.result-title {
+  font-size: 18px; 
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.link-like {
+  text-decoration: underline; 
+  color: blue; 
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Overlay + popup (mindre padding) */
+.overlay {
+  display: none;
+  position: fixed; 
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: transparent; 
+  z-index: 999;
+}
+
+.popup {
+  position: absolute; 
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  width: 280px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.closePopup {
+  float: right; 
+  cursor: pointer; 
+  font-weight: bold; 
+  margin-left: 8px; 
+  color: #666;
+}
+
+.closePopup:hover { 
+  color: #000;
+}
