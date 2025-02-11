@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mental Bokföring</title>
+  <title>Utgiftskoll</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -41,7 +41,7 @@
       font-size: 14px;
       font-weight: bold;
       white-space: nowrap;
-      margin-top: 5px;
+      margin-right: 10px; /* Flyttade texten till vänster om stapeln */
     }
     .input-group {
       margin: 10px 0;
@@ -52,10 +52,11 @@
   </style>
 </head>
 <body>
-  <h2>Mental Bokföring</h2>
+  <h2>Utgiftskoll</h2>
   <div class="container">
     <label for="income">Ange inkomst per år:</label>
-    <input type="range" id="income" min="0" max="2000000" step="10000" value="0" oninput="updateBars()">
+    <!-- Max satt till 1 000 000 kr -->
+    <input type="range" id="income" min="0" max="1000000" step="10000" value="0" oninput="updateBars()">
     <span id="income-display">0 kr</span>
     
     <div id="expenses"></div>
@@ -82,7 +83,7 @@
       { name: "Flexen", value: 196442 },
       { name: "Klarna - presenter och skoj", value: 60000 },
       { name: "Resa", value: 100000 },
-      { name: "Lån och amortering", value: 115245 },  // 57719+57526
+      { name: "Lån och amortering", value: 115245 },  // 57719 + 57526
       { name: "Lån och amortering CSN", value: 8748 }
     ];
     
@@ -102,7 +103,6 @@
       // Om inkomsten täcker alla utgifter, allokera fullt
       if (income >= totalCost) {
         let fullAlloc = expenses.map(item => item.value);
-        console.log("DEBUG: Inkomst >= Totala utgifter. Full allokering:", fullAlloc);
         return fullAlloc;
       }
       
@@ -123,12 +123,6 @@
       
       // Slutlig allocation: allocated[i] = U[i] * (income / S)
       let allocated = U.map(u => u * (income / S));
-      
-      console.log("DEBUG: r =", r);
-      console.log("DEBUG: boosts =", boosts);
-      console.log("DEBUG: U =", U);
-      console.log("DEBUG: S =", S);
-      console.log("DEBUG: allocated =", allocated);
       
       return allocated;
     }
@@ -159,8 +153,6 @@
           Math.round(fillPercentage) + "% | " +
           formatCurrency(allocated[index]) + " (" + formatCurrency(allocatedMonthly) +
           " / mån) av " + formatCurrency(entry.value) + " (" + formatCurrency(expenseMonthly) + " / mån)";
-          
-        console.log(`DEBUG: ${entry.name}: allocated = ${allocated[index]}, fill% = ${fillPercentage.toFixed(2)}% (utgift = ${entry.value})`);
       });
     }
     
