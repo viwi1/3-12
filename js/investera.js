@@ -7,8 +7,8 @@ function beräknaInvestering() {
 
     let avkastning = avkastningProcent / 100;
     
-    // ✅ Använd redan beräknat exitVarde från exitberäkningen
-    let investeratBelopp = getState("exitVarde") || 0; 
+    // ✅ Hämta det justerade exitbeloppet från exitberäkningen
+    let investeratBelopp = getState("exitVarde") || 0;  
 
     // ✅ Bruttoavkastning på det investerade beloppet
     let totalAvkastning = investeratBelopp * avkastning;
