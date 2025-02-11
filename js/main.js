@@ -14,3 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
     uppdateraBeräkningar();
 });
 
+export function formatNumber(num) {
+    return Math.round(num).toLocaleString("sv-SE") + " kr";
+}
