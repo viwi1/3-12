@@ -1,10 +1,9 @@
 const State = {
-    exitVarde: 0,  // Exitkapital från exitberakning.js
+    exitVarde: 6855837,  // Standardvärde på bolaget
     huslan: 2020500,  // Standard huslån
     nettoAvkastning: 0 // Nettoavkastning från utdelningsberäkning
 };
 
-// Uppdaterar en state-variabel
 function updateState(key, value) {
     if (State.hasOwnProperty(key)) {
         State[key] = value;
@@ -13,7 +12,6 @@ function updateState(key, value) {
     }
 }
 
-// Hämtar en state-variabel
 function getState(key) {
     return State.hasOwnProperty(key) ? State[key] : null;
 }
