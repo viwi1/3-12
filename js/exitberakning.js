@@ -1,36 +1,54 @@
 import { updateState, getState } from "./state.js";
-import { formatNumber } from "./main.js"; 
-
-function uppdateraNuvarde() {
-    let nuvarde = document.getElementById("daligtNuvarde").checked ? 3000000 : 6855837;
-    updateState("exitVarde", nuvarde); // ✅ Spara originalvärdet en gång
-    document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
-    uppdateraBeräkningar();
-}
-
-document.getElementById("daligtNuvarde").addEventListener("change", uppdateraNuvarde);
+import { formatNumber } from "./main.js"; // ✅ Importera formateringsfunktionen
 
 function uppdateraBeräkningar() {
-    let multipel = parseFloat(document.getElementById("multipel").value);
-    document.getElementById("multipelValue").textContent = multipel.toFixed(1);
+    let multipel = parseFloat(document.getElementById("multipel").value) || 1;
+    let nuvarde = getState("exitVarde") || 0;  // ✅ Hämta aktuellt bolagsvärde
+    let huslan = getState("huslan") || 0;
+    let betalaHuslan = document.getElementById("betalaHuslan").checked; // ✅ Kolla om checkboxen är markerad
 
-    // ✅ Hämta originalvärdet från state, inte det modifierade!
-    let originalExitVarde = document.getElementById("daligtNuvarde").checked ? 3000000 : 6855837;
-    let exitKapital = originalExitVarde * multipel;
+    let försäljningspris = nuvarde * multipel; // ✅ Exitkapital utan justering
+    let exitKapital = försäljningspris;
 
-    // 🔥 Spara INTE detta i state för att undvika ackumulering!
-    // updateState("exitVarde", exitKapital); ❌ Ta bort denna rad!
+    let skattLåg = 0.20;
+    let skattHög = 0.50;
+    let gränsvärde312 = 684166;
 
+    let nettoLåg = gränsvärde312 * (1 - skattLåg); 
+    let lånebehovEfterLågSkatt = huslan - nettoLåg;
+    let bruttoHögBehov = lånebehovEfterLågSkatt / (1 - skattHög);
+    let totaltBruttoFörLån = gränsvärde312 + bruttoHögBehov;
+    let nettoTotalt = nettoLåg + lånebehovEfterLågSkatt;
+
+    // ✅ Om checkboxen är markerad, justera exitbeloppet
+    if (betalaHuslan) {
+        exitKapital -= totaltBruttoFörLån;
+    }
+
+    // ✅ Uppdatera state för investeringen
+    updateState("exitVarde", exitKapital);
+
+    // ✅ Uppdatera HTML
     document.getElementById("resultFörsäljning").innerHTML = `
         <div class="box">
-            <p class="result-title">Exitbelopp</p>
+            <p class="result-title">${betalaHuslan ? "Exitbelopp efter huslånsbetalning 🏡" : "Exitbelopp"}</p>
             <p><strong>${formatNumber(exitKapital)}</strong></p>
+            ${betalaHuslan ? `
+            <p><strong>Huslån:</strong> ${formatNumber(huslan)}</p>
+            <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoFörLån)}</p>
+            <p>- ${formatNumber(gränsvärde312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
+            <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lånebehovEfterLågSkatt)}</p>
+            <p><strong>Totalt netto använt för lån:</strong> ${formatNumber(nettoTotalt)}</p>
+            ` : ""}
         </div>
     `;
 }
 
-// ✅ Lägg till event listeners på sliders och checkbox
-document.getElementById("multipel").addEventListener("input", uppdateraBeräkningar);
-document.getElementById("betalaHuslan").addEventListener("change", uppdateraBeräkningar);
+// ✅ Kör funktionen direkt vid sidladdning
+document.addEventListener("DOMContentLoaded", function () {
+    uppdateraBeräkningar(); // 🔥 Beräkna exitvärde vid sidladdning
+    document.getElementById("multipel").addEventListener("input", uppdateraBeräkningar);
+    document.getElementById("betalaHuslan").addEventListener("change", uppdateraBeräkningar);
+});
 
 export { uppdateraBeräkningar };
