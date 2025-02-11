@@ -3,11 +3,12 @@ import { formatNumber } from "./main.js"; // ✅ Importera formateringsfunktione
 
 function uppdateraBeräkningar() {
     let multipel = parseFloat(document.getElementById("multipel").value) || 1;
-    let nuvarde = getState("nuvarde") || 0;  // ✅ Hämta aktuellt bolagsvärde
+    let startVarde = getState("startVarde") || 0;  // ✅ Hämta originalvärdet, inte redan justerat exitVarde
     let huslan = getState("huslan") || 0;
     let betalaHuslan = document.getElementById("betalaHuslan").checked; // ✅ Kolla om checkboxen är markerad
 
-    let försäljningspris = nuvarde * multipel; // ✅ Exitkapital utan justering
+    // ✅ Använd `startVarde` istället för `exitVarde` för att undvika multipla multiplikationer
+    let försäljningspris = startVarde * multipel; // ✅ Exitkapital utan justering
     let exitKapital = försäljningspris;
 
     let skattLåg = 0.20;
@@ -25,7 +26,7 @@ function uppdateraBeräkningar() {
         exitKapital -= totaltBruttoFörLån;
     }
 
-    // ✅ 🔥 SKICKA EXITVÄRDET TILL STATE
+    // ✅ 🔥 SKICKA EXITVÄRDET TILL STATE EN GÅNG, UTAN LOOPNING
     updateState("exitVarde", exitKapital);
     console.log("🚀 Uppdaterat exitVarde i state:", exitKapital); // ✅ Debugging
 
@@ -45,11 +46,17 @@ function uppdateraBeräkningar() {
     `;
 }
 
-// ✅ Kör funktionen direkt vid sidladdning
+// ✅ Kör funktionen direkt vid sidladdning och säkerställ att den körs **endast en gång per ändring**
 document.addEventListener("DOMContentLoaded", function () {
     uppdateraBeräkningar(); // 🔥 Beräkna exitvärde vid sidladdning
-    document.getElementById("multipel").addEventListener("input", uppdateraBeräkningar);
-    document.getElementById("betalaHuslan").addEventListener("change", uppdateraBeräkningar);
+    document.getElementById("multipel").addEventListener("input", () => {
+        console.log("Multipel ändrad, uppdaterar exitberäkning...");
+        uppdateraBeräkningar();
+    });
+    document.getElementById("betalaHuslan").addEventListener("change", () => {
+        console.log("Checkbox för huslån ändrad, uppdaterar exitberäkning...");
+        uppdateraBeräkningar();
+    });
 });
 
 export { uppdateraBeräkningar };
