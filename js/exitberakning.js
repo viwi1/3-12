@@ -3,13 +3,20 @@ import { formatNumber } from "./main.js"; // ✅ Importera formateringsfunktione
 
 function uppdateraBeräkningar() {
     let multipel = parseFloat(document.getElementById("multipel").value) || 1;
-    let startVarde = getState("startVarde") || 0;  // ✅ Hämta originalvärdet, inte redan justerat exitVarde
+    let startVarde = getState("startVarde") || 0; // ✅ Hämta originalvärdet från state
     let huslan = getState("huslan") || 0;
     let betalaHuslan = document.getElementById("betalaHuslan").checked; // ✅ Kolla om checkboxen är markerad
 
-    // ✅ Använd `startVarde` istället för `exitVarde` för att undvika multipla multiplikationer
-    let försäljningspris = startVarde * multipel; // ✅ Exitkapital utan justering
+    console.log("🔎 Startvärde:", startVarde);
+    console.log("🔎 Multipel:", multipel);
+    console.log("🔎 Huslån:", huslan);
+    console.log("🔎 Checkbox Huslån:", betalaHuslan);
+
+    // ✅ Beräkna exitkapital korrekt (baserat på startvärde och multipel)
+    let försäljningspris = startVarde * multipel;
     let exitKapital = försäljningspris;
+
+    console.log("🔎 Försäljningspris (multipel använt):", försäljningspris);
 
     let skattLåg = 0.20;
     let skattHög = 0.50;
@@ -17,18 +24,27 @@ function uppdateraBeräkningar() {
 
     let nettoLåg = gränsvärde312 * (1 - skattLåg); 
     let lånebehovEfterLågSkatt = huslan - nettoLåg;
-    let bruttoHögBehov = lånebehovEfterLågSkatt / (1 - skattHög);
+    let bruttoHögBehov = lånebehovEfterLågSkatt > 0 ? lånebehovEfterLågSkatt / (1 - skattHög) : 0;
     let totaltBruttoFörLån = gränsvärde312 + bruttoHögBehov;
-    let nettoTotalt = nettoLåg + lånebehovEfterLågSkatt;
+    let nettoTotalt = nettoLåg + (lånebehovEfterLågSkatt > 0 ? lånebehovEfterLågSkatt : 0);
+
+    console.log("🔎 Bruttobelopp för lån:", totaltBruttoFörLån);
 
     // ✅ Om checkboxen är markerad, justera exitbeloppet
     if (betalaHuslan) {
         exitKapital -= totaltBruttoFörLån;
+        console.log("✅ Huslån betalat, nytt exitKapital:", exitKapital);
     }
 
-    // ✅ 🔥 SKICKA EXITVÄRDET TILL STATE EN GÅNG, UTAN LOOPNING
+    // 🚨 **Säkerhetskontroll: Se till att exitKapital inte blir negativt!**
+    if (exitKapital < 0) {
+        console.warn("🚨 Varning! Exitbelopp är negativt. Justerar till 0.");
+        exitKapital = 0;
+    }
+
+    // ✅ 🔥 SKICKA EXITVÄRDET TILL STATE
     updateState("exitVarde", exitKapital);
-    console.log("🚀 Uppdaterat exitVarde i state:", exitKapital); // ✅ Debugging
+    console.log("🚀 Uppdaterat exitVarde i state:", exitKapital);
 
     // ✅ Uppdatera HTML
     document.getElementById("resultFörsäljning").innerHTML = `
