@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mental Bokföring</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+    }
+    .container {
+      width: 500px;
+      margin: auto;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+    .bar-container {
+      width: 100%;
+      background-color: #ddd;
+      height: 30px;
+      margin: 10px 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      width: 0;
+      background-color: #007bff;
+      transition: width 0.5s ease-in-out;
+      border-radius: 5px 0 0 5px;
+    }
+    .bar-info {
+      font-size: 14px;
+      font-weight: bold;
+      white-space: nowrap;
+      margin-top: 5px;
+    }
+    .input-group {
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>Mental Bokföring</h2>
+  <div class="container">
+    <label for="income">Ange inkomst per år:</label>
+    <input type="range" id="income" min="0" max="2000000" step="10000" value="0" oninput="updateBars()">
+    <span id="income-display">0 kr</span>
+    
+    <div id="expenses"></div>
+    
+    <h3>Summeringar</h3>
+    <p>Total inkomst: <span id="totalIncome">0 kr</span></p>
+    <p>Totala utgifter: <span id="totalCost">0 kr</span></p>
+    <p>Inkomst täckning: <span id="coverage">0%</span></p>
+  </div>
+  
+  <script>
+    // Formatera valuta utan decimaler med tusentalsavgränsare
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 0 }).format(value) + ' kr';
+    }
+    
+    // Lista med utgifter (defaultvärden, med Lån och amortering 1 & 2 ihop)
+    let expenses = [
+      { name: "BRF Avgift", value: 95580 },
+      { name: "Hemförsäkring Dina försäkringar", value: 3420 },
+      { name: "Fritids och förskola", value: 28524 },
+      { name: "El vattenfall Elnät", value: 12726 },
+      { name: "El Tibbler", value: 6252 },
+      { name: "Flexen", value: 196442 },
+      { name: "Klarna - presenter och skoj", value: 60000 },
+      { name: "Resa", value: 100000 },
+      { name: "Lån och amortering", value: 115245 },  // 57719+57526
+      { name: "Lån och amortering CSN", value: 8748 }
+    ];
+    
+    // Parameter: exponent för boost. Testa med α = 1.
+    const alpha = 1;
+    
+    // Funktion för att allokera inkomsten enligt den nya modellen
+    function allocateIncome(income) {
+      let n = expenses.length;
+      let totalCost = expenses.reduce((sum, item) => sum + item.value, 0);
+      
+      // Om inkomst är noll eller mindre, returnera noll för alla
+      if (income <= 0) {
+        return Array(n).fill(0);
+      }
+      
+      // Om inkomsten täcker alla utgifter, allokera fullt
+      if (income >= totalCost) {
+        let fullAlloc = expenses.map(item => item.value);
+        console.log("DEBUG: Inkomst >= Totala utgifter. Full allokering:", fullAlloc);
+        return fullAlloc;
+      }
+      
+      // Basproportionell andel: r = income / totalCost
+      let r = income / totalCost;
+      
+      // Beräkna E_max (största utgiften)
+      let E_max = Math.max(...expenses.map(e => e.value));
+      
+      // Boost för varje utgift: boost = (E_max / E)^(alpha)
+      let boosts = expenses.map(e => Math.pow(E_max / e.value, alpha));
+      
+      // U[i] = E[i] * r * boost[i]
+      let U = expenses.map((e, i) => e.value * r * boosts[i]);
+      let S = U.reduce((sum, u) => sum + u, 0);
+      
+      if (S === 0) return Array(n).fill(0);
+      
+      // Slutlig allocation: allocated[i] = U[i] * (income / S)
+      let allocated = U.map(u => u * (income / S));
+      
+      console.log("DEBUG: r =", r);
+      console.log("DEBUG: boosts =", boosts);
+      console.log("DEBUG: U =", U);
+      console.log("DEBUG: S =", S);
+      console.log("DEBUG: allocated =", allocated);
+      
+      return allocated;
+    }
+    
+    function updateBars() {
+      let income = parseInt(document.getElementById('income').value) || 0;
+      document.getElementById('income-display').textContent = formatCurrency(income);
+      document.getElementById('totalIncome').textContent = formatCurrency(income);
+      
+      let totalCost = expenses.reduce((sum, item) => sum + item.value, 0);
+      document.getElementById('totalCost').textContent = formatCurrency(totalCost);
+      let coverage = totalCost > 0 ? (income / totalCost) * 100 : 0;
+      document.getElementById('coverage').textContent = Math.round(coverage) + '%';
+      
+      let allocated = allocateIncome(income);
+      
+      expenses.forEach((entry, index) => {
+        let fillPercentage = (allocated[index] / entry.value) * 100;
+        if (isNaN(fillPercentage)) fillPercentage = 0;
+        if (fillPercentage > 100) fillPercentage = 100;
+        
+        // Skriv ut månadsbelopp: dividera årsvärdet med 12
+        let allocatedMonthly = allocated[index] / 12;
+        let expenseMonthly = entry.value / 12;
+        
+        document.getElementById(`bar${index}`).style.width = fillPercentage + "%";
+        document.getElementById(`bar${index}-info`).textContent =
+          Math.round(fillPercentage) + "% | " +
+          formatCurrency(allocated[index]) + " (" + formatCurrency(allocatedMonthly) +
+          " / mån) av " + formatCurrency(entry.value) + " (" + formatCurrency(expenseMonthly) + " / mån)";
+          
+        console.log(`DEBUG: ${entry.name}: allocated = ${allocated[index]}, fill% = ${fillPercentage.toFixed(2)}% (utgift = ${entry.value})`);
+      });
+    }
+    
+    // Skapa UI för varje utgift
+    let expensesContainer = document.getElementById("expenses");
+    expenses.forEach((expense, index) => {
+      let inputGroup = document.createElement("div");
+      inputGroup.className = "input-group";
+      inputGroup.innerHTML = `
+                <label>${expense.name}:</label>
+                <input type="number" id="cost${index}" value="${expense.value}" oninput="updateBars()">
+            `;
+      expensesContainer.appendChild(inputGroup);
+      
+      let barContainer = document.createElement("div");
+      barContainer.className = "bar-container";
+      barContainer.innerHTML = `<div class="bar" id="bar${index}"></div>`;
+      expensesContainer.appendChild(barContainer);
+      
+      let barInfo = document.createElement("div");
+      barInfo.className = "bar-info";
+      barInfo.id = `bar${index}-info`;
+      barInfo.textContent = `0% | 0 kr (0 kr/mån) av ${formatCurrency(expense.value)} (${formatCurrency(expense.value/12)}/ mån)`;
+      expensesContainer.appendChild(barInfo);
+    });
+    
+    updateBars();
+  </script>
+</body>
+</html>
