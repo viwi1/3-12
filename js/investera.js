@@ -6,7 +6,8 @@ function beräknaInvestering() {
     document.getElementById("avkastningValue").textContent = avkastningProcent + "%";
 
     let avkastning = avkastningProcent / 100;
-    let justeratExitKapital = getState("exitVarde") || 0;  // ✅ Hämta justerat exitkapital
+let investeratBelopp = getState("exitVarde") || 0; // ✅ Använd exitVarde direkt från exitberäkningen
+
     let betalaHuslan = document.getElementById("betalaHuslan").checked;
     let huslan = getState("huslan") || 0;
     let multipel = parseFloat(document.getElementById("multipel").value) || 1;
