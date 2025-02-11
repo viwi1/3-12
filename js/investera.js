@@ -6,7 +6,11 @@ function beräknaInvestering() {
     document.getElementById("avkastningValue").textContent = avkastningProcent + "%";
 
     let avkastning = avkastningProcent / 100;
-    let investeratBelopp = getState("exitVarde") || 0; // ✅ Använd redan beräknat exitVarde
+    
+    // ✅ Använd redan beräknat exitVarde från exitberäkningen
+    let investeratBelopp = getState("exitVarde") || 0; 
+
+    // ✅ Bruttoavkastning på det investerade beloppet
     let totalAvkastning = investeratBelopp * avkastning;
 
     let skattLåg = 0.20;
@@ -32,7 +36,7 @@ function beräknaInvestering() {
 
 // ✅ Kör funktionen direkt vid sidladdning
 document.addEventListener("DOMContentLoaded", function () {
-    beräknaInvestering(); // 🔥 Kör direkt
+    beräknaInvestering(); // 🔥 Kör direkt vid sidladdning
     document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
     document.getElementById("betalaHuslan").addEventListener("change", beräknaInvestering);
     document.getElementById("multipel").addEventListener("input", beräknaInvestering);
