@@ -1,52 +1,52 @@
 import { updateState, getState } from "./state.js";
-import { formatNumber } from "./main.js"; // ✅ Importera formateringsfunktionen
+import { formatNumber } from "./main.js"; // För att kunna formatera siffror
 
 function uppdateraBeräkningar() {
+    // 1️⃣ Hämta multipel och ursprungligt bolagsvärde
     let multipel = parseFloat(document.getElementById("multipel").value) || 1;
-    let startVarde = getState("startVarde") || 0; // ✅ Hämta originalvärdet från state
+    let startVarde = getState("startVarde") || 0; // I state.js bör du ha: State.startVarde = 6855837 etc.
+
+    // 2️⃣ Hämta huslån och kolla om checkboxen är ibockad
     let huslan = getState("huslan") || 0;
-    let betalaHuslan = document.getElementById("betalaHuslan").checked; // ✅ Kolla om checkboxen är markerad
+    let betalaHuslan = document.getElementById("betalaHuslan").checked;
 
-    console.log("🔎 Startvärde:", startVarde);
-    console.log("🔎 Multipel:", multipel);
-    console.log("🔎 Huslån:", huslan);
-    console.log("🔎 Checkbox Huslån:", betalaHuslan);
+    // 3️⃣ Beräkna försäljningspris baserat på multipel
+    let forsaljningspris = startVarde * multipel;
+    console.log("🔎 Försäljningspris (startVarde * multipel):", forsaljningspris);
 
-    // ✅ Beräkna exitkapital korrekt (baserat på startvärde och multipel)
-    let försäljningspris = startVarde * multipel;
-    let exitKapital = försäljningspris;
+    let exitKapital = forsaljningspris;
 
-    console.log("🔎 Försäljningspris (multipel använt):", försäljningspris);
-
+    // Skattesatser och 3:12-gränsvärde
     let skattLåg = 0.20;
     let skattHög = 0.50;
-    let gränsvärde312 = 684166;
+    let gransvarde312 = 684166;
 
-    let nettoLåg = gränsvärde312 * (1 - skattLåg); 
-    let lånebehovEfterLågSkatt = huslan - nettoLåg;
-    let bruttoHögBehov = lånebehovEfterLågSkatt > 0 ? lånebehovEfterLågSkatt / (1 - skattHög) : 0;
-    let totaltBruttoFörLån = gränsvärde312 + bruttoHögBehov;
-    let nettoTotalt = nettoLåg + (lånebehovEfterLågSkatt > 0 ? lånebehovEfterLågSkatt : 0);
+    // 4️⃣ Räkna ut hur mycket som behövs för att betala huslån med 3:12-optimering
+    let nettoLåg = gransvarde312 * (1 - skattLåg);  
+    // Resterande huslån efter att vi använt "lågskattebeloppet"
+    let lanEfterLagSkatt = huslan - nettoLåg;
 
-    console.log("🔎 Bruttobelopp för lån:", totaltBruttoFörLån);
+    // Om det fortfarande finns lånebelopp kvar efter lågskatt
+    let bruttoHögBehov = lanEfterLagSkatt > 0 ? lanEfterLagSkatt / (1 - skattHög) : 0;
+    let totaltBruttoFörLån = gransvarde312 + bruttoHögBehov;  
 
-    // ✅ Om checkboxen är markerad, justera exitbeloppet
+    // Endast om checkboxen är ibockad, dra av från exitKapital
     if (betalaHuslan) {
         exitKapital -= totaltBruttoFörLån;
-        console.log("✅ Huslån betalat, nytt exitKapital:", exitKapital);
+        console.log("✅ Huslån betalas; exitKapital:", exitKapital);
     }
 
-    // 🚨 **Säkerhetskontroll: Se till att exitKapital inte blir negativt!**
+    // 5️⃣ Säkerhetskontroll: Om exitKapital blir negativt, sätt den till 0
     if (exitKapital < 0) {
-        console.warn("🚨 Varning! Exitbelopp är negativt. Justerar till 0.");
+        console.warn("🚨 Varning: exitKapital är negativt. Sätter exitKapital till 0.");
         exitKapital = 0;
     }
 
-    // ✅ 🔥 SKICKA EXITVÄRDET TILL STATE
+    // 6️⃣ Uppdatera state med nya exitKapitalet
     updateState("exitVarde", exitKapital);
-    console.log("🚀 Uppdaterat exitVarde i state:", exitKapital);
+    console.log("🚀 exitVarde uppdaterat i state:", exitKapital);
 
-    // ✅ Uppdatera HTML
+    // 7️⃣ Skriv ut resultat i HTML
     document.getElementById("resultFörsäljning").innerHTML = `
         <div class="box">
             <p class="result-title">${betalaHuslan ? "Exitbelopp efter huslånsbetalning 🏡" : "Exitbelopp"}</p>
@@ -54,23 +54,27 @@ function uppdateraBeräkningar() {
             ${betalaHuslan ? `
             <p><strong>Huslån:</strong> ${formatNumber(huslan)}</p>
             <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoFörLån)}</p>
-            <p>- ${formatNumber(gränsvärde312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
-            <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lånebehovEfterLågSkatt)}</p>
-            <p><strong>Totalt netto använt för lån:</strong> ${formatNumber(nettoTotalt)}</p>
+            <p>- ${formatNumber(gransvarde312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
+            <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLagSkatt > 0 ? lanEfterLagSkatt : 0)}</p>
+            <p><strong>Totalt netto använt för lån:</strong> ${formatNumber(huslan)}</p>
             ` : ""}
         </div>
     `;
 }
 
-// ✅ Kör funktionen direkt vid sidladdning och säkerställ att den körs **endast en gång per ändring**
+// ⏰ Körs när sidan laddas och när multipeln/huslånecheckboxen ändras
 document.addEventListener("DOMContentLoaded", function () {
-    uppdateraBeräkningar(); // 🔥 Beräkna exitvärde vid sidladdning
+    uppdateraBeräkningar();
+
+    // Event: multipel-slider
     document.getElementById("multipel").addEventListener("input", () => {
-        console.log("Multipel ändrad, uppdaterar exitberäkning...");
+        console.log("Multipel ändrad; uppdaterar exitberäkning ...");
         uppdateraBeräkningar();
     });
+
+    // Event: huslånecheckbox
     document.getElementById("betalaHuslan").addEventListener("change", () => {
-        console.log("Checkbox för huslån ändrad, uppdaterar exitberäkning...");
+        console.log("Huslån-checkbox ändrad; uppdaterar exitberäkning ...");
         uppdateraBeräkningar();
     });
 });
