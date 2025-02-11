@@ -62,19 +62,21 @@ function uppdateraBeräkningar() {
     `;
 }
 
-// 🏁 ⏰ Kör funktionen vid sidladdning och när multipeln/huslånecheckboxen ändras
 document.addEventListener("DOMContentLoaded", function () {
-    uppdateraBeräkningar();
+    let multipelElement = document.getElementById("multipel");
+    let multipelValueElement = document.getElementById("multipelValue");
 
-    // 🔄 Event: multipel-slider ändras
-    document.getElementById("multipel").addEventListener("input", () => {
-        console.log("⚡ Multipel ändrad, uppdaterar exitberäkning...");
-        uppdateraBeräkningar();
-    });
+    // 🔄 Visa startvärdet för multipeln från HTML
+    multipelValueElement.textContent = multipelElement.value;
 
-    // 🔄 Event: huslånecheckbox ändras
-    document.getElementById("betalaHuslan").addEventListener("change", () => {
-        console.log("⚡ Huslån-checkbox ändrad, uppdaterar exitberäkning...");
+    // 🔄 Uppdatera multipelvärdet i realtid när slidern ändras
+    multipelElement.addEventListener("input", function () {
+        let multipel = parseFloat(this.value);
+
+        // ✅ Uppdatera HTML-texten bredvid slidern
+        multipelValueElement.textContent = multipel.toFixed(1);
+
+        // ✅ Kör om exitberäkningen så att allt uppdateras korrekt
         uppdateraBeräkningar();
     });
 });
