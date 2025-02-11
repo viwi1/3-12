@@ -2,29 +2,30 @@
 
 // Ett gemensamt objekt som lagrar våra variabler
 const State = {
+    // Ursprungligt bolagsvärde (utan multipel)
     startVarde: 6855837,
+
+    // Huslån
     huslan: 2020500,
+
+    // Exitvärde efter multipel & huslåneavdrag
     exitVarde: 0,
-    totaltBruttoFörLån: 0,
-    exitVardeEfterSkatt: 0,
-    nettoAvkastning: 0,
-    bruttoAvkastning: 0,
-    nettoUtdelning: 0,
-    ibb: 80600,
 
-    // Byt t.ex. till "belopp312" istället för "312belopp"
-    get belopp312() {
-        return this.ibb * 2.75;
-    },
+    // Visar om huslån ska betalas av (checkbox)
+    betalaHuslan: true,
 
-    // Byt ev. "312sparatbelopp" → "sparatbelopp312"
-    sparatbelopp312: 684166,
-
+    // Skattesatser för utdelning
     skattUtdelningLåg: 0.20,
     skattUtdelningHög: 0.50,
-    avkastningProcent: 10
+
+    // 3:12-belopp för låg skatt
+    belopp312: 684166,
+
+    // Exempel på sparat belopp för framtida utdelning
+    sparatbelopp312: 684166
 };
 
+// Uppdaterar en enskild variabel i state
 function updateState(key, value) {
     if (State.hasOwnProperty(key)) {
         State[key] = value;
@@ -33,6 +34,7 @@ function updateState(key, value) {
     }
 }
 
+// Hämtar en enskild variabel ur state
 function getState(key) {
     return State.hasOwnProperty(key) ? State[key] : null;
 }
