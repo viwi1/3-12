@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultContainer = document.getElementById("resultFörsäljning");
   if (!resultContainer) return;
 
-  // 1) Infoga två sektioner – en för kontroller och en för resultat
+  // 1. Infoga kontroller och en separat sektion för resultat
   resultContainer.innerHTML = `
     <div id="exitControls" class="box">
       <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
@@ -29,17 +29,69 @@ document.addEventListener("DOMContentLoaded", () => {
     <div id="exitResult" class="box"></div>
   `;
 
-  // 2) Hämta element
-  const nuvardeEl        = document.getElementById("nuvarde");
-  const daligtNuvardeEl  = document.getElementById("daligtNuvarde");
-  const multipelEl       = document.getElementById("multipel");
-  const multipelValueEl  = document.getElementById("multipelValue");
-  const betalaHuslanEl   = document.getElementById("betalaHuslan");
-  const exitResultEl     = document.getElementById("exitResult");
+  // 2. Hämta våra nya element
+  const nuvardeEl       = document.getElementById("nuvarde");
+  const daligtNuvardeEl = document.getElementById("daligtNuvarde");
+  const multipelEl      = document.getElementById("multipel");
+  const multipelValueEl = document.getElementById("multipelValue");
+  const betalaHuslanEl  = document.getElementById("betalaHuslan");
+  const exitResultEl    = document.getElementById("exitResult");
 
-  // 3) Koppla event-lyssnare
+  // 3. Huvudfunktionen för beräkning
+  function uppdateraBeräkningar() {
+    const multipel   = parseFloat(multipelEl.value) || 1;
+    const startVarde = getState("startVarde") || 0;
+    const huslan     = getState("huslan") || 0;
 
-  // "Dåligt värde" (3 000 000 kr)
+    const skattLåg   = getState("skattUtdelningLåg") || 0.20;
+    const skattHög   = getState("skattUtdelningHög") || 0.50;
+    const gransvarde = getState("belopp312") || 684166;
+
+    // Bas: startVarde × multipel
+    let forsaljningspris = startVarde * multipel;
+    let exitKapital      = forsaljningspris;
+
+    // Huslånsberäkning
+    let nettoLåg   = gransvarde * (1 - skattLåg);
+    let lanEfterLågSkatt  = huslan - nettoLåg;
+    let bruttoHögBehov    = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
+    let totaltBruttoForLan = gransvarde + bruttoHögBehov;
+
+    // Om checkbox huslån är ibockad → minska exitKapital
+    if (betalaHuslanEl.checked) {
+      exitKapital -= totaltBruttoForLan;
+      if (exitKapital < 0) exitKapital = 0;
+      updateState("betalaHuslan", true);
+    } else {
+      updateState("betalaHuslan", false);
+    }
+
+    // Spara nya exitVarde i state
+    updateState("exitVarde", exitKapital);
+
+    // Uppdatera resultatsektionen
+    exitResultEl.innerHTML = `
+      <p><strong>${betalaHuslanEl.checked
+        ? "Exitbelopp efter huslånsbetalning 🏡"
+        : "Exitbelopp"
+      }</strong></p>
+      <p>${formatNumber(exitKapital)}</p>
+      ${
+        betalaHuslanEl.checked
+          ? `
+        <p>Huslån: ${formatNumber(huslan)}</p>
+        <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoForLan)}</p>
+        <p>- ${formatNumber(gransvarde)} (20%): → Netto: ${formatNumber(nettoLåg)}</p>
+        <p>- Resterande (50%): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt > 0 ? lanEfterLågSkatt : 0)}</p>
+      `
+          : ""
+      }
+    `;
+  }
+
+  // 4. Event-lyssnare
+
+  // Dåligt värde
   daligtNuvardeEl.addEventListener("change", () => {
     const nyttVarde = daligtNuvardeEl.checked ? 3000000 : getState("startVarde");
     updateState("startVarde", nyttVarde);
@@ -47,75 +99,22 @@ document.addEventListener("DOMContentLoaded", () => {
     uppdateraBeräkningar();
   });
 
-  // Multipel
+  // Multipelslider
   multipelEl.addEventListener("input", () => {
     multipelValueEl.textContent = parseFloat(multipelEl.value).toFixed(1);
     uppdateraBeräkningar();
   });
 
   // Huslånecheckbox
-  betalaHuslanEl.addEventListener("change", () => {
-    updateState("betalaHuslan", betalaHuslanEl.checked);
-    uppdateraBeräkningar();
-  });
+  betalaHuslanEl.addEventListener("change", uppdateraBeräkningar);
 
-  // 4) Initiera kontroller (värden från state)
+  // 5. Initiera UI och kör första beräkning
   nuvardeEl.textContent       = formatNumber(getState("startVarde") || 0);
   multipelValueEl.textContent = multipelEl.value;
-  betalaHuslanEl.checked      = getState("betalaHuslan"); // Ladda tidigare checkbox-status
+  betalaHuslanEl.checked      = getState("betalaHuslan") || false;
 
-  // 5) Första beräkningen
   uppdateraBeräkningar();
 });
 
-// 6) Exportera funktionen för att andra skript ska kunna anropa
-export function uppdateraBeräkningar() {
-  // Hämtar nödvändiga data
-  const multipelEl      = document.getElementById("multipel");
-  const betalaHuslanEl  = document.getElementById("betalaHuslan");
-  const exitResultEl    = document.getElementById("exitResult");
-
-  if (!multipelEl || !exitResultEl) return;
-
-  const multipel     = parseFloat(multipelEl.value) || 1;
-  const startVarde   = getState("startVarde") || 0;
-  const huslan       = getState("huslan") || 0;
-  const betalaHuslan = getState("betalaHuslan");
-  const skattLåg     = getState("skattUtdelningLåg") || 0.20;
-  const skattHög     = getState("skattUtdelningHög") || 0.50;
-  const gransvarde   = getState("belopp312") || 684166;
-
-  const forsaljningspris = startVarde * multipel;
-  let exitKapital = forsaljningspris;
-
-  // Huslånsberäkning (enkel variant)
-  const nettoLag = gransvarde * (1 - skattLåg);
-  const restLan  = huslan - nettoLag;
-  const bruttoHogBehov = restLan > 0 ? restLan / (1 - skattHög) : 0;
-  const totaltBruttoForLan = gransvarde + bruttoHogBehov;
-
-  if (betalaHuslan) {
-    exitKapital -= totaltBruttoForLan;
-    if (exitKapital < 0) exitKapital = 0;
-  }
-
-  updateState("exitVarde", exitKapital);
-
-  exitResultEl.innerHTML = `
-    <p><strong>${betalaHuslan
-      ? "Exitbelopp efter huslånsbetalning 🏡"
-      : "Exitbelopp"
-    }</strong></p>
-    <p>${formatNumber(exitKapital)}</p>
-    ${
-      betalaHuslan
-        ? `
-      <p>Huslån: ${formatNumber(huslan)}</p>
-      <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoForLan)}</p>
-      <p>- ${formatNumber(gransvarde)} (20%): → Netto: ${formatNumber(nettoLag)}</p>
-      <p>- Resterande (50%): ${formatNumber(bruttoHogBehov)} → Netto: ${formatNumber(restLan > 0 ? restLan : 0)}</p>
-    `
-        : ""
-    }
-  `;
-}
+// 6. Exportera så andra filer kan anropa funktionen direkt om så önskas
+export function uppdateraBeräkningar() {}
