@@ -7,25 +7,8 @@
 </head>
 <body>
 
-<!-- Nuvarande värde -->
-<p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
-<div class="checkbox-container">
-  <input type="checkbox" id="daligtNuvarde">
-  <label for="daligtNuvarde">3 000 000 kr</label>
-</div>
-
-<!-- Multipel -->
-<div class="slider-container">
-  <label for="multipel">Multipel:</label>
-  <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="2.8">
-  <span class="slider-value" id="multipelValue">1.5</span>
-</div>
-
-<!-- Checkbox huslån -->
-<div class="checkbox-container">
-  <input type="checkbox" id="betalaHuslan" checked>
-  <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
-</div>
+<!-- Lägg denna där du vill att beräkningarna ska synas -->
+<div id="exitberakning-container"></div>
 
 <!-- Exitruta -->
 <div id="resultFörsäljning"></div>
