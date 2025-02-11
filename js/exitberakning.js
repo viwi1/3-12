@@ -10,17 +10,17 @@ function uppdateraBeräkningar() {
     let huslan = getState("huslan") || 0;
     let betalaHuslan = document.getElementById("betalaHuslan").checked;
 
-    // 3️⃣ Beräkna försäljningspris baserat på multipel (🔴 OBS: startvärde används korrekt här!)
+    // 3️⃣ Hämta skattesatser och 3:12-belopp från state.js
+    let skattLåg = getState("skattUtdelningLåg") || 0.20;
+    let skattHög = getState("skattUtdelningHög") || 0.50;
+    let gransvarde312 = getState("312sparatbelopp") || 684166;
+
+    // 4️⃣ Beräkna försäljningspris baserat på multipel (🔴 OBS: startvärde används korrekt här!)
     let forsaljningspris = startVarde * multipel;
     console.log("🔎 Försäljningspris (startVarde * multipel):", forsaljningspris);
 
-    // 4️⃣ Sätt alltid `exitKapital` till `forsaljningspris` först (❗ undviker ackumulativa avdrag)
+    // 5️⃣ Sätt alltid `exitKapital` till `forsaljningspris` först (❗ undviker ackumulativa avdrag)
     let exitKapital = forsaljningspris;
-
-    // 5️⃣ Skattesatser och 3:12-gränsvärde
-    let skattLåg = 0.20;
-    let skattHög = 0.50;
-    let gransvarde312 = 684166;
 
     // 6️⃣ Räkna ut hur mycket som behövs för att betala huslån
     let nettoLåg = gransvarde312 * (1 - skattLåg);
@@ -32,6 +32,8 @@ function uppdateraBeräkningar() {
     if (betalaHuslan) {
         exitKapital = forsaljningspris - totaltBruttoFörLån;
         console.log("✅ Huslån betalat, nytt exitKapital:", exitKapital);
+    } else {
+        exitKapital = forsaljningspris; // ❗ Återställ till original om checkboxen bockas ur
     }
 
     // 8️⃣ Säkerhetskontroll: Om `exitKapital` blir negativt, sätt det till 0
