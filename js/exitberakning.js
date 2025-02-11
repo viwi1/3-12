@@ -1,12 +1,5 @@
 import { updateState, getState } from "./state.js";
 
-function uppdateraNuvarde() {
-    let nuvarde = document.getElementById("daligtNuvarde").checked ? 3000000 : 6855837;
-    document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
-    updateState("exitVarde", nuvarde);
-    uppdateraBeräkningar();
-}
-
 function uppdateraBeräkningar() {
     let multipel = parseFloat(document.getElementById("multipel").value);
     document.getElementById("multipelValue").textContent = multipel.toFixed(1);
@@ -14,6 +7,7 @@ function uppdateraBeräkningar() {
     let exitKapital = getState("exitVarde") * multipel;
     updateState("exitVarde", exitKapital);
 
+    // 🔥 Skriver ut exitvärdet i `resultFörsäljning`
     document.getElementById("resultFörsäljning").innerHTML = `
         <div class="box">
             <p class="result-title">Exitbelopp</p>
@@ -22,5 +16,8 @@ function uppdateraBeräkningar() {
     `;
 }
 
+// ✅ Lägg till event listeners på sliders och checkbox
 document.getElementById("multipel").addEventListener("input", uppdateraBeräkningar);
-document.getElementById("daligtNuvarde").addEventListener("change", uppdateraNuvarde);
+document.getElementById("betalaHuslan").addEventListener("change", uppdateraBeräkningar);
+
+export { uppdateraBeräkningar };
