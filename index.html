@@ -60,7 +60,7 @@
 <!-- Popup Huslån -->
 <div class="overlay" id="overlayHuslan">
   <div class="popup">
-    <span class="closePopup" onclick="closeOverlayHuslan()">×</span>
+    <span class="closePopup" onclick="closePopup('overlayHuslan')">×</span>
     <h4>Huslån</h4>
     <input type="text" id="huslanInput" style="width:120px;">
     <p>Här kan du ange ditt huslån.</p>
@@ -70,7 +70,7 @@
 <!-- Popup 3:12 -->
 <div class="overlay" id="overlay312">
   <div class="popup">
-    <span class="closePopup" onclick="closeOverlay312()">×</span>
+    <span class="closePopup" onclick="closePopup('overlay312')">×</span>
     <h4>Eget 3:12-gränsvärde</h4>
     <input type="number" id="gransvardeInput" style="width:120px;">
     <p>Anpassa ditt 3:12-gränsvärde här.</p>
@@ -80,7 +80,7 @@
 <!-- Popup IBB -->
 <div class="overlay" id="overlayIBB">
   <div class="popup">
-    <span class="closePopup" onclick="closeOverlayIBB()">×</span>
+    <span class="closePopup" onclick="closePopup('overlayIBB')">×</span>
     <h4>IBB</h4>
     <input type="number" id="ibbInput" style="width:120px;">
     <p>Justera inkomstbasbeloppet (IBB).</p>
@@ -92,6 +92,14 @@
 <script type="module" src="./js/main.js"></script>
 <script type="module" src="./js/exitberakning.js"></script>
 <script type="module" src="./js/huslanmodul.js"></script>
+<script type="module" src="./js/utdelningsmodul.js"></script> <!-- ✅ Lade till utdelningsmodulen -->
+
+<script>
+  // Funktion för att stänga popups
+  function closePopup(id) {
+      document.getElementById(id).style.display = "none";
+  }
+</script>
 
 </body>
 </html>
