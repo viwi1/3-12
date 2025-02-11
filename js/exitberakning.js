@@ -1,4 +1,5 @@
 import { updateState, getState } from "./state.js";
+import { formatNumber } from "./main.js";
 
 
 function uppdateraNuvarde() {
