@@ -32,4 +32,20 @@ function uppdateraBeräkningar() {
 document.getElementById("multipel").addEventListener("input", uppdateraBeräkningar);
 document.getElementById("betalaHuslan").addEventListener("change", uppdateraBeräkningar);
 
-export { uppdateraBeräkningar };
+
+export function uppdateraBeräkningar() {
+    let multipel = parseFloat(document.getElementById("multipel").value);
+    document.getElementById("multipelValue").textContent = multipel.toFixed(1);
+
+    let exitVarde = getState("exitVarde") || 0;
+    let exitKapital = exitVarde * multipel;
+    updateState("exitVarde", exitKapital);
+
+    document.getElementById("resultFörsäljning").innerHTML = `
+        <div class="box">
+            <p class="result-title">Exitbelopp</p>
+            <p><strong>${formatNumber(exitKapital)}</strong></p>
+        </div>
+    `;
+}
+
