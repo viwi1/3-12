@@ -1,5 +1,5 @@
 import { updateState, getState } from "./state.js";
-import { formatNumber } from "./main.js"; // ✅ Importera `formatNumber`
+import { formatNumber } from "./main.js"; // ✅ Rätt import!
 
 function beraknaHuslan() {
     let huslan = getState("huslan") || 0;  // ✅ Sätt standardvärde
