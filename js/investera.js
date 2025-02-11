@@ -1,13 +1,13 @@
 import { getState } from "./state.js";
 import { formatNumber } from "./main.js"; // ✅ Importera formateringsfunktionen
 
-function beräknaUtdelning() {
+function beräknaInvestering() {
     let avkastningProcent = parseInt(document.getElementById("avkastning").value, 10);
     document.getElementById("avkastningValue").textContent = avkastningProcent + "%";
     
     let avkastning = avkastningProcent / 100;
     let exitKapital = getState("exitVarde") || 0;
-    let totalAvkastning = exitKapital * avkastning; // ✅ Bruttobelopp för aktieutdelning
+    let totalAvkastning = exitKapital * avkastning; // ✅ Bruttobelopp för investering
 
     let skattLåg = 0.20;
     let skattHög = 0.50;
@@ -30,7 +30,7 @@ function beräknaUtdelning() {
     let totaltNettoUtanLån = nettoLågUtanLån + nettoHögUtanLån;
     let skillnad = totaltNettoUtanLån - totaltNetto;
 
-    // ✅ Uppdatera HTML med utdelningsvärden
+    // ✅ Uppdatera HTML med investeringsvärden
     document.getElementById("brutto").textContent = formatNumber(totalAvkastning);
     document.getElementById("inomGransvardeBrutto").textContent = formatNumber(bruttoLåg);
     document.getElementById("inomGransvardeNetto").textContent = formatNumber(nettoLåg);
@@ -40,7 +40,7 @@ function beräknaUtdelning() {
 
     // ✅ Visa skillnad om huslånet betalas
     if (betalaHuslan) {
-        document.getElementById("resultAktieutdelning").innerHTML += `
+        document.getElementById("resultInvestera").innerHTML += `
             <p><strong>Utan att betala huslån:</strong> ${formatNumber(totaltNettoUtanLån)}</p>
             <p><strong>Skillnad:</strong> ${formatNumber(skillnad)}</p>
         `;
@@ -49,7 +49,7 @@ function beräknaUtdelning() {
 
 // ✅ Lägg till event listener när DOM laddats
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("avkastning").addEventListener("input", beräknaUtdelning);
+    document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
 });
 
-export { beräknaUtdelning };
+export { beräknaInvestering };
