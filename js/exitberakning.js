@@ -1,12 +1,12 @@
 import { updateState, getState } from "./state.js";
-import { formatNumber } from "./main.js"; // Din formateringsfunktion
+import { formatNumber } from "./main.js";
 
+// Skapar HTML i #resultFörsäljning och sätter upp event-lyssnare
 document.addEventListener("DOMContentLoaded", () => {
-  // Hämta behållaren för exit-rutan
   const resultContainer = document.getElementById("resultFörsäljning");
   if (!resultContainer) return;
 
-  // Sätt in minimal HTML
+  // Infoga minimal HTML
   resultContainer.innerHTML = `
     <div class="box">
       <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
@@ -27,76 +27,76 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   `;
 
-  // Referenser till nyskapade element
-  const nuvardeEl         = document.getElementById("nuvarde");
-  const daligtNuvardeEl   = document.getElementById("daligtNuvarde");
-  const multipelEl        = document.getElementById("multipel");
-  const multipelValueEl   = document.getElementById("multipelValue");
-  const betalaHuslanEl    = document.getElementById("betalaHuslan");
-  const exitResultEl      = document.getElementById("exitResult");
+  // Hämta element
+  const nuvardeEl       = document.getElementById("nuvarde");
+  const daligtNuvardeEl = document.getElementById("daligtNuvarde");
+  const multipelEl      = document.getElementById("multipel");
+  const multipelValueEl = document.getElementById("multipelValue");
+  const betalaHuslanEl  = document.getElementById("betalaHuslan");
+  const exitResultEl    = document.getElementById("exitResult");
 
-  // Funktion för att uppdatera alla beräkningar
-  function uppdateraBeräkningar() {
-    // Hämta värden från state
-    let startVarde   = getState("startVarde") || 0;
-    let huslan       = getState("huslan") || 0;
-    let skattLåg     = getState("skattUtdelningLåg") || 0.20;
-    let skattHög     = getState("skattUtdelningHög") || 0.50;
-    let gransvarde   = getState("belopp312") || 684166; // t.ex. 3:12-belopp
-    let multipel     = parseFloat(multipelEl.value) || 1;
-
-    // Räkna fram försäljningspris
-    let forsaljningspris = startVarde * multipel;
-    let exitKapital      = forsaljningspris;
-
-    // Huslåneavdrag
-    let nettoLag  = gransvarde * (1 - skattLåg);
-    let restLan   = huslan - nettoLag;
-    let bruttoHog = restLan > 0 ? restLan / (1 - skattHög) : 0;
-    let totaltForLan = gransvarde + bruttoHog;
-
-    if (betalaHuslanEl.checked) {
-      exitKapital = forsaljningspris - totaltForLan;
-      if (exitKapital < 0) exitKapital = 0;
-    }
-
-    // Spara exitvärdet i state
-    updateState("exitVarde", exitKapital);
-
-    // Skriv ut resultat
-    exitResultEl.innerHTML = `
-      <p><strong>${betalaHuslanEl.checked ? "Exitbelopp efter huslånsbetalning 🏡" : "Exitbelopp"}</strong></p>
-      <p>${formatNumber(exitKapital)}</p>
-      ${betalaHuslanEl.checked ? `
-        <p>Huslån: ${formatNumber(huslan)}</p>
-        <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltForLan)}</p>
-        <p>- ${formatNumber(gransvarde)} (20%): → Netto: ${formatNumber(nettoLag)}</p>
-        <p>- Resterande (50%): ${formatNumber(bruttoHog)} → Netto: ${formatNumber(restLan > 0 ? restLan : 0)}</p>
-      ` : ""}
-    `;
-  }
-
-  // Event: dåligt värde
+  // Event: Växla dåligt värde
   daligtNuvardeEl.addEventListener("change", () => {
-    let nyttVarde = daligtNuvardeEl.checked ? 3000000 : getState("startVarde");
+    const nyttVarde = daligtNuvardeEl.checked ? 3000000 : getState("startVarde");
     updateState("startVarde", nyttVarde);
     nuvardeEl.textContent = formatNumber(nyttVarde);
     uppdateraBeräkningar();
   });
 
-  // Event: multipel
+  // Event: Multipelslider
   multipelEl.addEventListener("input", () => {
     multipelValueEl.textContent = parseFloat(multipelEl.value).toFixed(1);
     uppdateraBeräkningar();
   });
 
-  // Event: huslånekryss
+  // Event: Huslånecheckbox
   betalaHuslanEl.addEventListener("change", uppdateraBeräkningar);
 
-  // Sätt initialt startvärde & multipel
+  // Initiera sidladdning
   nuvardeEl.textContent = formatNumber(getState("startVarde") || 0);
   multipelValueEl.textContent = multipelEl.value;
-
-  // Kör första beräkningen
   uppdateraBeräkningar();
 });
+
+// Exporterad funktion så att andra filer kan anropa den
+export function uppdateraBeräkningar() {
+  const multipel = parseFloat(document.getElementById("multipel").value) || 1;
+  const startVarde = getState("startVarde") || 0;
+  const huslan = getState("huslan") || 0;
+
+  // Hämta skattesatser/gränsvärde från state eller hårdkoda (justera som du vill)
+  const skattLåg   = getState("skattUtdelningLåg") || 0.20;
+  const skattHög   = getState("skattUtdelningHög") || 0.50;
+  const gransvarde = getState("belopp312") || 684166;
+
+  const forsaljningspris = startVarde * multipel;
+  let exitKapital = forsaljningspris;
+
+  const nettoLåg = gransvarde * (1 - skattLåg);
+  const lanEfterLåg = huslan - nettoLåg;
+  const bruttoHögBehov = lanEfterLåg > 0 ? lanEfterLåg / (1 - skattHög) : 0;
+  const totaltBruttoFörLån = gransvarde + bruttoHögBehov;
+
+  const betalaHuslan = document.getElementById("betalaHuslan").checked;
+  if (betalaHuslan) {
+    exitKapital = forsaljningspris - totaltBruttoFörLån;
+    if (exitKapital < 0) exitKapital = 0;
+  }
+
+  updateState("exitVarde", exitKapital);
+
+  // Skriv ut
+  const exitResultEl = document.getElementById("exitResult");
+  if (exitResultEl) {
+    exitResultEl.innerHTML = `
+      <p><strong>${betalaHuslan ? "Exitbelopp efter huslånsbetalning 🏡" : "Exitbelopp"}</strong></p>
+      <p>${formatNumber(exitKapital)}</p>
+      ${betalaHuslan ? `
+        <p>Huslån: ${formatNumber(huslan)}</p>
+        <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoFörLån)}</p>
+        <p>- ${formatNumber(gransvarde)} (20%): → Netto: ${formatNumber(nettoLåg)}</p>
+        <p>- Resterande (50%): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLåg > 0 ? lanEfterLåg : 0)}</p>
+      ` : ""}
+    `;
+  }
+}
