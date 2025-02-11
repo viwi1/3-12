@@ -6,19 +6,7 @@ function beräknaInvestering() {
     document.getElementById("avkastningValue").textContent = avkastningProcent + "%";
 
     let avkastning = avkastningProcent / 100;
-let investeratBelopp = getState("exitVarde") || 0; // ✅ Använd exitVarde direkt från exitberäkningen
-
-    let betalaHuslan = document.getElementById("betalaHuslan").checked;
-    let huslan = getState("huslan") || 0;
-    let multipel = parseFloat(document.getElementById("multipel").value) || 1;
-
-    // ✅ Beräkna investerat belopp baserat på justerat exitkapital
-    let investeratBelopp = justeratExitKapital * multipel;
-    if (betalaHuslan) {
-        investeratBelopp -= huslan; // Justera om huslån betalas av
-    }
-
-    // ✅ Bruttoavkastning på det investerade beloppet
+    let investeratBelopp = getState("exitVarde") || 0; // ✅ Använd redan beräknat exitVarde
     let totalAvkastning = investeratBelopp * avkastning;
 
     let skattLåg = 0.20;
@@ -32,7 +20,7 @@ let investeratBelopp = getState("exitVarde") || 0; // ✅ Använd exitVarde dire
     let nettoHög = bruttoHög * (1 - skattHög);
     let totaltNetto = nettoLåg + nettoHög;
 
-    // ✅ Uppdatera **endast siffrorna** istället för att skriva om hela boxen
+    // ✅ Uppdatera HTML med investeringsvärden
     document.getElementById("investeratBelopp").textContent = formatNumber(investeratBelopp);
     document.getElementById("brutto").textContent = formatNumber(totalAvkastning);
     document.getElementById("inomGransvardeBrutto").textContent = formatNumber(bruttoLåg);
@@ -44,13 +32,10 @@ let investeratBelopp = getState("exitVarde") || 0; // ✅ Använd exitVarde dire
 
 // ✅ Kör funktionen direkt vid sidladdning
 document.addEventListener("DOMContentLoaded", function () {
-    // ✅ Säkerställ att alla element finns innan event listeners läggs till
-    if (document.getElementById("avkastning")) {
-        beräknaInvestering(); // 🔥 Kör direkt
-        document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
-        document.getElementById("betalaHuslan").addEventListener("change", beräknaInvestering);
-        document.getElementById("multipel").addEventListener("input", beräknaInvestering);
-    }
+    beräknaInvestering(); // 🔥 Kör direkt
+    document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
+    document.getElementById("betalaHuslan").addEventListener("change", beräknaInvestering);
+    document.getElementById("multipel").addEventListener("input", beräknaInvestering);
 });
 
 export { beräknaInvestering };
