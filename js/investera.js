@@ -44,9 +44,12 @@ function beräknaInvestering() {
     `;
 }
 
-// ✅ Lägg till event listener när DOM laddats
+// ✅ Kör funktionen direkt vid sidladdning
 document.addEventListener("DOMContentLoaded", function () {
+    beräknaInvestering(); // 🔥 Kör direkt
     document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
+    document.getElementById("betalaHuslan").addEventListener("change", beräknaInvestering);
+    document.getElementById("multipel").addEventListener("input", beräknaInvestering);
 });
 
 export { beräknaInvestering };
