@@ -1,6 +1,5 @@
 import { updateState, getState } from "./state.js";
-import { formatNumber } from "./main.js";
-
+import { formatNumber } from "./main.js"; // 🔥 Nu fungerar importen!
 
 function uppdateraNuvarde() {
     let nuvarde = document.getElementById("daligtNuvarde").checked ? 3000000 : 6855837;
@@ -10,7 +9,6 @@ function uppdateraNuvarde() {
 }
 
 document.getElementById("daligtNuvarde").addEventListener("change", uppdateraNuvarde);
-
 
 function uppdateraBeräkningar() {
     let multipel = parseFloat(document.getElementById("multipel").value);
@@ -32,20 +30,4 @@ function uppdateraBeräkningar() {
 document.getElementById("multipel").addEventListener("input", uppdateraBeräkningar);
 document.getElementById("betalaHuslan").addEventListener("change", uppdateraBeräkningar);
 
-
-export function uppdateraBeräkningar() {
-    let multipel = parseFloat(document.getElementById("multipel").value);
-    document.getElementById("multipelValue").textContent = multipel.toFixed(1);
-
-    let exitVarde = getState("exitVarde") || 0;
-    let exitKapital = exitVarde * multipel;
-    updateState("exitVarde", exitKapital);
-
-    document.getElementById("resultFörsäljning").innerHTML = `
-        <div class="box">
-            <p class="result-title">Exitbelopp</p>
-            <p><strong>${formatNumber(exitKapital)}</strong></p>
-        </div>
-    `;
-}
-
+export { uppdateraBeräkningar };
