@@ -1,112 +1,102 @@
 import { updateState, getState } from "./state.js";
-import { formatNumber } from "./main.js";
+import { formatNumber } from "./main.js"; // Din formateringsfunktion
 
-////////////////////////////////////////////////////////////////////////////////
-// 1) Start: Kolla att filen verkligen laddas (ersätter console.log med alert)
-////////////////////////////////////////////////////////////////////////////////
-alert("exitberakning.js laddad! (Steg 1)");
-
-////////////////////////////////////////////////////////////////////////////////
-// 2) När sidan laddat klart, injicera HTML i #resultFörsäljning
-////////////////////////////////////////////////////////////////////////////////
-document.addEventListener("DOMContentLoaded", function () {
-  alert("DOMContentLoaded i exitberakning.js! (Steg 2)");
-
-  // Hitta div#resultFörsäljning
+document.addEventListener("DOMContentLoaded", () => {
+  // Hämta behållaren för exit-rutan
   const resultContainer = document.getElementById("resultFörsäljning");
-  if (!resultContainer) {
-    alert("Fel: #resultFörsäljning saknas i HTML. Avbryter…");
-    return;
-  }
+  if (!resultContainer) return;
 
-  // Ersätt innehållet i #resultFörsäljning
+  // Sätt in minimal HTML
   resultContainer.innerHTML = `
     <div class="box">
       <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
       <div class="checkbox-container">
-          <input type="checkbox" id="daligtNuvarde">
-          <label for="daligtNuvarde">3 000 000 kr</label>
+        <input type="checkbox" id="daligtNuvarde">
+        <label for="daligtNuvarde">3 000 000 kr</label>
       </div>
-
-      <!-- Multipel -->
       <div class="slider-container">
-          <label for="multipel">Multipel:</label>
-          <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="2.8">
-          <span class="slider-value" id="multipelValue">2.8</span>
+        <label for="multipel">Multipel:</label>
+        <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="2.8">
+        <span class="slider-value" id="multipelValue">2.8</span>
       </div>
-
-      <!-- Checkbox huslån -->
       <div class="checkbox-container">
-          <input type="checkbox" id="betalaHuslan" checked>
-          <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
+        <input type="checkbox" id="betalaHuslan" checked>
+        <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
       </div>
+      <div id="exitResult"></div>
     </div>
   `;
 
-  alert("HTML injicerad i #resultFörsäljning (Steg 3)");
+  // Referenser till nyskapade element
+  const nuvardeEl         = document.getElementById("nuvarde");
+  const daligtNuvardeEl   = document.getElementById("daligtNuvarde");
+  const multipelEl        = document.getElementById("multipel");
+  const multipelValueEl   = document.getElementById("multipelValue");
+  const betalaHuslanEl    = document.getElementById("betalaHuslan");
+  const exitResultEl      = document.getElementById("exitResult");
 
-  // 3) Hämta referenser till elementen
-  let multipelElement = document.getElementById("multipel");
-  let multipelValueElement = document.getElementById("multipelValue");
-  let daligtNuvardeCheckbox = document.getElementById("daligtNuvarde");
-  let nuvardeElement = document.getElementById("nuvarde");
-  let betalaHuslanCheckbox = document.getElementById("betalaHuslan");
+  // Funktion för att uppdatera alla beräkningar
+  function uppdateraBeräkningar() {
+    // Hämta värden från state
+    let startVarde   = getState("startVarde") || 0;
+    let huslan       = getState("huslan") || 0;
+    let skattLåg     = getState("skattUtdelningLåg") || 0.20;
+    let skattHög     = getState("skattUtdelningHög") || 0.50;
+    let gransvarde   = getState("belopp312") || 684166; // t.ex. 3:12-belopp
+    let multipel     = parseFloat(multipelEl.value) || 1;
 
-  // 4) Sätt upp event-listeners
-  multipelElement.addEventListener("input", function () {
-    let multipel = parseFloat(this.value);
-    multipelValueElement.textContent = multipel.toFixed(1);
-    uppdateraBeräkningar();
-  });
+    // Räkna fram försäljningspris
+    let forsaljningspris = startVarde * multipel;
+    let exitKapital      = forsaljningspris;
 
-  daligtNuvardeCheckbox.addEventListener("change", function () {
-    let nyttVarde = daligtNuvardeCheckbox.checked ? 3000000 : getState("startVarde");
-    updateState("startVarde", nyttVarde);
-    nuvardeElement.textContent = formatNumber(nyttVarde);
-    uppdateraBeräkningar();
-  });
+    // Huslåneavdrag
+    let nettoLag  = gransvarde * (1 - skattLåg);
+    let restLan   = huslan - nettoLag;
+    let bruttoHog = restLan > 0 ? restLan / (1 - skattHög) : 0;
+    let totaltForLan = gransvarde + bruttoHog;
 
-  betalaHuslanCheckbox.addEventListener("change", function () {
-    alert("Huslån-checkbox ändrad!");
-    uppdateraBeräkningar();
-  });
+    if (betalaHuslanEl.checked) {
+      exitKapital = forsaljningspris - totaltForLan;
+      if (exitKapital < 0) exitKapital = 0;
+    }
 
-  // 5) Visa aktuellt startvärde från state.js
-  nuvardeElement.textContent = formatNumber(getState("startVarde") || 0);
+    // Spara exitvärdet i state
+    updateState("exitVarde", exitKapital);
 
-  // 6) Gör en första beräkning
-  uppdateraBeräkningar();
-});
-
-////////////////////////////////////////////////////////////////////////////////
-// 7) Funktion för att göra själva exitberäkningen
-////////////////////////////////////////////////////////////////////////////////
-function uppdateraBeräkningar() {
-  alert("Nu körs uppdateraBeräkningar! (Steg 4)");
-
-  // Exempel: uppdatera exitVarde i state baserat på multipeln
-  let multipel = parseFloat(document.getElementById("multipel").value) || 1;
-  let startVarde = getState("startVarde") || 0;
-  let forsaljningspris = startVarde * multipel;
-
-  // Kolla om huslån ska dras
-  let betalaHuslan = document.getElementById("betalaHuslan").checked;
-  let huslan = getState("huslan") || 0;
-  let exitKapital = forsaljningspris;
-  if (betalaHuslan) {
-    exitKapital -= huslan; // Förenklad logik för test
+    // Skriv ut resultat
+    exitResultEl.innerHTML = `
+      <p><strong>${betalaHuslanEl.checked ? "Exitbelopp efter huslånsbetalning 🏡" : "Exitbelopp"}</strong></p>
+      <p>${formatNumber(exitKapital)}</p>
+      ${betalaHuslanEl.checked ? `
+        <p>Huslån: ${formatNumber(huslan)}</p>
+        <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltForLan)}</p>
+        <p>- ${formatNumber(gransvarde)} (20%): → Netto: ${formatNumber(nettoLag)}</p>
+        <p>- Resterande (50%): ${formatNumber(bruttoHog)} → Netto: ${formatNumber(restLan > 0 ? restLan : 0)}</p>
+      ` : ""}
+    `;
   }
 
-  // Se till att inte bli negativt
-  if (exitKapital < 0) exitKapital = 0;
+  // Event: dåligt värde
+  daligtNuvardeEl.addEventListener("change", () => {
+    let nyttVarde = daligtNuvardeEl.checked ? 3000000 : getState("startVarde");
+    updateState("startVarde", nyttVarde);
+    nuvardeEl.textContent = formatNumber(nyttVarde);
+    uppdateraBeräkningar();
+  });
 
-  // Spara i state
-  updateState("exitVarde", exitKapital);
+  // Event: multipel
+  multipelEl.addEventListener("input", () => {
+    multipelValueEl.textContent = parseFloat(multipelEl.value).toFixed(1);
+    uppdateraBeräkningar();
+  });
 
-  alert(`Nytt exitVarde: ${exitKapital} (Steg 5)`);
-}
+  // Event: huslånekryss
+  betalaHuslanEl.addEventListener("change", uppdateraBeräkningar);
 
-////////////////////////////////////////////////////////////////////////////////
-// 8) Exportera funktionen om andra skript behöver anropa den
-////////////////////////////////////////////////////////////////////////////////
-export { uppdateraBeräkningar };
+  // Sätt initialt startvärde & multipel
+  nuvardeEl.textContent = formatNumber(getState("startVarde") || 0);
+  multipelValueEl.textContent = multipelEl.value;
+
+  // Kör första beräkningen
+  uppdateraBeräkningar();
+});
