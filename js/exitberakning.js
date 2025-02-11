@@ -3,7 +3,7 @@ import { formatNumber } from "./main.js"; // ✅ Importera formateringsfunktione
 
 function uppdateraBeräkningar() {
     let multipel = parseFloat(document.getElementById("multipel").value) || 1;
-    let nuvarde = getState("exitVarde") || 0;  // ✅ Hämta aktuellt bolagsvärde
+    let nuvarde = getState("nuvarde") || 0;  // ✅ Hämta aktuellt bolagsvärde
     let huslan = getState("huslan") || 0;
     let betalaHuslan = document.getElementById("betalaHuslan").checked; // ✅ Kolla om checkboxen är markerad
 
@@ -25,8 +25,9 @@ function uppdateraBeräkningar() {
         exitKapital -= totaltBruttoFörLån;
     }
 
-    // ✅ Uppdatera state för investeringen
+    // ✅ 🔥 SKICKA EXITVÄRDET TILL STATE
     updateState("exitVarde", exitKapital);
+    console.log("🚀 Uppdaterat exitVarde i state:", exitKapital); // ✅ Debugging
 
     // ✅ Uppdatera HTML
     document.getElementById("resultFörsäljning").innerHTML = `
