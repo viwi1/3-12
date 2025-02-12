@@ -32,16 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <hr>
             <div id="huslanDetaljer"></div>
         </div>
-
-        <!-- Popup för att ändra huslån -->
-        <div class="overlay" id="huslanPopup" style="display: none;">
-            <div class="popup">
-                <span class="closePopup" onclick="closeHuslanPopup()">×</span>
-                <h4>Ändra huslån</h4>
-                <input type="number" id="huslanInput" value="${huslan}" style="width:120px;">
-                <button onclick="updateHuslan()">Spara</button>
-            </div>
-        </div>
     `;
 
     // 🔹 Hämta element
@@ -98,26 +88,18 @@ document.addEventListener("DOMContentLoaded", () => {
         // Lägg till klick-event på huslånebeloppet
         const huslanBeloppEl = document.getElementById("huslanBelopp");
         if (huslanBeloppEl) {
-            huslanBeloppEl.addEventListener("click", openHuslanPopup);
+            huslanBeloppEl.addEventListener("click", ändraHuslan);
         }
     }
 
-    function updateHuslan() {
-        let nyttHuslan = parseInt(document.getElementById("huslanInput").value, 10);
+    function ändraHuslan() {
+        let nyttHuslan = prompt("Ange nytt huslånebelopp:", huslan);
+        nyttHuslan = parseInt(nyttHuslan, 10);
         if (!isNaN(nyttHuslan) && nyttHuslan > 0) {
             huslan = nyttHuslan;
             updateState("huslan", huslan);
             uppdateraBeräkningar();
-            closeHuslanPopup();
         }
-    }
-
-    function openHuslanPopup() {
-        document.getElementById("huslanPopup").style.display = "block";
-    }
-
-    function closeHuslanPopup() {
-        document.getElementById("huslanPopup").style.display = "none";
     }
 
     multipelEl.addEventListener("input", () => {
