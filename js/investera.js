@@ -40,9 +40,20 @@ function beräknaInvestering() {
     overGransvardeBruttoEl.textContent = formatNumber(bruttoHög);
     overGransvardeNettoEl.textContent = formatNumber(nettoHög);
     totaltNettoEl.textContent = formatNumber(totaltNetto);
+
+    // 🔥 Lägg till event-lyssnare för pop-up efter att UI är renderat
+    document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
 }
 
-// ✅ Flytta DOM-manipulering utanför funktionen
+// ✅ Pop-up för att ändra 3:12-beloppet
+function öppnaPopupBelopp312() {
+    let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", belopp312);
+    if (nyttBelopp312 !== null) {
+        belopp312 = parseInt(nyttBelopp312, 10) || belopp312;
+        beräknaInvestering();
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const resultContainer = document.getElementById("resultInvestera");
     if (!resultContainer) return;
@@ -71,15 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     `;
 
-    function öppnaPopupBelopp312() {
-        let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", belopp312);
-        if (nyttBelopp312 !== null) {
-            belopp312 = parseInt(nyttBelopp312, 10) || belopp312;
-            beräknaInvestering();
-        }
-    }
-
-    // ✅ Lägg till event listeners
+    // ✅ Koppla event-lyssnare
     document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
     document.getElementById("betalaHuslan").addEventListener("change", beräknaInvestering);
     document.getElementById("multipel").addEventListener("input", beräknaInvestering);
@@ -88,5 +91,5 @@ document.addEventListener("DOMContentLoaded", () => {
     beräknaInvestering();
 });
 
-// ✅ Nu exporteras funktionen KORREKT
+// ✅ Exportera funktionen korrekt
 export { beräknaInvestering };
