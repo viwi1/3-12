@@ -3,6 +3,9 @@ const State = {
     // 🔹 Ursprungligt bolagsvärde (utan multipel)
     startVarde: 6855837,
 
+    // 🔹 Alternativt startvärde vid dåligt nuvärde
+    startVardeDåligt: 3000000,
+
     // 🔹 Huslån
     huslan: 2020500,
 
@@ -36,11 +39,14 @@ const State = {
     skattUtdelningLåg: 0.20,
     skattUtdelningHög: 0.50,
 
-    // 🔹 Multipel (uppdateras av slider)
+    // 🔹 Multipel (standardvärde)
     multipel: 2.8,
 
     // 🔹 Huslåne-checkbox status (false = unchecked vid sidladdning)
-    betalaHuslan: false
+    betalaHuslan: false,
+
+    // 🔹 Dåligt nuvärde-checkbox status
+    daligtNuvarde: false
 };
 
 // ✅ Uppdaterar en enskild variabel i state
