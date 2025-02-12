@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultContainer = document.getElementById("resultFörsäljning");
   if (!resultContainer) return;
 
-  // 🎯 Startvärdet sätts direkt här
-  let startVarde = 6855837;
+  // 🎯 Startvärdet sätts från state vid sidladdning
+  let startVarde = getState("daligtNuvarde") ? getState("startVardeDåligt") : getState("startVarde");
 
   resultContainer.innerHTML = `
     <div class="box">
@@ -19,8 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <div class="slider-container">
         <label for="multipel">Multipel:</label>
-        <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="2.8">
-        <span class="slider-value" id="multipelValue">2.8</span>
+        <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="${getState("multipel")}">
+        <span class="slider-value" id="multipelValue">${getState("multipel").toFixed(1)}</span>
       </div>
 
       <div class="checkbox-container">
@@ -48,32 +48,26 @@ document.addEventListener("DOMContentLoaded", () => {
   function uppdateraBeräkningar() {
     const multipel = parseFloat(multipelEl.value) || 1;
     const huslan = getState("huslan") || 0;
-    const belopp312 = getState("belopp312") || 684166;
-    const skattLåg = getState("skattUtdelningLåg") || 0.20;
-    const skattHög = getState("skattUtdelningHög") || 0.50;
+    const belopp312 = getState("belopp312");
+    const skattLåg = getState("skattUtdelningLåg");
+    const skattHög = getState("skattUtdelningHög");
 
-    // 🏗 **Alltid börja från startVarde × multipel**
     let forsPris = startVarde * multipel;
     let exitKapital = forsPris;
 
-    // 🔄 Huslåneberäkning
     let nettoLåg = belopp312 * (1 - skattLåg);
     let lanEfterLågSkatt = huslan - nettoLåg;
     let bruttoHögBehov = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
     let totaltBruttoForLan = belopp312 + bruttoHögBehov;
 
-    // ✅ Om checkbox är ibockad → dra av lån
     if (betalaHuslanEl.checked) {
       exitKapital -= totaltBruttoForLan;
     }
 
-    // ✅ Spara checkboxens status i state
+    updateState("multipel", multipel);
     updateState("betalaHuslan", betalaHuslanEl.checked);
-
-    // ✅ Spara nya exitvärdet i state
     updateState("exitVarde", exitKapital);
 
-    // 📝 Uppdatera HTML
     exitTitleEl.textContent = betalaHuslanEl.checked
       ? "Exitbelopp efter huslånsbetalning 🏡"
       : "Exitbelopp";
@@ -89,28 +83,15 @@ document.addEventListener("DOMContentLoaded", () => {
       : "";
   }
 
-  // 🔄 Event-lyssnare
+  multipelEl.addEventListener("input", uppdateraBeräkningar);
+  betalaHuslanEl.addEventListener("change", uppdateraBeräkningar);
   daligtNuvardeEl.addEventListener("change", () => {
-    startVarde = daligtNuvardeEl.checked ? 3000000 : 6855837;
+    startVarde = daligtNuvardeEl.checked ? getState("startVardeDåligt") : getState("startVarde");
     nuvardeEl.textContent = formatNumber(startVarde);
     uppdateraBeräkningar();
   });
 
-  multipelEl.addEventListener("input", () => {
-    multipelValueEl.textContent = parseFloat(multipelEl.value).toFixed(1);
-    uppdateraBeräkningar();
-  });
-
-  betalaHuslanEl.addEventListener("change", () => {
-    updateState("betalaHuslan", betalaHuslanEl.checked);
-    uppdateraBeräkningar();
-  });
-
-  // 🏗 Initiera UI och kör första beräkning
-  multipelValueEl.textContent = multipelEl.value;
-  betalaHuslanEl.checked = getState("betalaHuslan") || false;
   uppdateraBeräkningar();
 });
 
-// 🛠 Exportera funktionen
 export function uppdateraBeräkningar() {}
