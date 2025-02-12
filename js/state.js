@@ -14,7 +14,10 @@ const State = {
 
     // 🔹 Skattesatser för utdelning
     skattUtdelningLåg: 0.20,
-    skattUtdelningHög: 0.50
+    skattUtdelningHög: 0.50,
+
+    // 🔹 Totalt netto utdelning från investeringsmodulen
+    totaltNetto: 0
 };
 
 // 🎯 Uppdaterar en variabel i state
@@ -22,7 +25,7 @@ function updateState(key, value) {
     if (State.hasOwnProperty(key)) {
         State[key] = value;
     } else {
-        console.warn(⚠️  State-nyckeln '${key}' finns inte.);
+        console.warn(`⚠️  State-nyckeln '${key}' finns inte.`);
     }
 }
 
@@ -33,4 +36,3 @@ function getState(key) {
 
 // 🎯 Exporterar funktionerna
 export { State, updateState, getState };
-
