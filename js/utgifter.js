@@ -7,6 +7,7 @@ const BELÖPP_312 = getState("belopp312") || 221650;
 const betalaHuslan = getState("betalaHuslan") || false;
 let inkomst = getState("totaltNetto") || 0;
 
+// 🎯 Logga ut värden för felsökning
 console.log("✅ [Debug] 3:12-belopp:", BELÖPP_312);
 console.log("✅ [Debug] Betala huslån:", betalaHuslan);
 console.log("✅ [Debug] Hämtad inkomst:", inkomst);
@@ -25,54 +26,16 @@ const UTGIFTER = [
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
 
-// 🎯 Fördelningsfunktion
-function fördelaInkomst(inkomst) {
-    let totalUtgifter = UTGIFTER.reduce((sum, u) => sum + u.belopp, 0);
-    if (inkomst <= 0) return Array(UTGIFTER.length).fill(0);
-    if (inkomst >= totalUtgifter) return UTGIFTER.map(u => u.belopp);
-
-    let r = inkomst / totalUtgifter;
-    let störstaUtgift = Math.max(...UTGIFTER.map(u => u.belopp));
-    let boosts = UTGIFTER.map(u => Math.pow(störstaUtgift / u.belopp, 1));
-    let justeradeUtgifter = UTGIFTER.map((u, i) => u.belopp * r * boosts[i]);
-    let summaJustering = justeradeUtgifter.reduce((sum, ju) => sum + ju, 0);
-
-    return justeradeUtgifter.map(ju => ju * (inkomst / summaJustering));
-}
-
-// 🎯 Uppdatera UI
-function uppdateraUtgifter(inkomst) {
-    document.getElementById("inkomstBelopp").textContent = formatNumber(inkomst);
-    document.getElementById("totalInkomst").textContent = formatNumber(inkomst);
-
-    let totalUtgifter = UTGIFTER.reduce((sum, u) => sum + u.belopp, 0);
-    document.getElementById("totalUtgifter").textContent = formatNumber(totalUtgifter);
-    
-    let täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
-    document.getElementById("inkomstTäckning").textContent = Math.round(täckning) + "%";
-
-    let fördeladInkomst = fördelaInkomst(inkomst);
-    
-    UTGIFTER.forEach((utgift, index) => {
-        let procent = (fördeladInkomst[index] / utgift.belopp) * 100;
-        procent = isNaN(procent) ? 0 : Math.min(procent, 100);
-
-        let fördeladPerMånad = fördeladInkomst[index] / 12;
-        let utgiftPerMånad = utgift.belopp / 12;
-        
-        document.getElementById(`bar${index}`).style.width = procent + "%";
-        document.getElementById(`bar${index}-info`).textContent =
-            `${Math.round(procent)}% | ${formatNumber(fördeladInkomst[index])} (${formatNumber(fördeladPerMånad)} / mån) av ${formatNumber(utgift.belopp)} (${formatNumber(utgiftPerMånad)} / mån)`;
-    });
-
-    // 🔄 Uppdatera state
-    updateState("totaltNetto", inkomst);
-}
-
 // 🎯 Skapa UI
 function skapaUtgifterUI() {
-    let container = document.getElementById("expenses");
-    if (!container) return console.error("❌ [Error] #expenses hittades inte!");
+    let container = document.getElementById("expensesContainer");
+
+    if (!container) {
+        console.error("❌ [Error] #expensesContainer hittades inte i DOM!");
+        return;
+    }
+
+    console.log("✅ [Debug] #expensesContainer hittades! Skapar UI...");
 
     let inkomstSektion = document.createElement("div");
     inkomstSektion.className = "input-group";
