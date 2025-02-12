@@ -19,10 +19,6 @@ const UTGIFTER = [
 let inkomst = getState("totaltNetto");
 console.log("🔍 [Debug] Hämtar 'totaltNetto' från state.js:", inkomst);
 
-if (!inkomst || inkomst === 0) {
-    inkomst = 100000; // 🔥 Standardvärde om inget finns i state
-    console.warn("⚠️ [Warning] Inkomst saknas i state, sätter till standardvärde:", inkomst);
-}
 
 // 🎯 Skapa UI
 function skapaUtgifterUI() {
