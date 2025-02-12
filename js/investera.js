@@ -1,7 +1,7 @@
 import { getState, updateState, onStateChange } from "./state.js";
 import { formatNumber } from "./main.js";
 
-// 🔹 Hämta lagrat 3:12-belopp
+// 🔹 Hämta lagrat 3:12-belopp från state
 let belopp312 = getState("belopp312") || 221650;
 
 /**
@@ -12,6 +12,11 @@ function beräknaInvestering() {
     const avkastningEl = document.getElementById("avkastning");
     const avkastningValueEl = document.getElementById("avkastningValue");
     const totaltNettoEl = document.getElementById("totaltNetto");
+    const bruttoEl = document.getElementById("brutto");
+    const inomGransvardeBruttoEl = document.getElementById("belopp312Value");
+    const inomGransvardeNettoEl = document.getElementById("inomGransvardeNetto");
+    const overGransvardeBruttoEl = document.getElementById("overGransvardeBrutto");
+    const overGransvardeNettoEl = document.getElementById("overGransvardeNetto");
 
     if (!investeratBeloppEl || !avkastningEl) return;
 
@@ -40,16 +45,31 @@ function beräknaInvestering() {
 
     // 🔹 Uppdatera UI
     investeratBeloppEl.textContent = formatNumber(investeratBelopp);
+    bruttoEl.textContent = formatNumber(totalAvkastning);
+    inomGransvardeBruttoEl.textContent = formatNumber(belopp312);
+    inomGransvardeNettoEl.textContent = formatNumber(nettoLåg);
+    overGransvardeBruttoEl.textContent = formatNumber(bruttoHög);
+    overGransvardeNettoEl.textContent = formatNumber(nettoHög);
     totaltNettoEl.textContent = formatNumber(totaltNetto);
 
     // 🔥 Uppdatera state (så att utgifter.js får rätt inkomstvärde)
-    console.log("🚀 [Debug] Uppdaterar state med nytt totaltNetto:", totaltNetto);
     updateState("totaltNetto", totaltNetto);
+}
+
+/**
+ * Öppnar popup för att ändra belopp312
+ */
+function öppnaPopupBelopp312() {
+    let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", belopp312);
+    if (nyttBelopp312 !== null) {
+        belopp312 = parseInt(nyttBelopp312, 10) || belopp312;
+        updateState("belopp312", belopp312);
+        beräknaInvestering();
+    }
 }
 
 // 🔹 Lyssna på förändringar i exitVarde och uppdatera UI
 onStateChange("exitVarde", (nyttExitVarde) => {
-    console.log("🔄 [Debug] `exitVarde` har uppdaterats:", nyttExitVarde);
     beräknaInvestering(); // 🔥 Kör om beräkningen när värdet ändras
 });
 
@@ -71,11 +91,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="slider-value" id="avkastningValue">10%</span>
             </div>
             <p><strong>Totalt netto utdelning:</strong> <span id="totaltNetto" style="color: green; font-weight: bold;"></span></p>
+            <hr>
+            <p>Brutto: <span id="brutto"></span></p>
+            <p>
+                <span id="belopp312Value" style="cursor:pointer; text-decoration:underline;">${formatNumber(belopp312)}</span> (20% skatt) → 
+                Netto: <span id="inomGransvardeNetto"></span>
+            </p>
+            <p>
+                Över gränsvärde (50% skatt): 
+                <span id="overGransvardeBrutto"></span>
+                → Netto: <span id="overGransvardeNetto"></span>
+            </p>
         </div>
     `;
 
     // 🔹 Koppla event-lyssnare
     document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
+    document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
 
     // 🔹 Gör en första beräkning
     beräknaInvestering();
