@@ -9,6 +9,9 @@ const State = {
     // 🔹 3:12-gränsbelopp (beräknas som IBB * 2.75)
     belopp312: 80600 * 2.75, 
 
+    // 🔹 3:12-gränsbelopp (beräknas som IBB * 2.75)
+    spara312: 684166, 
+    
     // 🔹 Skattesatser för utdelning
     skattUtdelningLåg: 0.20,
     skattUtdelningHög: 0.50
