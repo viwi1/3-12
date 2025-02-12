@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function uppdateraBeräkningar() {
     const multipel = parseFloat(multipelEl.value) || 1;
     const huslan = getState("huslan") || 0;
-    const gransvarde = getState("belopp312") || 684166;
+    const belopp312 = getState("belopp312") || 684166;
     const skattLåg = getState("skattUtdelningLåg") || 0.20;
     const skattHög = getState("skattUtdelningHög") || 0.50;
 
@@ -57,19 +57,35 @@ document.addEventListener("DOMContentLoaded", () => {
     let exitKapital = forsPris;
 
     // 🔄 Huslåneberäkning
-    let nettoLåg = gransvarde * (1 - skattLåg);
-    let bruttoHögBehov = (huslan - nettoLåg) / (1 - skattHög);
-    let totaltBruttoForLan = gransvarde + bruttoHögBehov;
+    let nettoLåg = belopp312 * (1 - skattLåg);
+    let lanEfterLågSkatt = huslan - nettoLåg;
+    let bruttoHögBehov = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
+    let totaltBruttoForLan = belopp312 + bruttoHögBehov;
 
     // ✅ Om checkbox är ibockad → dra av lån
     if (betalaHuslanEl.checked) {
       exitKapital -= totaltBruttoForLan;
     }
 
+    // ✅ Spara checkboxens status i state
+    updateState("betalaHuslan", betalaHuslanEl.checked);
+
+    // ✅ Spara nya exitvärdet i state
     updateState("exitVarde", exitKapital);
+
+    // 📝 Uppdatera HTML
+    exitTitleEl.textContent = betalaHuslanEl.checked
+      ? "Exitbelopp efter huslånsbetalning 🏡"
+      : "Exitbelopp";
     exitBeloppEl.textContent = formatNumber(exitKapital);
+
     huslanDetaljerEl.innerHTML = betalaHuslanEl.checked
-      ? `<p>Huslån: ${formatNumber(huslan)}</p>`
+      ? `
+        <p>Huslån: ${formatNumber(huslan)}</p>
+        <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoForLan)}</p>
+        <p>- ${formatNumber(belopp312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
+        <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt > 0 ? lanEfterLågSkatt : 0)}</p>
+      `
       : "";
   }
 
@@ -85,13 +101,14 @@ document.addEventListener("DOMContentLoaded", () => {
     uppdateraBeräkningar();
   });
 
-  betalaHuslanEl.addEventListener("change", uppdateraBeräkningar);
+  betalaHuslanEl.addEventListener("change", () => {
+    updateState("betalaHuslan", betalaHuslanEl.checked);
+    uppdateraBeräkningar();
+  });
 
   // 🏗 Initiera UI och kör första beräkning
   multipelValueEl.textContent = multipelEl.value;
-  betalaHuslanEl.checked = false; // ❌ Checkbox är alltid avbockad vid sidladdning
-  updateState("betalaHuslan", false);
-
+  betalaHuslanEl.checked = getState("betalaHuslan") || false;
   uppdateraBeräkningar();
 });
 
