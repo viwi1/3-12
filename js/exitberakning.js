@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎯 Direkt definierade värden
     const START_VARDE = 6855837;
     const START_VARDE_DALIGT = 3000000;
-    let huslan = 2500000; // Standard huslån
+    let huslan = 2020500; // Standard huslån
     let belopp312 = 684166; // Standard 3:12-belopp
 
     const resultContainer = document.getElementById("resultFörsäljning");
