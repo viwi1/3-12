@@ -42,8 +42,8 @@ function beräknaInvestering() {
     totaltNettoEl.textContent = formatNumber(totaltNetto);
 
     // 🔥 Uppdatera state SISTA STEGET
-    updateState("totaltNetto", totaltNetto);
-    console.log("🚀 [Debug] Uppdaterar state: totaltNetto =", totaltNetto);
+console.log("🚀 [Debug] Skickar till state: totaltNetto =", totaltNetto);
+    updateState("totaltNetto", totaltNetto); // 🔥 Uppdatera state.js
 }
 
 function öppnaPopupBelopp312() {
