@@ -6,13 +6,17 @@ const State = {
     belopp312: 221650,
     skattUtdelningLåg: 0.20,
     skattUtdelningHög: 0.50,
-    totaltNetto: 0, // 🔹 Observerad variabel
+    totaltNetto: 0 // 🔹 Observerad variabel
 };
 
-// 🔍 **Event listeners för state-ändringar**
+// 🎯 Objekt som håller event-lyssnare (observers)
 const observers = {};
 
-// 🎯 Uppdatera en variabel i state och meddela observers
+/**
+ * Uppdaterar en variabel i `State` och meddelar eventuella lyssnare
+ * @param {string} key - Nyckeln i State som ska uppdateras
+ * @param {any} value - Värdet som ska sättas
+ */
 function updateState(key, value) {
     if (State.hasOwnProperty(key)) {
         State[key] = value;
@@ -27,7 +31,11 @@ function updateState(key, value) {
     }
 }
 
-// 🎯 Lägg till en eventlyssnare på en state-variabel
+/**
+ * Lägger till en eventlyssnare för en specifik state-variabel
+ * @param {string} key - State-nyckeln man vill lyssna på
+ * @param {function} callback - Funktionen som körs när `key` uppdateras
+ */
 function onStateChange(key, callback) {
     if (!observers[key]) {
         observers[key] = [];
@@ -35,7 +43,11 @@ function onStateChange(key, callback) {
     observers[key].push(callback);
 }
 
-// 🎯 Hämta en variabel från state
+/**
+ * Hämtar en variabel ur `State`
+ * @param {string} key - Nyckeln du vill hämta
+ * @returns {any} Värdet från `State` eller `null` om nyckeln saknas
+ */
 function getState(key) {
     return State.hasOwnProperty(key) ? State[key] : null;
 }
