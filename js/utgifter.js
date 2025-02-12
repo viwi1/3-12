@@ -16,7 +16,12 @@ const UTGIFTER = [
 ];
 
 // 🔹 Hämta initial inkomst från state
-let inkomst = getState("totaltNetto") || 0;
+let inkomst = getState("totaltNetto");
+
+// 🛑 Om inkomst är 0 eller null, vänta på att den uppdateras
+if (!inkomst || inkomst === 0) {
+    inkomst = "Laddar...";
+}
 
 // 🔹 Kör UI direkt vid sidladdning
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,9 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
     uppdateraUtgifter(inkomst);
 });
 
-// 🔹 Lyssna på förändringar i `totaltNetto`, men undvik loopar
+// 🔹 Vänta på att `totaltNetto` uppdateras innan vi ritar om UI
 onStateChange("totaltNetto", (nyInkomst) => {
-    if (Math.round(nyInkomst) !== Math.round(inkomst)) {
+    if (nyInkomst > 0) {
         uppdateraUtgifter(nyInkomst);
     }
 });
@@ -40,7 +45,7 @@ function skapaUtgifterUI() {
 
     container.innerHTML = `
         <h3>Summeringar</h3>
-        <p>Total inkomst: <span id="totalInkomst"></span></p>
+        <p>Total inkomst: <span id="totalInkomst">${formatNumber(inkomst)}</span></p>
         <p>Totala utgifter: <span id="totalUtgifter"></span></p>
         <p>Inkomst täckning: <span id="inkomstTäckning"></span></p>
         <div id="utgifterForm"></div>
