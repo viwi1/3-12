@@ -20,6 +20,9 @@ const State = {
     totaltNetto: 0
 };
 
+console.log(getState("totaltNetto"));
+
+
 // 🎯 Uppdaterar en variabel i state
 function updateState(key, value) {
     if (State.hasOwnProperty(key)) {
