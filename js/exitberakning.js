@@ -96,10 +96,22 @@ document.addEventListener("DOMContentLoaded", () => {
             `
             : "";
 
+        // 🏡 Lägg till klickfunktioner för att ändra huslånet och 3:12-beloppet
         document.getElementById("huslanValue").addEventListener("click", öppnaPopupHuslan);
         document.getElementById("spara312Value").addEventListener("click", öppnaPopupSpara312);
     }
 
+    // 🔹 Popup för att ändra **huslånet**
+    function öppnaPopupHuslan() {
+        let nyttHuslan = prompt("Ange nytt huslånebelopp:", huslan);
+        if (nyttHuslan !== null) {
+            huslan = parseInt(nyttHuslan, 10) || huslan;
+            updateState("huslan", huslan);
+            uppdateraBeräkningar();
+        }
+    }
+
+    // 🔹 Popup för att ändra **sparat 3:12-belopp**
     function öppnaPopupSpara312() {
         let nyttSpara312 = prompt("Ange nytt sparat 3:12-belopp:", getState("spara312"));
         if (nyttSpara312 !== null) {
