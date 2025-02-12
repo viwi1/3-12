@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="slider-container">
                 <label for="multipel">Multipel:</label>
-                <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="1.5">
+                <input type="range" id="multipel" min="1.0" max="4" step="0.1" value="3.0">
                 <span class="slider-value" id="multipelValue">1.5</span>
             </div>
             <div class="checkbox-container">
