@@ -12,37 +12,12 @@
 <div id="resultFörsäljning"></div>
 
 <!-- Investera -->
-<div id="resultInvestera">
-  <div class="box">
-    <p class="result-title">Investera</p>
-    <p><strong>Investerat belopp:</strong> <span id="investeratBelopp"></span></p>
-    <div class="slider-container">
-      <label for="avkastning">Avkastning (% per år):</label>
-      <input type="range" id="avkastning" min="1" max="30" step="1" value="10">
-      <span class="slider-value" id="avkastningValue">10%</span>
-    </div>
-    <p>Brutto: <span id="brutto"></span></p>
-    <p>
-      Inom gränsvärde (20% skatt): 
-      <span id="inomGransvardeBrutto"></span>
-      → Netto: <span id="inomGransvardeNetto"></span>
-    </p>
-    <p>
-      Över gränsvärde (50% skatt): 
-      <span id="overGransvardeBrutto"></span>
-      → Netto: <span id="overGransvardeNetto"></span>
-    </p>
-    <p>
-      <strong>Totalt netto utdelning:</strong>
-      <span id="totaltNetto"></span>
-    </p>
-  </div>
-</div>
+<div id="resultInvestera"></div>
 
 <script type="module" src="./js/state.js"></script>
 <script type="module" src="./js/main.js"></script>
 <script type="module" src="./js/exitberakning.js"></script>
-<script type="module" src="./js/investera.js"></script> <!-- ✅ Lade till utdelningsmodulen -->
+<script type="module" src="./js/investera.js"></script>
 
 </body>
 </html>
