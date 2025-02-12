@@ -1,4 +1,5 @@
 import { formatNumber } from "./main.js";
+import { getState } from "./state.js";
 
 // 🎯 Standardutgifter
 const UTGIFTER = [
@@ -16,6 +17,9 @@ const UTGIFTER = [
 
 // 🎯 Exponent för fördelningsmodellen
 const BOOST_EXPONENT = 1;
+
+// 🎯 Hämta initial inkomst från investeringsmodulen
+let inkomst = getState("totaltNetto") || 0;
 
 // 🎯 Fördelar inkomst proportionellt baserat på utgifter
 function fördelaInkomst(inkomst) {
@@ -68,15 +72,15 @@ function skapaUtgifterUI() {
     inkomstSektion.className = "input-group";
     inkomstSektion.innerHTML = `
         <label for="inkomstSlider">Ange inkomst per år:</label>
-        <input type="range" id="inkomstSlider" min="0" max="1000000" step="10000" value="0">
-        <span id="inkomstBelopp">0 kr</span>
+        <input type="range" id="inkomstSlider" min="0" max="1000000" step="10000" value="${inkomst}">
+        <span id="inkomstBelopp">${formatNumber(inkomst)}</span>
     `;
     container.appendChild(inkomstSektion);
 
     let summering = document.createElement("div");
     summering.innerHTML = `
         <h3>Summeringar</h3>
-        <p>Total inkomst: <span id="totalInkomst">0 kr</span></p>
+        <p>Total inkomst: <span id="totalInkomst">${formatNumber(inkomst)}</span></p>
         <p>Totala utgifter: <span id="totalUtgifter">0 kr</span></p>
         <p>Inkomst täckning: <span id="inkomstTäckning">0%</span></p>
     `;
@@ -114,7 +118,7 @@ function skapaUtgifterUI() {
         });
     });
 
-    uppdateraUtgifter(0);
+    uppdateraUtgifter(inkomst);
 }
 
 // 🎯 Initiera vid sidladdning
