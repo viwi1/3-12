@@ -56,8 +56,7 @@ function öppnaPopupBelopp312() {
     }
 }
 
-console.log("🚀 [Debug] Skickar till state: totaltNetto =", totaltNetto);
-updateState("totaltNetto", totaltNetto);
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -93,5 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     beräknaInvestering();
 });
+
+console.log("🚀 [Debug] Skickar till state: totaltNetto =", totaltNetto);
+updateState("totaltNetto", totaltNetto);
 
 export { beräknaInvestering };
