@@ -9,7 +9,7 @@ export { formatNumber };
 
 // 🏁 Säkerställ att startvärde syns vid sidladdning
 document.addEventListener("DOMContentLoaded", function () {
-    let nuvarde = getState("startVarde") || 0;
+    let nuvarde = getState("startVarde") || 250000;
     document.getElementById("nuvarde").textContent = formatNumber(nuvarde);
 
     // ✅ Kör uppdateraBeräkningar() efter att sidan laddats
