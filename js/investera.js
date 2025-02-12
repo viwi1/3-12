@@ -90,4 +90,5 @@ document.addEventListener("DOMContentLoaded", () => {
     beräknaInvestering();
 });
 
+// ✅ **Korrekt export**
 export { beräknaInvestering };
