@@ -2,14 +2,14 @@
 const State = {
     betalaHuslan: false,
     exitVarde: 0,
-    spara312: 684166, 
+    spara312: 684166,
     belopp312: 221650,
     skattUtdelningLåg: 0.20,
     skattUtdelningHög: 0.50,
-    totaltNetto: 0 // 🔹 Observerad variabel
+    totaltNetto: 0, // 🔹 Observerad variabel
 };
 
-// 🎯 Objekt som håller event-lyssnare (observers)
+// 🎯 Event listeners för state-ändringar
 const observers = {};
 
 /**
