@@ -1,7 +1,7 @@
-import { getState } from "./state.js";
+import { getState, updateState } from "./state.js";
 import { formatNumber } from "./main.js";
 
-let belopp312 = 221650; // Standardvärde för 3:12-beloppet
+let belopp312 = getState("belopp312") || 221650;
 
 function beräknaInvestering() {
     const investeratBeloppEl = document.getElementById("investeratBelopp");
@@ -41,15 +41,17 @@ function beräknaInvestering() {
     overGransvardeNettoEl.textContent = formatNumber(nettoHög);
     totaltNettoEl.textContent = formatNumber(totaltNetto);
 
-    // 🔥 Lägg till event-lyssnare för pop-up efter att UI är renderat
+    // 🔥 Uppdatera state så att utgifter.js får rätt inkomstvärde
+    updateState("totaltNetto", totaltNetto);
+
     document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
 }
 
-// ✅ Pop-up för att ändra 3:12-beloppet
 function öppnaPopupBelopp312() {
     let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", belopp312);
     if (nyttBelopp312 !== null) {
         belopp312 = parseInt(nyttBelopp312, 10) || belopp312;
+        updateState("belopp312", belopp312);
         beräknaInvestering();
     }
 }
@@ -82,14 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     `;
 
-    // ✅ Koppla event-lyssnare
     document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
-    document.getElementById("betalaHuslan").addEventListener("change", beräknaInvestering);
-    document.getElementById("multipel").addEventListener("input", beräknaInvestering);
     document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
 
     beräknaInvestering();
 });
 
-// ✅ Exportera funktionen korrekt
 export { beräknaInvestering };
