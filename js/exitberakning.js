@@ -1,4 +1,4 @@
-import { updateState } from "./state.js";
+import { updateState, getState } from "./state.js";
 import { formatNumber } from "./main.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const START_VARDE = 6855837;
     const START_VARDE_DALIGT = 3000000;
     let huslan = 2020500; // Standard huslån
-    let belopp312 = 684166; // Standard 3:12-belopp
 
     const resultContainer = document.getElementById("resultFörsäljning");
     if (!resultContainer) return;
@@ -53,6 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const multipel = parseFloat(multipelEl.value) || 1;
         multipelValueEl.textContent = multipel.toFixed(1);
 
+        // 🔹 Hämta 3:12-belopp från state
+        let belopp312 = getState("belopp312") || 684166;
+
         // 🔹 Beräkna exitKapital
         let försäljningspris = startVarde * multipel;
         let exitKapital = försäljningspris;
@@ -93,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
             `
             : "";
 
-        // 🏡 Lägg till klickfunktioner för att ändra huslånet och 3:12-beloppet
         document.getElementById("huslanValue").addEventListener("click", öppnaPopupHuslan);
         document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
     }
@@ -107,9 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function öppnaPopupBelopp312() {
-        let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", belopp312);
+        let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", getState("belopp312"));
         if (nyttBelopp312 !== null) {
-            belopp312 = parseInt(nyttBelopp312, 10) || belopp312;
+            updateState("belopp312", parseInt(nyttBelopp312, 10) || getState("belopp312"));
             uppdateraBeräkningar();
         }
     }
