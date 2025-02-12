@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎯 Direkt definierade värden (ej i state.js)
     const START_VARDE = 6855837;
     const START_VARDE_DALIGT = 3000000;
-    const HUSLAN = 2020500;
+    let huslan = getState("huslan") || 2020500; // ✅ Hämtas från state, default 2 020 500 kr
 
     // 🎯 Generera UI
     resultContainer.innerHTML = `
@@ -24,13 +24,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="slider-value" id="multipelValue">1.5</span>
             </div>
             <div class="checkbox-container">
-                <input type="checkbox" id="betalaHuslan">
+                <input type="checkbox" id="betalaHuslan" checked>
                 <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
+                <span class="link-like" id="openHuslanPopup">✏️ Ändra</span>
             </div>
             <p class="result-title"><strong id="exitTitle">Exitbelopp</strong></p>
             <p id="exitBelopp" style="color: green; font-weight: bold;"></p>
             <hr>
             <div id="huslanDetaljer"></div>
+        </div>
+
+        <!-- Popup för att ändra huslån -->
+        <div class="overlay" id="huslanPopup">
+            <div class="popup">
+                <span class="closePopup" onclick="closeHuslanPopup()">×</span>
+                <h4>Ändra huslån</h4>
+                <input type="number" id="huslanInput" value="${huslan}" style="width:120px;">
+                <button onclick="updateHuslan()">Spara</button>
+            </div>
         </div>
     `;
 
@@ -43,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const exitTitleEl = document.getElementById("exitTitle");
     const exitBeloppEl = document.getElementById("exitBelopp");
     const huslanDetaljerEl = document.getElementById("huslanDetaljer");
+    const openHuslanPopupEl = document.getElementById("openHuslanPopup");
 
     function uppdateraBeräkningar() {
         const multipel = parseFloat(multipelEl.value) || 1;
@@ -56,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let exitKapital = forsPris;
 
         let nettoLåg = spara312 * (1 - skattLåg);
-        let lanEfterLågSkatt = HUSLAN - nettoLåg;
+        let lanEfterLågSkatt = huslan - nettoLåg;
         let bruttoHögBehov = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
         let totaltBruttoForLan = spara312 + bruttoHögBehov;
 
@@ -66,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateState("exitVarde", exitKapital);
         updateState("betalaHuslan", betalaHuslan);
+        updateState("huslan", huslan); // ✅ Uppdaterar huslånet i state
 
         exitTitleEl.textContent = betalaHuslan
             ? "Exitbelopp efter huslånsbetalning 🏡"
@@ -74,12 +87,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
         huslanDetaljerEl.innerHTML = betalaHuslan
             ? `
-            <p>Huslån: ${formatNumber(HUSLAN)}</p>
+            <p>Huslån: ${formatNumber(huslan)}</p>
             <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoForLan)}</p>
             <p>- ${formatNumber(spara312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
-            <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt > 0 ? lanEfterLågSkatt : 0)}</p>
+            <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt)}</p>
+            <p><strong>Totalt betalat för lån:</strong> ${formatNumber(nettoLåg + lanEfterLågSkatt)}</p>
             `
             : "";
+    }
+
+    function updateHuslan() {
+        let nyttHuslan = parseInt(document.getElementById("huslanInput").value, 10);
+        if (!isNaN(nyttHuslan) && nyttHuslan > 0) {
+            huslan = nyttHuslan;
+            updateState("huslan", huslan);
+            uppdateraBeräkningar();
+            closeHuslanPopup();
+        }
+    }
+
+    function openHuslanPopup() {
+        document.getElementById("huslanPopup").style.display = "block";
+    }
+
+    function closeHuslanPopup() {
+        document.getElementById("huslanPopup").style.display = "none";
     }
 
     multipelEl.addEventListener("input", () => {
@@ -95,8 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
         uppdateraBeräkningar();
     });
 
+    openHuslanPopupEl.addEventListener("click", openHuslanPopup);
+
     multipelValueEl.textContent = multipelEl.value;
-    betalaHuslanEl.checked = getState("betalaHuslan") || false;
+    betalaHuslanEl.checked = true; // ✅ Huslånet är ibockat som standard
     uppdateraBeräkningar();
 });
 
