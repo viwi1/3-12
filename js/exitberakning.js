@@ -1,10 +1,37 @@
+import { updateState } from "./state.js";
+import { formatNumber } from "./main.js"; // ✅ Se till att formatNumber importeras korrekt
+
 document.addEventListener("DOMContentLoaded", () => {
-    // 🎯 Direkt definierade värden i `exitberakning.js`
     let startVarde = 6855837;
     const START_VARDE_DALIGT = 3000000;
     const HUSLAN = 2020500;
 
-    // 🎯 Hämta element
+    const resultContainer = document.getElementById("resultFörsäljning");
+    if (!resultContainer) return;
+
+    // ✅ Generera UI i DOM
+    resultContainer.innerHTML = `
+        <div class="box">
+            <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde">${formatNumber(startVarde)}</span></p>
+            <div class="checkbox-container">
+                <input type="checkbox" id="daligtNuvarde">
+                <label for="daligtNuvarde">3 000 000 kr</label>
+            </div>
+            <div class="slider-container">
+                <label for="multipel">Multipel:</label>
+                <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="1.5">
+                <span class="slider-value" id="multipelValue">1.5</span>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="betalaHuslan" checked>
+                <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
+            </div>
+            <p class="result-title"><strong id="exitTitle">Exitbelopp</strong></p>
+            <p id="exitBelopp"></p>
+            <div id="huslanDetaljer"></div>
+        </div>
+    `;
+
     const nuvardeEl = document.getElementById("nuvarde");
     const daligtNuvardeEl = document.getElementById("daligtNuvarde");
     const multipelEl = document.getElementById("multipel");
@@ -14,24 +41,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const exitBeloppEl = document.getElementById("exitBelopp");
     const huslanDetaljerEl = document.getElementById("huslanDetaljer");
 
-    // ✅ Sätt startvärde direkt vid sidladdning
-    nuvardeEl.textContent = formatNumber(startVarde);
-
     function uppdateraBeräkningar() {
         const multipel = parseFloat(multipelEl.value) || 1;
         const skattLåg = 0.20;
         const skattHög = 0.50;
         const belopp312 = 684166;
 
-        // 🔹 Kontrollera om användaren valt "Dåligt startvärde"
         startVarde = daligtNuvardeEl.checked ? START_VARDE_DALIGT : 6855837;
         nuvardeEl.textContent = formatNumber(startVarde);
 
-        // 🔹 Beräkna försäljningspris baserat på startvärde och multipel
         let forsPris = startVarde * multipel;
         let exitKapital = forsPris;
 
-        // 🔹 Räkna ut skatt & lån
         let nettoLåg = belopp312 * (1 - skattLåg);
         let lanEfterLågSkatt = HUSLAN - nettoLåg;
         let bruttoHögBehov = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
@@ -41,7 +62,9 @@ document.addEventListener("DOMContentLoaded", () => {
             exitKapital -= totaltBruttoForLan;
         }
 
-        // ✅ Uppdatera UI
+        updateState("exitVarde", exitKapital);
+        updateState("betalaHuslan", betalaHuslanEl.checked);
+
         exitTitleEl.textContent = betalaHuslanEl.checked
             ? "Exitbelopp efter huslånsbetalning 🏡"
             : "Exitbelopp";
@@ -57,7 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
             : "";
     }
 
-    // ✅ Lägg till event listeners
     multipelEl.addEventListener("input", () => {
         multipelValueEl.textContent = parseFloat(multipelEl.value).toFixed(1);
         uppdateraBeräkningar();
@@ -71,8 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
         uppdateraBeräkningar();
     });
 
-    // ✅ Initiera beräkningar vid sidladdning
     multipelValueEl.textContent = multipelEl.value;
-    betalaHuslanEl.checked = true; // ✅ Huslån är CHECKED som default
+    betalaHuslanEl.checked = true; 
     uppdateraBeräkningar();
 });
+
+// ✅ Exporterar funktionen korrekt
+export { uppdateraBeräkningar };
