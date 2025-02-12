@@ -4,13 +4,14 @@ import { formatNumber } from "./main.js";
 document.addEventListener("DOMContentLoaded", () => {
 
     let huslan = 2020500;
+    let svartVarde = 6855837;
 
     const resultContainer = document.getElementById("resultFörsäljning");
     if (!resultContainer) return;
 
     resultContainer.innerHTML = `
         <div class="box">
-            <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
+            <p><strong>Startvärde på bolaget:</strong> <span id="startVarde"></span></p>
             <div class="slider-container">
                 <label for="multipel">Multipel:</label>
                 <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="1.5">
