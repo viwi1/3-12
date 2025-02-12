@@ -52,8 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const multipel = parseFloat(multipelEl.value) || 1;
         multipelValueEl.textContent = multipel.toFixed(1);
 
-        // 🔹 Hämta 3:12-belopp från state
-        let belopp312 = getState("belopp312") || 684166;
+        // 🔹 Hämta belopp från state
+        let spara312 = getState("spara312"); // Används för huslånet
+        let belopp312 = getState("belopp312"); // Används för utdelning
 
         // 🔹 Beräkna exitKapital
         let försäljningspris = startVarde * multipel;
@@ -63,10 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const skattLåg = 0.20;
         const skattHög = 0.50;
 
-        let nettoLåg = belopp312 * (1 - skattLåg);
+        let nettoLåg = spara312 * (1 - skattLåg);
         let lanEfterLågSkatt = huslan - nettoLåg;
         let bruttoHögBehov = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
-        let totaltBruttoFörLån = belopp312 + bruttoHögBehov;
+        let totaltBruttoFörLån = spara312 + bruttoHögBehov;
         let totaltNettoLån = nettoLåg + lanEfterLågSkatt;
 
         if (betalaHuslanEl.checked) {
@@ -89,28 +90,20 @@ document.addEventListener("DOMContentLoaded", () => {
             <hr>
             <p>Huslån: <span id="huslanValue" style="cursor:pointer; text-decoration:underline;">${formatNumber(huslan)}</span></p>
             <p>Bruttobelopp för lån: ${formatNumber(totaltBruttoFörLån)}</p>
-            <p>- <span id="belopp312Value" style="cursor:pointer; text-decoration:underline;">${formatNumber(belopp312)}</span> (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
+            <p>- <span id="spara312Value" style="cursor:pointer; text-decoration:underline;">${formatNumber(spara312)}</span> (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
             <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt)}</p>
             <p>- Beräkning nettoutdelning: ${formatNumber(nettoLåg)} + ${formatNumber(lanEfterLågSkatt)} = ${formatNumber(totaltNettoLån)}</p>
             `
             : "";
 
         document.getElementById("huslanValue").addEventListener("click", öppnaPopupHuslan);
-        document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
+        document.getElementById("spara312Value").addEventListener("click", öppnaPopupSpara312);
     }
 
-    function öppnaPopupHuslan() {
-        let nyttHuslan = prompt("Ange nytt huslånebelopp:", huslan);
-        if (nyttHuslan !== null) {
-            huslan = parseInt(nyttHuslan, 10) || huslan;
-            uppdateraBeräkningar();
-        }
-    }
-
-    function öppnaPopupBelopp312() {
-        let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", getState("belopp312"));
-        if (nyttBelopp312 !== null) {
-            updateState("belopp312", parseInt(nyttBelopp312, 10) || getState("belopp312"));
+    function öppnaPopupSpara312() {
+        let nyttSpara312 = prompt("Ange nytt sparat 3:12-belopp:", getState("spara312"));
+        if (nyttSpara312 !== null) {
+            updateState("spara312", parseInt(nyttSpara312, 10) || getState("spara312"));
             uppdateraBeräkningar();
         }
     }
