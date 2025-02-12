@@ -1,3 +1,4 @@
+// 🎯 State-objektet
 const State = {
     betalaHuslan: false,
     exitVarde: 0,
@@ -5,16 +6,11 @@ const State = {
     belopp312: 221650,
     skattUtdelningLåg: 0.20,
     skattUtdelningHög: 0.50,
-    totaltNetto: 0,  // 🔹 Observerad variabel
-    observers: {} // 🔥 Nytt objekt för att lagra eventlyssnare
+    totaltNetto: 0, // 🔹 Observerad variabel
 };
-onStateChange("totaltNetto", (nyInkomst) => {
-    console.log("🔄 [Debug] `totaltNetto` har uppdaterats i state.js:", nyInkomst);
-    
-    // 🔥 Uppdatera slider och UI
-    document.getElementById("inkomstSlider").value = nyInkomst;
-    document.getElementById("inkomstBelopp").textContent = formatNumber(nyInkomst);
-});
+
+// 🔍 **Event listeners för state-ändringar**
+const observers = {};
 
 // 🎯 Uppdatera en variabel i state och meddela observers
 function updateState(key, value) {
@@ -22,19 +18,21 @@ function updateState(key, value) {
         State[key] = value;
         console.log(`🔄 [State] Uppdaterar ${key}:`, value);
 
-        // 🔥 Notifiera eventlyssnare
-        if (State.observers[key]) {
-            State.observers[key].forEach(callback => callback(value));
+        // 🔥 Notifiera eventlyssnare om värdet ändras
+        if (observers[key]) {
+            observers[key].forEach(callback => callback(value));
         }
+    } else {
+        console.warn(`⚠️ [Warning] Försökte uppdatera okänd state-nyckel: '${key}'`);
     }
 }
 
 // 🎯 Lägg till en eventlyssnare på en state-variabel
 function onStateChange(key, callback) {
-    if (!State.observers[key]) {
-        State.observers[key] = [];
+    if (!observers[key]) {
+        observers[key] = [];
     }
-    State.observers[key].push(callback);
+    observers[key].push(callback);
 }
 
 // 🎯 Hämta en variabel från state
@@ -42,4 +40,5 @@ function getState(key) {
     return State.hasOwnProperty(key) ? State[key] : null;
 }
 
+// ✅ Exportera funktionerna
 export { State, updateState, getState, onStateChange };
