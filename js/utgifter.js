@@ -16,12 +16,7 @@ const UTGIFTER = [
 ];
 
 // 🔹 Hämta initial inkomst från state
-let inkomst = getState("totaltNetto");
-
-// 🛑 Om inkomst är 0 eller null, vänta på att den uppdateras
-if (!inkomst || inkomst === 0) {
-    inkomst = "Laddar...";
-}
+let inkomst = getState("totaltNetto") || 0;
 
 // 🔹 Kör UI direkt vid sidladdning
 document.addEventListener("DOMContentLoaded", () => {
@@ -37,7 +32,7 @@ onStateChange("totaltNetto", (nyInkomst) => {
 });
 
 /**
- * Skapar UI för utgifter (körs en gång vid sidladdning)
+ * Skapar UI för utgifter
  */
 function skapaUtgifterUI() {
     const container = document.getElementById("expenses");
@@ -45,23 +40,26 @@ function skapaUtgifterUI() {
 
     container.innerHTML = `
         <h3>Summeringar</h3>
-        <p>Total inkomst: <span id="totalInkomst">${formatNumber(inkomst)}</span></p>
-        <p>Totala utgifter: <span id="totalUtgifter"></span></p>
-        <p>Inkomst täckning: <span id="inkomstTäckning"></span></p>
-        <div id="utgifterForm"></div>
+        <div class="summary">
+            <p><strong>Total inkomst:</strong> <span id="totalInkomst">${formatNumber(inkomst)} kr</span></p>
+            <p><strong>Totala utgifter:</strong> <span id="totalUtgifter">0 kr</span></p>
+            <p><strong>Inkomst täckning:</strong> <span id="inkomstTäckning">0%</span></p>
+        </div>
+        <div id="utgifterList"></div>
     `;
 
-    const utgifterForm = document.getElementById("utgifterForm");
+    const utgifterList = document.getElementById("utgifterList");
 
-    // 🔹 Skapa utgiftsposter
+    // 🔹 Skapa utgiftsposter snyggt
     UTGIFTER.forEach((utgift, index) => {
-        const inputGroup = document.createElement("div");
-        inputGroup.className = "input-group";
-        inputGroup.innerHTML = `
-            <label>${utgift.namn}:</label>
+        const item = document.createElement("div");
+        item.className = "utgift-item";
+        item.innerHTML = `
+            <label>${utgift.namn}</label>
             <input type="number" id="kostnad${index}" value="${utgift.belopp}">
+            <span class="utgift-belopp">${formatNumber(utgift.belopp)} kr</span>
         `;
-        utgifterForm.appendChild(inputGroup);
+        utgifterList.appendChild(item);
 
         // 🔹 Eventlyssnare för att uppdatera totalbelopp när utgifter ändras
         document.getElementById(`kostnad${index}`).addEventListener("input", () => {
@@ -72,9 +70,9 @@ function skapaUtgifterUI() {
 }
 
 /**
- * Uppdaterar endast totalbelopp & procent, ingen onödig state-uppdatering
+ * Uppdaterar totalbelopp och procent
  * @param {number} nyInkomst - Värdet på "totaltNetto"
- * @param {boolean} frånUI - Om uppdateringen sker från UI (ändring av utgifter)
+ * @param {boolean} frånUI - Om uppdateringen sker från UI
  */
 function uppdateraUtgifter(nyInkomst, frånUI = false) {
     if (!document.getElementById("totalInkomst")) return;
@@ -82,9 +80,14 @@ function uppdateraUtgifter(nyInkomst, frånUI = false) {
     const totalUtgifter = UTGIFTER.reduce((sum, u) => sum + u.belopp, 0);
     const täckning = totalUtgifter > 0 ? (nyInkomst / totalUtgifter) * 100 : 0;
 
-    document.getElementById("totalInkomst").textContent = formatNumber(nyInkomst);
-    document.getElementById("totalUtgifter").textContent = formatNumber(totalUtgifter);
-    document.getElementById("inkomstTäckning").textContent = Math.round(täckning) + "%";
+    document.getElementById("totalInkomst").textContent = `${formatNumber(nyInkomst)} kr`;
+    document.getElementById("totalUtgifter").textContent = `${formatNumber(totalUtgifter)} kr`;
+    document.getElementById("inkomstTäckning").textContent = `${Math.round(täckning)}%`;
+
+    // 🔹 Uppdatera varje utgiftsposts visade belopp
+    UTGIFTER.forEach((utgift, index) => {
+        document.getElementById(`kostnad${index}`).nextElementSibling.textContent = `${formatNumber(utgift.belopp)} kr`;
+    });
 
     // 🔹 Undvik att uppdatera state om värdet redan är detsamma
     if (!frånUI && Math.round(getState("totaltNetto")) !== Math.round(nyInkomst)) {
