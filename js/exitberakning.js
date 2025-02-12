@@ -87,12 +87,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // 🔹 Visa huslånedetaljer
         huslanDetaljerEl.innerHTML = betalaHuslanEl.checked
             ? `
-            <p>Huslån: <span id="huslanValue" style="cursor:pointer; text-decoration:underline;">${formatNumber(huslan)}</span> ✏️</p>
+            <hr>
+            <p>Huslån: <span id="huslanValue" style="cursor:pointer; text-decoration:underline;">${formatNumber(huslan)}</span></p>
             <p>Bruttobelopp för lån: ${formatNumber(totaltBruttoFörLån)}</p>
             <p>- ${formatNumber(belopp312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
             <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt)}</p>
-            <hr>
-            <p><strong>${formatNumber(nettoLåg)} + ${formatNumber(lanEfterLågSkatt)} = ${formatNumber(totaltNettoLån)}</strong></p>
+
+            <p>test test${formatNumber(nettoLåg)} + ${formatNumber(lanEfterLågSkatt)} = ${formatNumber(totaltNettoLån)}</p>
             `
             : "";
 
