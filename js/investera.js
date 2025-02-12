@@ -1,8 +1,12 @@
 import { getState, updateState } from "./state.js";
 import { formatNumber } from "./main.js";
 
+// 🔹 Hämtar lagrat 3:12-belopp, om det finns
 let belopp312 = getState("belopp312") || 221650;
 
+/**
+ * Beräknar investeringsutdelning och uppdaterar UI + state
+ */
 function beräknaInvestering() {
     const investeratBeloppEl = document.getElementById("investeratBelopp");
     const avkastningEl = document.getElementById("avkastning");
@@ -14,25 +18,36 @@ function beräknaInvestering() {
     const overGransvardeNettoEl = document.getElementById("overGransvardeNetto");
     const totaltNettoEl = document.getElementById("totaltNetto");
 
+    // 🔹 Om elementen saknas (t.ex. om "resultInvestera" inte finns i DOM) -> avbryt
     if (!investeratBeloppEl) return;
 
+    // 🔹 Hämta slider-värdet för avkastning
     const avkastningProcent = parseInt(avkastningEl.value, 10);
     avkastningValueEl.textContent = avkastningProcent + "%";
 
+    // 🔹 Beräkna avkastningen
     const avkastning = avkastningProcent / 100;
+
+    // 🔹 Hämta det värde på bolaget (exitVarde) som finns i state
     const investeratBelopp = getState("exitVarde") || 0;
 
+    // 🔹 Räkna ut totalavkastning
     const totalAvkastning = investeratBelopp * avkastning;
 
+    // 🔹 Hämta skattesatser och räkna ut fördelning låg/hög beskattning
     const skattLåg = getState("skattUtdelningLåg");
     const skattHög = getState("skattUtdelningHög");
 
+    // 🔹 Lågskattedel upp till belopp312, resten högskatt
     const bruttoLåg = Math.min(totalAvkastning, belopp312);
     const bruttoHög = totalAvkastning > belopp312 ? totalAvkastning - belopp312 : 0;
     const nettoLåg = bruttoLåg * (1 - skattLåg);
     const nettoHög = bruttoHög * (1 - skattHög);
-    const totaltNetto = nettoLåg + nettoHög;  // 🔥 Här skapas `totaltNetto`
 
+    // 🔹 Summan av låg + hög beskattning -> totaltNetto
+    const totaltNetto = nettoLåg + nettoHög;
+
+    // 🔹 Uppdatera UI-värden
     investeratBeloppEl.textContent = formatNumber(investeratBelopp);
     bruttoEl.textContent = formatNumber(totalAvkastning);
     inomGransvardeBruttoEl.textContent = formatNumber(belopp312);
@@ -41,11 +56,16 @@ function beräknaInvestering() {
     overGransvardeNettoEl.textContent = formatNumber(nettoHög);
     totaltNettoEl.textContent = formatNumber(totaltNetto);
 
-    // 🔥 Uppdatera state SISTA STEGET
-console.log("🚀 [Debug] Skickar till state: totaltNetto =", totaltNetto);
-    updateState("totaltNetto", totaltNetto); // 🔥 Uppdatera state.js
+    // 🔹 Logga för debug
+    console.log("🚀 [Debug] Skickar till state: totaltNetto =", totaltNetto);
+
+    // 🔹 Uppdatera state med beräknad utdelning
+    updateState("totaltNetto", totaltNetto);
 }
 
+/**
+ * Öppnar popup för att ändra belopp312
+ */
 function öppnaPopupBelopp312() {
     let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", belopp312);
     if (nyttBelopp312 !== null) {
@@ -55,10 +75,14 @@ function öppnaPopupBelopp312() {
     }
 }
 
+/**
+ * Vid sidladdning, bygg investerings-ui och koppla event-lyssnare
+ */
 document.addEventListener("DOMContentLoaded", () => {
     const resultContainer = document.getElementById("resultInvestera");
     if (!resultContainer) return;
 
+    // 🔹 Dynamiskt skapa HTML
     resultContainer.innerHTML = `
         <div class="box">
             <p class="result-title">Investera</p>
@@ -83,10 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     `;
 
+    // 🔹 Koppla event-lyssnare
     document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
     document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
 
+    // 🔹 Gör en första beräkning
     beräknaInvestering();
 });
 
+// ✅ Exportera funktionen
 export { beräknaInvestering };
