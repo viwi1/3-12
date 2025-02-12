@@ -1,5 +1,5 @@
 import { formatNumber } from "./main.js";
-import { getState } from "./state.js";
+import { getState, updateState } from "./state.js";
 
 // 🎯 Standardutgifter
 const UTGIFTER = [
@@ -19,12 +19,14 @@ const UTGIFTER = [
 const BELÖPP_312 = getState("belopp312") || 221650;
 
 // 🎯 Hämta initial inkomst från investeringsmodulen
-let inkomst = getState("totaltNetto") || 0;
+let inkomst = getState("totaltNetto");
+if (!inkomst || inkomst === 0) {
+    inkomst = 100000; // 🔥 Standardvärde om inget finns i state
+}
 
 // 🎯 Fördelningsfunktion
 function fördelaInkomst(inkomst) {
     let totalUtgifter = UTGIFTER.reduce((sum, u) => sum + u.belopp, 0);
-
     if (inkomst <= 0) return Array(UTGIFTER.length).fill(0);
     if (inkomst >= totalUtgifter) return UTGIFTER.map(u => u.belopp);
 
@@ -61,18 +63,21 @@ function uppdateraUtgifter(inkomst) {
         document.getElementById(`bar${index}-info`).textContent =
             `${Math.round(procent)}% | ${formatNumber(fördeladInkomst[index])} (${formatNumber(fördeladPerMånad)} / mån) av ${formatNumber(utgift.belopp)} (${formatNumber(utgiftPerMånad)} / mån)`;
     });
+
+    // 🔄 Uppdatera state
+    updateState("totaltNetto", inkomst);
 }
 
 // 🎯 Skapa UI
 function skapaUtgifterUI() {
-    let container = document.getElementById("expensesContainer");
+    let container = document.getElementById("expenses"); // 🛠 FIX: Använd rätt ID
     if (!container) return;
 
     let inkomstSektion = document.createElement("div");
     inkomstSektion.className = "input-group";
     inkomstSektion.innerHTML = `
         <label for="inkomstSlider">Ange inkomst per år:</label>
-        <input type="range" id="inkomstSlider" min="0" max="1000000" step="10000" value="${inkomst}">
+        <input type="range" id="inkomstSlider" min="0" max="2000000" step="10000" value="${inkomst}">
         <span id="inkomstBelopp">${formatNumber(inkomst)}</span>
     `;
     container.appendChild(inkomstSektion);
