@@ -15,55 +15,56 @@ const UTGIFTER = [
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
 
-// 🔹 Hämta initial inkomst från state
+// 🔹 Hämta initial inkomst från state och ladda UI direkt
 let inkomst = getState("totaltNetto") || 0;
-if (!inkomst || inkomst === 0) {
-    onStateChange("totaltNetto", (nyInkomst) => skapaUtgifterUI(nyInkomst));
-} else {
-    skapaUtgifterUI(inkomst);
-}
+document.addEventListener("DOMContentLoaded", () => skapaUtgifterUI(inkomst));
+
+// 🔹 Lyssna på förändringar i `totaltNetto` och uppdatera UI
+onStateChange("totaltNetto", (nyInkomst) => uppdateraUtgifter(nyInkomst));
 
 /**
- * Bygger UI för utgifter med manuella inmatningar
- * @param {number} inkomst - Det värde på "totaltNetto" vi vill använda
+ * Skapar UI för utgifter (körs en gång vid sidladdning)
+ * @param {number} inkomst - Det initiala värdet av "totaltNetto"
  */
 function skapaUtgifterUI(inkomst) {
     const container = document.getElementById("expenses");
     if (!container) return;
 
+    // 🔹 Bygg UI
     container.innerHTML = `
-        <div>
-            <h3>Summeringar</h3>
-            <p>Total inkomst: <span id="totalInkomst">${formatNumber(inkomst)}</span></p>
-            <p>Totala utgifter: <span id="totalUtgifter">0 kr</span></p>
-            <p>Inkomst täckning: <span id="inkomstTäckning">0%</span></p>
-        </div>
+        <h3>Summeringar</h3>
+        <p>Total inkomst: <span id="totalInkomst">${formatNumber(inkomst)}</span></p>
+        <p>Totala utgifter: <span id="totalUtgifter">0 kr</span></p>
+        <p>Inkomst täckning: <span id="inkomstTäckning">0%</span></p>
         <div id="utgifterForm"></div>
     `;
 
+    // 🔹 Skapa utgiftsposter
     const utgifterForm = document.getElementById("utgifterForm");
-
     UTGIFTER.forEach((utgift, index) => {
-        const inputGroup = document.createElement("div");
-        inputGroup.className = "input-group";
-        inputGroup.innerHTML = `
-            <label>${utgift.namn}:</label>
-            <input type="number" id="kostnad${index}" value="${utgift.belopp}">
+        utgifterForm.innerHTML += `
+            <div class="input-group">
+                <label>${utgift.namn}:</label>
+                <input type="number" id="kostnad${index}" value="${utgift.belopp}">
+            </div>
         `;
-        utgifterForm.appendChild(inputGroup);
+    });
 
+    // 🔹 Lägg till eventlyssnare
+    UTGIFTER.forEach((_, index) => {
         document.getElementById(`kostnad${index}`).addEventListener("input", () => {
             UTGIFTER[index].belopp = parseInt(document.getElementById(`kostnad${index}`).value, 10) || 0;
-            uppdateraUtgifter(inkomst);
+            uppdateraUtgifter(getState("totaltNetto"));
         });
     });
 
+    // 🔹 Uppdatera alla värden vid start
     uppdateraUtgifter(inkomst);
 }
 
 /**
- * Uppdaterar alla delar av UI baserat på inkomst och utgifter
- * @param {number} inkomst - Värdet på "totaltNetto" vi visar
+ * Uppdaterar endast totalbelopp & procent, inget onödigt renderande
+ * @param {number} inkomst - Värdet på "totaltNetto"
  */
 function uppdateraUtgifter(inkomst) {
     const totalUtgifter = UTGIFTER.reduce((sum, u) => sum + u.belopp, 0);
