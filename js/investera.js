@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <input type="range" id="avkastning" min="1" max="30" step="1" value="10">
                 <span class="slider-value" id="avkastningValue">10%</span>
             </div>
-            <p><strong>Totalt netto utdelning:</strong> <span id="totaltNetto" style="color: blue; font-weight: bold;"></span></p>
+            <p><strong>Totalt netto utdelning:</strong> <span id="totaltNetto" style="color: green; font-weight: bold;"></span></p>
             <hr>
             <p>Brutto: <span id="brutto"></span></p>
             <p>
