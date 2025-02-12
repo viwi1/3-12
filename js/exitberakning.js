@@ -2,16 +2,18 @@ import { updateState } from "./state.js";
 import { formatNumber } from "./main.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    // 🎯 Direkt definierade värden (ej i state.js)
     const START_VARDE = 6855837;
     const START_VARDE_DALIGT = 3000000;
-    let huslan = 2020500;
+    let huslan = 2020500; // Standard huslån
 
     const resultContainer = document.getElementById("resultFörsäljning");
     if (!resultContainer) return;
 
+    // ✅ Skapa UI direkt i DOM
     resultContainer.innerHTML = `
         <div class="box">
-            <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
+            <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde">${formatNumber(START_VARDE)}</span></p>
             <div class="checkbox-container">
                 <input type="checkbox" id="daligtNuvarde">
                 <label for="daligtNuvarde">3 000 000 kr</label>
@@ -32,59 +34,47 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     // 🔹 Hämta element
-    const nuvardeEl        = document.getElementById("nuvarde");
-    const daligtNuvardeEl  = document.getElementById("daligtNuvarde");
-    const multipelEl       = document.getElementById("multipel");
-    const multipelValueEl  = document.getElementById("multipelValue");
-    const betalaHuslanEl   = document.getElementById("betalaHuslan");
-    const exitTitleEl      = document.getElementById("exitTitle");
-    const exitBeloppEl     = document.getElementById("exitBelopp");
+    const nuvardeEl = document.getElementById("nuvarde");
+    const daligtNuvardeEl = document.getElementById("daligtNuvarde");
+    const multipelEl = document.getElementById("multipel");
+    const multipelValueEl = document.getElementById("multipelValue");
+    const betalaHuslanEl = document.getElementById("betalaHuslan");
+    const exitTitleEl = document.getElementById("exitTitle");
+    const exitBeloppEl = document.getElementById("exitBelopp");
     const huslanDetaljerEl = document.getElementById("huslanDetaljer");
 
     // ✅ Sätt startvärde i UI direkt vid sidladdning
-    console.log("🔎 [Debug] startvärde innan UI:", START_VARDE);
     nuvardeEl.textContent = formatNumber(START_VARDE);
 
     function uppdateraBeräkningar() {
-        console.log("🔎 [Debug] Kör uppdateraBeräkningar");
-
         // 🔹 Kolla om "Dåligt nuvärde" är ikryssat
         const ärDåligt = daligtNuvardeEl.checked;
         const faktiskStartvarde = ärDåligt ? START_VARDE_DALIGT : START_VARDE;
-        console.log("🔎 [Debug] ärDåligt?", ärDåligt, " => startvärde=", faktiskStartvarde);
 
         // 🔹 Utskrift av startvärde i UI
         nuvardeEl.textContent = formatNumber(faktiskStartvarde);
 
         // 🔹 Hämta multipel
         const multipel = parseFloat(multipelEl.value) || 1;
-        console.log("🔎 [Debug] multipel =", multipel);
         multipelValueEl.textContent = multipel.toFixed(1);
 
         // 🔹 Beräkna exitKapital
         let försäljningspris = faktiskStartvarde * multipel;
         let exitKapital = försäljningspris;
-        console.log("🔎 [Debug] försäljningspris =", försäljningspris);
 
         // 🔹 Låneberäkning
         const belopp312 = 684166;
-        const skattLåg  = 0.20;
-        const skattHög  = 0.50;
+        const skattLåg = 0.20;
+        const skattHög = 0.50;
 
-        let nettoLåg          = belopp312 * (1 - skattLåg);
-        let lanEfterLågSkatt  = huslan - nettoLåg;
-        let bruttoHögBehov    = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
+        let nettoLåg = belopp312 * (1 - skattLåg);
+        let lanEfterLågSkatt = huslan - nettoLåg;
+        let bruttoHögBehov = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
         let totaltBruttoFörLån = belopp312 + bruttoHögBehov;
-
-        console.log("🔎 [Debug] lanEfterLågSkatt =", lanEfterLågSkatt);
-        console.log("🔎 [Debug] totaltBruttoFörLån =", totaltBruttoFörLån);
 
         if (betalaHuslanEl.checked) {
             exitKapital -= totaltBruttoFörLån;
-            console.log("🔎 [Debug] Huslån draget => exitKapital =", exitKapital);
         }
-
-        console.log("🔎 [Debug] Slutligt exitKapital =", exitKapital);
 
         // 🔹 Sätt i state
         updateState("exitVarde", exitKapital);
@@ -105,20 +95,27 @@ document.addEventListener("DOMContentLoaded", () => {
             `
             : "";
 
-        console.log("🔎 [Debug] Utskrift klar!");
+        // 🏡 Lägg till klickbar funktion för att ändra huslån
+        const huslanValueEl = document.getElementById("huslanValue");
+        if (huslanValueEl) {
+            huslanValueEl.addEventListener("click", öppnaPopupHuslan);
+        }
     }
 
-    multipelEl.addEventListener("input", () => {
-        uppdateraBeräkningar();
-    });
+    function öppnaPopupHuslan() {
+        let nyttHuslan = prompt("Ange nytt huslånebelopp:", huslan);
+        if (nyttHuslan !== null) {
+            huslan = parseInt(nyttHuslan, 10) || huslan;
+            uppdateraBeräkningar();
+        }
+    }
 
+    multipelEl.addEventListener("input", uppdateraBeräkningar);
     betalaHuslanEl.addEventListener("change", uppdateraBeräkningar);
     daligtNuvardeEl.addEventListener("change", uppdateraBeräkningar);
 
-    console.log("🔎 [Debug] Initierar => betalaHuslanEl.checked =", betalaHuslanEl.checked);
     betalaHuslanEl.checked = true;
     uppdateraBeräkningar();
 });
 
-// ✅ Export
 export function uppdateraBeräkningar() {}
