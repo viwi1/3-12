@@ -92,8 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <p>Bruttobelopp för lån: ${formatNumber(totaltBruttoFörLån)}</p>
             <p>- ${formatNumber(belopp312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
             <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt)}</p>
-
-            <p>test test${formatNumber(nettoLåg)} + ${formatNumber(lanEfterLågSkatt)} = ${formatNumber(totaltNettoLån)}</p>
+            <p>- Berätning nettoutdelning: ${formatNumber(nettoLåg)} + ${formatNumber(lanEfterLågSkatt)} = ${formatNumber(totaltNettoLån)}</p>
             `
             : "";
 
