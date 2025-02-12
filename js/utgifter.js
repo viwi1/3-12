@@ -1,6 +1,16 @@
 import { formatNumber } from "./main.js";
 import { getState, updateState } from "./state.js";
 
+// 🎯 Kontrollera att rätt värden hämtas från state
+console.log("📌 [Debug] Hämtar värden från state.js...");
+const BELÖPP_312 = getState("belopp312") || 221650;
+const betalaHuslan = getState("betalaHuslan") || false;
+let inkomst = getState("totaltNetto") || 0;
+
+console.log("✅ [Debug] 3:12-belopp:", BELÖPP_312);
+console.log("✅ [Debug] Betala huslån:", betalaHuslan);
+console.log("✅ [Debug] Hämtad inkomst:", inkomst);
+
 // 🎯 Standardutgifter
 const UTGIFTER = [
     { namn: "BRF Avgift", belopp: 95580 },
@@ -11,18 +21,9 @@ const UTGIFTER = [
     { namn: "Flexen", belopp: 196442 },
     { namn: "Klarna - presenter och skoj", belopp: 60000 },
     { namn: "Resa", belopp: 100000 },
-    { namn: "Lån och amortering", belopp: 115245 },
+    { namn: "Lån och amortering", belopp: betalaHuslan ? 0 : 115245 }, // 🛠 Sätt till 0 om huslånet är betalat
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
-
-// 🎯 Hämta årligt 3:12-belopp från state
-const BELÖPP_312 = getState("belopp312") || 221650;
-
-// 🎯 Hämta initial inkomst från investeringsmodulen
-let inkomst = getState("totaltNetto");
-if (!inkomst || inkomst === 0) {
-    inkomst = 100000; // 🔥 Standardvärde om inget finns i state
-}
 
 // 🎯 Fördelningsfunktion
 function fördelaInkomst(inkomst) {
@@ -70,8 +71,8 @@ function uppdateraUtgifter(inkomst) {
 
 // 🎯 Skapa UI
 function skapaUtgifterUI() {
-    let container = document.getElementById("expenses"); // 🛠 FIX: Använd rätt ID
-    if (!container) return;
+    let container = document.getElementById("expenses");
+    if (!container) return console.error("❌ [Error] #expenses hittades inte!");
 
     let inkomstSektion = document.createElement("div");
     inkomstSektion.className = "input-group";
