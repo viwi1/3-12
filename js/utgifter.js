@@ -1,7 +1,7 @@
 import { formatNumber } from "./main.js";
-import { getState, onStateChange } from "./state.js";
+import { getState, updateState, onStateChange } from "./state.js";
 
-const UTGIFTER = [
+let UTGIFTER = [
     { namn: "BRF Avgift", belopp: 95580 },
     { namn: "Hemförsäkring Dina försäkringar", belopp: 3420 },
     { namn: "Fritids och förskola", belopp: 28524 },
@@ -43,22 +43,52 @@ function skapaUtgifterUI() {
         </div>
 
         <h3>Utgifter</h3>
-        <div class="expenses-list">
-            ${aktivaUtgifter.map(utgift => `
-                <div class="expense-item">
-                    <span class="expense-name">${utgift.namn}</span>
-                    <span class="expense-amount">${formatNumber(utgift.belopp)}</span>
-                </div>
-            `).join("")}
+        <div id="utgifterForm" class="expenses-list"></div>
+
+        <h3>Lägg till egen årskostnad</h3>
+        <div class="add-expense">
+            <input type="text" id="nyUtgiftNamn" placeholder="Namn på utgift">
+            <input type="number" id="nyUtgiftBelopp" placeholder="Årskostnad (kr)">
+            <button id="läggTillUtgift">Lägg till</button>
         </div>
     `;
+
+    skapaUtgiftsposter();
+    document.getElementById("läggTillUtgift").addEventListener("click", läggTillEgenUtgift);
+}
+
+/**
+ * Skapar individuella utgiftsposter i UI.
+ */
+function skapaUtgiftsposter() {
+    const utgifterForm = document.getElementById("utgifterForm");
+    if (!utgifterForm) return;
+
+    utgifterForm.innerHTML = "";
+    const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
+
+    aktivaUtgifter.forEach((utgift, index) => {
+        const perMånad = utgift.belopp / 12;
+        const inputGroup = document.createElement("div");
+        inputGroup.className = "expense-item";
+        inputGroup.innerHTML = `
+            <span class="expense-name">${utgift.namn}</span>
+            <input type="number" id="kostnad${index}" class="expense-input" value="${utgift.belopp}">
+            <span class="expense-monthly">(${formatNumber(perMånad)}/mån)</span>
+        `;
+        utgifterForm.appendChild(inputGroup);
+
+        document.getElementById(`kostnad${index}`).addEventListener("input", () => {
+            UTGIFTER[index].belopp = parseInt(document.getElementById(`kostnad${index}`).value, 10) || 0;
+            uppdateraUtgifter(getState("totaltNetto"));
+        });
+    });
 }
 
 /**
  * Uppdaterar endast summeringarna utan att bygga om UI.
  */
 function uppdateraUtgifter(nyInkomst) {
-    const betalaHuslan = getState("betalaHuslan");
     const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
     const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = nyInkomst - totalUtgifter;
@@ -71,8 +101,20 @@ function uppdateraUtgifter(nyInkomst) {
 }
 
 /**
- * Lyssna på förändringar i både `totaltNetto` och `betalaHuslan`
+ * Lägger till en egen utgiftspost.
  */
+function läggTillEgenUtgift() {
+    const namn = document.getElementById("nyUtgiftNamn").value.trim();
+    const belopp = parseInt(document.getElementById("nyUtgiftBelopp").value, 10);
+
+    if (!namn || isNaN(belopp) || belopp <= 0) return;
+
+    UTGIFTER.push({ namn, belopp });
+    skapaUtgiftsposter();
+    uppdateraUtgifter(getState("totaltNetto"));
+}
+
+// 🔹 Lyssna på förändringar i både `totaltNetto` och `betalaHuslan`
 onStateChange("totaltNetto", uppdateraUtgifter);
 onStateChange("betalaHuslan", skapaUtgifterUI);
 
