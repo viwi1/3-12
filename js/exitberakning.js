@@ -4,7 +4,7 @@ import { formatNumber } from "./main.js";
 document.addEventListener("DOMContentLoaded", () => {
     const START_VARDE = 6855837;
     const START_VARDE_DALIGT = 3000000;
-    let huslan = 2020500; // Standardvärde, ändras via popup
+    let huslan = 2020500; // Standardvärde, kan ändras via popup
 
     const resultContainer = document.getElementById("resultFörsäljning");
     if (!resultContainer) return;
@@ -116,5 +116,5 @@ document.addEventListener("DOMContentLoaded", () => {
     uppdateraBeräkningar();
 });
 
-// ✅ Exportera funktionen
-export function uppdateraBeräkningar() {}
+// ✅ Korrekt export
+export { uppdateraBeräkningar };
