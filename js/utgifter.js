@@ -15,13 +15,13 @@ const UTGIFTER = [
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
 
-// 🎯 Exponent för fördelningsmodellen
-const BOOST_EXPONENT = 1;
+// 🎯 Hämta årligt 3:12-belopp från state
+const BELÖPP_312 = getState("belopp312") || 221650;
 
 // 🎯 Hämta initial inkomst från investeringsmodulen
 let inkomst = getState("totaltNetto") || 0;
 
-// 🎯 Fördelar inkomst proportionellt baserat på utgifter
+// 🎯 Fördelningsfunktion
 function fördelaInkomst(inkomst) {
     let totalUtgifter = UTGIFTER.reduce((sum, u) => sum + u.belopp, 0);
 
@@ -30,7 +30,7 @@ function fördelaInkomst(inkomst) {
 
     let r = inkomst / totalUtgifter;
     let störstaUtgift = Math.max(...UTGIFTER.map(u => u.belopp));
-    let boosts = UTGIFTER.map(u => Math.pow(störstaUtgift / u.belopp, BOOST_EXPONENT));
+    let boosts = UTGIFTER.map(u => Math.pow(störstaUtgift / u.belopp, 1));
     let justeradeUtgifter = UTGIFTER.map((u, i) => u.belopp * r * boosts[i]);
     let summaJustering = justeradeUtgifter.reduce((sum, ju) => sum + ju, 0);
 
