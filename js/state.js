@@ -8,6 +8,13 @@ const State = {
     totaltNetto: 0,  // 🔹 Observerad variabel
     observers: {} // 🔥 Nytt objekt för att lagra eventlyssnare
 };
+onStateChange("totaltNetto", (nyInkomst) => {
+    console.log("🔄 [Debug] `totaltNetto` har uppdaterats i state.js:", nyInkomst);
+    
+    // 🔥 Uppdatera slider och UI
+    document.getElementById("inkomstSlider").value = nyInkomst;
+    document.getElementById("inkomstBelopp").textContent = formatNumber(nyInkomst);
+});
 
 // 🎯 Uppdatera en variabel i state och meddela observers
 function updateState(key, value) {
