@@ -15,36 +15,28 @@ const UTGIFTER = [
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
 
-// 🎯 Hämta årligt 3:12-belopp från state
-const BELÖPP_312 = getState("belopp312") || 221650;
-
 // 🎯 Hämta initial inkomst från investeringsmodulen
 let inkomst = getState("totaltNetto");
+console.log("🔍 [Debug] Hämtar 'totaltNetto' från state.js:", inkomst);
+
 if (!inkomst || inkomst === 0) {
     inkomst = 100000; // 🔥 Standardvärde om inget finns i state
-}
-
-// ✅ **Se till att funktionen finns innan export**
-function uppdateraUtgifter(inkomst) {
-    if (!document.getElementById("inkomstBelopp")) return; // 🔥 Stoppar felet om element saknas
-
-    document.getElementById("inkomstBelopp").textContent = formatNumber(inkomst);
-    document.getElementById("totalInkomst").textContent = formatNumber(inkomst);
-
-    let totalUtgifter = UTGIFTER.reduce((sum, u) => sum + u.belopp, 0);
-    document.getElementById("totalUtgifter").textContent = formatNumber(totalUtgifter);
-    
-    let täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
-    document.getElementById("inkomstTäckning").textContent = Math.round(täckning) + "%";
-
-    // 🔄 Uppdatera state
-    updateState("totaltNetto", inkomst);
+    console.warn("⚠️ [Warning] Inkomst saknas i state, sätter till standardvärde:", inkomst);
 }
 
 // 🎯 Skapa UI
 function skapaUtgifterUI() {
-    let container = document.getElementById("expenses"); // 🛠 FIX: Använd rätt ID
-    if (!container) return;
+    let container = document.getElementById("expenses");
+    
+    if (!container) {
+        console.error("❌ [Error] 'expenses' container saknas i DOM!");
+        return;
+    }
+
+    console.log("✅ [Debug] 'expenses' container hittad, bygger UI...");
+
+    // Rensa tidigare innehåll om det finns
+    container.innerHTML = "";
 
     let inkomstSektion = document.createElement("div");
     inkomstSektion.className = "input-group";
@@ -64,6 +56,27 @@ function skapaUtgifterUI() {
     `;
     container.appendChild(summering);
 
+    UTGIFTER.forEach((utgift, index) => {
+        let inputGroup = document.createElement("div");
+        inputGroup.className = "input-group";
+        inputGroup.innerHTML = `
+            <label>${utgift.namn}:</label>
+            <input type="number" id="kostnad${index}" value="${utgift.belopp}">
+        `;
+        container.appendChild(inputGroup);
+
+        let barContainer = document.createElement("div");
+        barContainer.className = "bar-container";
+        barContainer.innerHTML = `<div class="bar" id="bar${index}"></div>`;
+        container.appendChild(barContainer);
+
+        let barInfo = document.createElement("div");
+        barInfo.className = "bar-info";
+        barInfo.id = `bar${index}-info`;
+        barInfo.textContent = `0% | 0 kr (0 kr/mån) av ${formatNumber(utgift.belopp)} (${formatNumber(utgift.belopp / 12)}/ mån)`;
+        container.appendChild(barInfo);
+    });
+
     document.getElementById("inkomstSlider").addEventListener("input", (e) => {
         uppdateraUtgifter(parseInt(e.target.value, 10));
     });
@@ -71,8 +84,30 @@ function skapaUtgifterUI() {
     uppdateraUtgifter(inkomst);
 }
 
+// 🎯 Uppdatera utgifter
+function uppdateraUtgifter(inkomst) {
+    console.log("🔄 [Debug] Uppdaterar utgifter med inkomst:", inkomst);
+
+    if (!document.getElementById("inkomstBelopp")) {
+        console.error("❌ [Error] Element 'inkomstBelopp' hittades inte!");
+        return;
+    }
+
+    document.getElementById("inkomstBelopp").textContent = formatNumber(inkomst);
+    document.getElementById("totalInkomst").textContent = formatNumber(inkomst);
+
+    let totalUtgifter = UTGIFTER.reduce((sum, u) => sum + u.belopp, 0);
+    document.getElementById("totalUtgifter").textContent = formatNumber(totalUtgifter);
+    
+    let täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
+    document.getElementById("inkomstTäckning").textContent = Math.round(täckning) + "%";
+
+    // 🔄 Uppdatera state
+    updateState("totaltNetto", inkomst);
+}
+
 // 🎯 Initiera vid sidladdning
 document.addEventListener("DOMContentLoaded", skapaUtgifterUI);
 
-// ✅ **Exportera endast om funktionen är definierad**
+// ✅ **Exportera korrekt**
 export { skapaUtgifterUI, uppdateraUtgifter };
