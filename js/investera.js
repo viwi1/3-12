@@ -1,7 +1,7 @@
-import { getState, updateState } from "./state.js";
+import { getState, updateState, onStateChange } from "./state.js";
 import { formatNumber } from "./main.js";
 
-// 🔹 Hämtar lagrat 3:12-belopp
+// 🔹 Hämta lagrat 3:12-belopp
 let belopp312 = getState("belopp312") || 221650;
 
 /**
@@ -15,13 +15,15 @@ function beräknaInvestering() {
 
     if (!investeratBeloppEl || !avkastningEl) return;
 
+    // 🔹 Hämta exitVärde i realtid från state
+    const investeratBelopp = getState("exitVarde") || 0;
+
     // 🔹 Hämta och visa avkastningens procentvärde
     const avkastningProcent = parseInt(avkastningEl.value, 10);
     avkastningValueEl.textContent = avkastningProcent + "%";
 
     // 🔹 Beräkna avkastningen
     const avkastning = avkastningProcent / 100;
-    const investeratBelopp = getState("exitVarde") || 0;
     const totalAvkastning = investeratBelopp * avkastning;
 
     // 🔹 Hämta skattesatser och räkna ut fördelning låg/hög beskattning
@@ -44,6 +46,12 @@ function beräknaInvestering() {
     console.log("🚀 [Debug] Uppdaterar state med nytt totaltNetto:", totaltNetto);
     updateState("totaltNetto", totaltNetto);
 }
+
+// 🔹 Lyssna på förändringar i exitVarde och uppdatera UI
+onStateChange("exitVarde", (nyttExitVarde) => {
+    console.log("🔄 [Debug] `exitVarde` har uppdaterats:", nyttExitVarde);
+    beräknaInvestering(); // 🔥 Kör om beräkningen när värdet ändras
+});
 
 /**
  * Vid sidladdning, bygg investerings-ui och koppla event-lyssnare
