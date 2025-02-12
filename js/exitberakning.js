@@ -2,14 +2,15 @@ import { updateState } from "./state.js";
 import { formatNumber } from "./main.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    // 🎯 Värden direkt i filen
     const START_VARDE = 6855837;
     const START_VARDE_DALIGT = 3000000;
-    let huslan = 2020500; // Standard huslån, ändras via prompt
+    let huslan = 2020500; // Standard huslån
 
     const resultContainer = document.getElementById("resultFörsäljning");
     if (!resultContainer) return;
 
-    // 🎯 Generera UI
+    // ✅ Generera UI
     resultContainer.innerHTML = `
         <div class="box">
             <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
@@ -42,87 +43,77 @@ document.addEventListener("DOMContentLoaded", () => {
     const exitBeloppEl     = document.getElementById("exitBelopp");
     const huslanDetaljerEl = document.getElementById("huslanDetaljer");
 
+    // ✅ Sätt startvärde i UI direkt vid sidladdning
+    nuvardeEl.textContent = formatNumber(START_VARDE);
+
     function uppdateraBeräkningar() {
-        // 1. Kolla att formatNumber verkligen finns
-        if (typeof formatNumber !== "function") {
-            console.error("formatNumber saknas eller importeras fel!");
-            return;
+        // 🔹 Kolla om "Dåligt nuvärde" är ibockat
+        const ärDåligt = daligtNuvardeEl.checked;
+        const faktiskStartvarde = ärDåligt ? START_VARDE_DALIGT : START_VARDE;
+
+        // 🔹 Skriv ut startvärdet i UI
+        nuvardeEl.textContent = formatNumber(faktiskStartvarde);
+
+        // 🔹 Hämta multipel
+        const multipel = parseFloat(multipelEl.value) || 1;
+        multipelValueEl.textContent = multipel.toFixed(1);
+
+        // 🔹 Beräkna exitKapital
+        let försäljningspris = faktiskStartvarde * multipel;
+        let exitKapital = försäljningspris;
+
+        // 🔹 Låneberäkning
+        const belopp312 = 684166;
+        const skattLåg  = 0.20;
+        const skattHög  = 0.50;
+
+        let nettoLåg          = belopp312 * (1 - skattLåg);
+        let lanEfterLågSkatt  = huslan - nettoLåg;
+        let bruttoHögBehov    = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
+        let totaltBruttoFörLån = belopp312 + bruttoHögBehov;
+
+        if (betalaHuslanEl.checked) {
+            exitKapital -= totaltBruttoFörLån;
         }
 
-        // 2. Läs av multipel och definiera skattesatser
-        const multipel    = parseFloat(multipelEl.value) || 1;
-        const skattLåg    = 0.20;
-        const skattHög    = 0.50;
-        const belopp312   = 684166;
-        const betalaHuslan = betalaHuslanEl.checked;
-
-        // 3. Startvärde (standard/dåligt)
-        let startVarde = daligtNuvardeEl.checked ? START_VARDE_DALIGT : START_VARDE;
-        nuvardeEl.textContent = formatNumber(startVarde);
-
-        // 4. Försäljningspris och exitKapital
-        let forsPris    = startVarde * multipel;
-        let exitKapital = forsPris;
-
-        // 5. Räkna fram hur mycket som behövs för att betala huslån
-        let nettoLåg         = belopp312 * (1 - skattLåg);
-        let lanEfterLågSkatt = huslan - nettoLåg;
-        let bruttoHögBehov   = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
-        let totaltBruttoForLan = belopp312 + bruttoHögBehov;
-
-        // 6. Om huslån är ibockat -> dra av
-        if (betalaHuslan) {
-            exitKapital -= totaltBruttoForLan;
-        }
-
-        // 7. Uppdatera state
+        // 🔹 Sätt i state
         updateState("exitVarde", exitKapital);
-        updateState("betalaHuslan", betalaHuslan);
+        updateState("betalaHuslan", betalaHuslanEl.checked);
 
-        // 8. Sätt rubriker och belopp
-        exitTitleEl.textContent = betalaHuslan
+        // 🔹 Visa exit
+        exitTitleEl.textContent = betalaHuslanEl.checked
             ? "Exitbelopp efter huslånsbetalning 🏡"
             : "Exitbelopp";
         exitBeloppEl.textContent = formatNumber(exitKapital);
 
-        // 9. Sätt detaljer kring huslånet
-        huslanDetaljerEl.innerHTML = betalaHuslan
+        // 🔹 Skriv ut huslånsinfo
+        huslanDetaljerEl.innerHTML = betalaHuslanEl.checked
             ? `
             <p>Huslån: <span id="huslanValue" style="cursor:pointer; text-decoration:underline;">${formatNumber(huslan)}</span></p>
-            <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoForLan)}</p>
+            <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoFörLån)}</p>
             <p>- ${formatNumber(belopp312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
             <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt > 0 ? lanEfterLågSkatt : 0)}</p>
             `
             : "";
-
-        // 10. Klickbar huslånebelopp -> popup
-        const huslanValueEl = document.getElementById("huslanValue");
-        if (huslanValueEl) {
-            huslanValueEl.addEventListener("click", öppnaHuslanPrompt);
-        }
     }
 
-    function öppnaHuslanPrompt() {
-        let nyttHuslan = prompt("Ange nytt huslånebelopp:", huslan);
-        if (nyttHuslan !== null) {
-            huslan = parseInt(nyttHuslan, 10) || huslan;
-            uppdateraBeräkningar();
-        }
-    }
-
-    // 🔄 Event-lyssnare
+    // 🔹 Klick på multipelslidern
     multipelEl.addEventListener("input", () => {
-        multipelValueEl.textContent = parseFloat(multipelEl.value).toFixed(1);
         uppdateraBeräkningar();
     });
-    betalaHuslanEl.addEventListener("change", uppdateraBeräkningar);
-    daligtNuvardeEl.addEventListener("change", uppdateraBeräkningar);
 
-    // 🏁 Initiera
-    multipelValueEl.textContent = multipelEl.value;
-    betalaHuslanEl.checked = true;
+    // 🔹 Klick på huslånecheckbox
+    betalaHuslanEl.addEventListener("change", uppdateraBeräkningar);
+
+    // 🔹 Klick på "Dåligt nuvärde"
+    daligtNuvardeEl.addEventListener("change", () => {
+        uppdateraBeräkningar();
+    });
+
+    // 🏁 Initiera beräkning vid sidladdning
+    betalaHuslanEl.checked = true; // Huslån default ibockad
     uppdateraBeräkningar();
 });
 
-// ✅ Exportera korrekt
+// ✅ Exportera funktionen
 export function uppdateraBeräkningar() {}
