@@ -56,6 +56,10 @@ function öppnaPopupBelopp312() {
     }
 }
 
+console.log("🚀 [Debug] Skickar till state: totaltNetto =", totaltNetto);
+updateState("totaltNetto", totaltNetto);
+
+
 document.addEventListener("DOMContentLoaded", () => {
     const resultContainer = document.getElementById("resultInvestera");
     if (!resultContainer) return;
