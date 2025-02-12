@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function uppdateraBeräkningar() {
         const multipel = parseFloat(multipelEl.value) || 1;
-        const belopp312 = getState("belopp312");
+        const spara312 = getState("spara312");
         const skattLåg = getState("skattUtdelningLåg");
         const skattHög = getState("skattUtdelningHög");
         const betalaHuslan = betalaHuslanEl.checked;
@@ -54,10 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
         let forsPris = startVarde * multipel;
         let exitKapital = forsPris;
 
-        let nettoLåg = belopp312 * (1 - skattLåg);
+        let nettoLåg = spara312 * (1 - skattLåg);
         let lanEfterLågSkatt = HUSLAN - nettoLåg;
         let bruttoHögBehov = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
-        let totaltBruttoForLan = belopp312 + bruttoHögBehov;
+        let totaltBruttoForLan = spara312 + bruttoHögBehov;
 
         if (betalaHuslan) {
             exitKapital -= totaltBruttoForLan;
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ? `
             <p>Huslån: ${formatNumber(HUSLAN)}</p>
             <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoForLan)}</p>
-            <p>- ${formatNumber(belopp312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
+            <p>- ${formatNumber(spara312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
             <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt > 0 ? lanEfterLågSkatt : 0)}</p>
             `
             : "";
