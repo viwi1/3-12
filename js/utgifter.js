@@ -1,7 +1,6 @@
 import { formatNumber } from "./main.js";
-import { getState, updateState } from "./state.js";
+import { getState, updateState, onStateChange } from "./state.js";
 
-// 🎯 Standardutgifter
 const UTGIFTER = [
     { namn: "BRF Avgift", belopp: 95580 },
     { namn: "Hemförsäkring Dina försäkringar", belopp: 3420 },
@@ -15,13 +14,24 @@ const UTGIFTER = [
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
 
-// 🎯 Hämta initial inkomst från investeringsmodulen
+// 🔍 Vänta på att `totaltNetto` uppdateras
 let inkomst = getState("totaltNetto");
 console.log("🔍 [Debug] Hämtar 'totaltNetto' från state.js:", inkomst);
 
+if (!inkomst || inkomst === 0) {
+    console.warn("⚠️ [Warning] Väntar på att 'totaltNetto' ska uppdateras...");
+} else {
+    skapaUtgifterUI(inkomst);
+}
 
-// 🎯 Skapa UI
-function skapaUtgifterUI() {
+// 🔄 **Vänta på att `totaltNetto` uppdateras och starta UI då**
+onStateChange("totaltNetto", (nyInkomst) => {
+    console.log("✅ [Debug] 'totaltNetto' uppdaterat, startar UI:", nyInkomst);
+    skapaUtgifterUI(nyInkomst);
+});
+
+// 🔹 **Skapa UI först när vi har rätt `inkomst`**
+function skapaUtgifterUI(inkomst) {
     let container = document.getElementById("expenses");
     
     if (!container) {
@@ -29,22 +39,16 @@ function skapaUtgifterUI() {
         return;
     }
 
-    console.log("✅ [Debug] 'expenses' container hittad, bygger UI...");
+    container.innerHTML = ""; // Rensa tidigare innehåll
 
-    // Rensa tidigare innehåll om det finns
-    container.innerHTML = "";
-
-let inkomst = getState("totaltNetto") || 0; // Hämta senaste värdet från state
-
-let inkomstSektion = document.createElement("div");
-inkomstSektion.className = "input-group";
-inkomstSektion.innerHTML = `
-    <label for="inkomstSlider">Ange inkomst per år:</label>
-    <input type="range" id="inkomstSlider" min="0" max="2000000" step="10000" value="${inkomst}">
-    <span id="inkomstBelopp">${formatNumber(inkomst)}</span>
-`;
-container.appendChild(inkomstSektion);
-
+    let inkomstSektion = document.createElement("div");
+    inkomstSektion.className = "input-group";
+    inkomstSektion.innerHTML = `
+        <label for="inkomstSlider">Ange inkomst per år:</label>
+        <input type="range" id="inkomstSlider" min="0" max="2000000" step="10000" value="${inkomst}">
+        <span id="inkomstBelopp">${formatNumber(inkomst)}</span>
+    `;
+    container.appendChild(inkomstSektion);
 
     let summering = document.createElement("div");
     summering.innerHTML = `
@@ -55,27 +59,6 @@ container.appendChild(inkomstSektion);
     `;
     container.appendChild(summering);
 
-    UTGIFTER.forEach((utgift, index) => {
-        let inputGroup = document.createElement("div");
-        inputGroup.className = "input-group";
-        inputGroup.innerHTML = `
-            <label>${utgift.namn}:</label>
-            <input type="number" id="kostnad${index}" value="${utgift.belopp}">
-        `;
-        container.appendChild(inputGroup);
-
-        let barContainer = document.createElement("div");
-        barContainer.className = "bar-container";
-        barContainer.innerHTML = `<div class="bar" id="bar${index}"></div>`;
-        container.appendChild(barContainer);
-
-        let barInfo = document.createElement("div");
-        barInfo.className = "bar-info";
-        barInfo.id = `bar${index}-info`;
-        barInfo.textContent = `0% | 0 kr (0 kr/mån) av ${formatNumber(utgift.belopp)} (${formatNumber(utgift.belopp / 12)}/ mån)`;
-        container.appendChild(barInfo);
-    });
-
     document.getElementById("inkomstSlider").addEventListener("input", (e) => {
         uppdateraUtgifter(parseInt(e.target.value, 10));
     });
@@ -83,15 +66,8 @@ container.appendChild(inkomstSektion);
     uppdateraUtgifter(inkomst);
 }
 
-// 🎯 Uppdatera utgifter
+// 🔹 **Uppdatera utgifter**
 function uppdateraUtgifter(inkomst) {
-    console.log("🔄 [Debug] Uppdaterar utgifter med inkomst:", inkomst);
-
-    if (!document.getElementById("inkomstBelopp")) {
-        console.error("❌ [Error] Element 'inkomstBelopp' hittades inte!");
-        return;
-    }
-
     document.getElementById("inkomstBelopp").textContent = formatNumber(inkomst);
     document.getElementById("totalInkomst").textContent = formatNumber(inkomst);
 
@@ -101,12 +77,8 @@ function uppdateraUtgifter(inkomst) {
     let täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
     document.getElementById("inkomstTäckning").textContent = Math.round(täckning) + "%";
 
-    // 🔄 Uppdatera state
     updateState("totaltNetto", inkomst);
 }
 
-// 🎯 Initiera vid sidladdning
-document.addEventListener("DOMContentLoaded", skapaUtgifterUI);
-
-// ✅ **Exportera korrekt**
+// ✅ **Exportera**
 export { skapaUtgifterUI, uppdateraUtgifter };
