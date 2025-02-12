@@ -60,7 +60,7 @@ function beräknaInvestering() {
     console.log("🚀 [Debug] Skickar till state: totaltNetto =", totaltNetto);
 
     // 🔹 Uppdatera state med beräknad utdelning
-    updateState("totaltNetto", totaltNetto);
+    updateState("totaltNetto", nyttVärde);
 }
 
 /**
