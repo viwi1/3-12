@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎯 Direkt definierade värden
     const START_VARDE = 6855837;
     const START_VARDE_DALIGT = 3000000;
-    let huslan = 2020500; // Standard huslån
+    let huslan = 2500000; // Standard huslån
+    let belopp312 = 684166; // Standard 3:12-belopp
 
     const resultContainer = document.getElementById("resultFörsäljning");
     if (!resultContainer) return;
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="slider-container">
                 <label for="multipel">Multipel:</label>
                 <input type="range" id="multipel" min="1.0" max="4" step="0.1" value="3.0">
-                <span class="slider-value" id="multipelValue">1.5</span>
+                <span class="slider-value" id="multipelValue">3.0</span>
             </div>
             <div class="checkbox-container">
                 <input type="checkbox" id="betalaHuslan" checked>
@@ -45,10 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function uppdateraBeräkningar() {
         // 🔹 Kolla om "Dåligt nuvärde" är ikryssat
-        const ärDåligt = daligtNuvardeEl.checked;
-        const startVarde = ärDåligt ? START_VARDE_DALIGT : START_VARDE;
-
-        // 🔹 Uppdatera startvärde
+        const startVarde = daligtNuvardeEl.checked ? START_VARDE_DALIGT : START_VARDE;
         nuvardeEl.textContent = formatNumber(startVarde);
 
         // 🔹 Hämta multipel
@@ -60,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let exitKapital = försäljningspris;
 
         // 🔹 Låneberäkning
-        const belopp312 = 684166;
         const skattLåg = 0.20;
         const skattHög = 0.50;
 
@@ -90,23 +87,29 @@ document.addEventListener("DOMContentLoaded", () => {
             <hr>
             <p>Huslån: <span id="huslanValue" style="cursor:pointer; text-decoration:underline;">${formatNumber(huslan)}</span></p>
             <p>Bruttobelopp för lån: ${formatNumber(totaltBruttoFörLån)}</p>
-            <p>- ${formatNumber(belopp312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
+            <p>- <span id="belopp312Value" style="cursor:pointer; text-decoration:underline;">${formatNumber(belopp312)}</span> (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
             <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt)}</p>
-            <p>- Berätning nettoutdelning: ${formatNumber(nettoLåg)} + ${formatNumber(lanEfterLågSkatt)} = ${formatNumber(totaltNettoLån)}</p>
+            <p>- Beräkning nettoutdelning: ${formatNumber(nettoLåg)} + ${formatNumber(lanEfterLågSkatt)} = ${formatNumber(totaltNettoLån)}</p>
             `
             : "";
 
-        // 🏡 Lägg till klickfunktion för att ändra huslånet
-        const huslanValueEl = document.getElementById("huslanValue");
-        if (huslanValueEl) {
-            huslanValueEl.addEventListener("click", öppnaPopupHuslan);
-        }
+        // 🏡 Lägg till klickfunktioner för att ändra huslånet och 3:12-beloppet
+        document.getElementById("huslanValue").addEventListener("click", öppnaPopupHuslan);
+        document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
     }
 
     function öppnaPopupHuslan() {
         let nyttHuslan = prompt("Ange nytt huslånebelopp:", huslan);
         if (nyttHuslan !== null) {
             huslan = parseInt(nyttHuslan, 10) || huslan;
+            uppdateraBeräkningar();
+        }
+    }
+
+    function öppnaPopupBelopp312() {
+        let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", belopp312);
+        if (nyttBelopp312 !== null) {
+            belopp312 = parseInt(nyttBelopp312, 10) || belopp312;
             uppdateraBeräkningar();
         }
     }
