@@ -10,44 +10,69 @@ const UTGIFTER = [
     { namn: "Flexen", belopp: 196442 },
     { namn: "Klarna - presenter och skoj", belopp: 60000 },
     { namn: "Resa", belopp: 100000 },
-    { namn: "Lån och amortering", belopp: 115245, kräverHuslan: true },
+    { namn: "Lån och amortering", belopp: 115245, villkor: () => !getState("betalaHuslan") },
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
 
+/**
+ * Skapar UI för utgifter och sammanfattning.
+ */
 function skapaUtgifterUI() {
     const container = document.getElementById("expenses");
     if (!container) return;
 
-    const betalaHuslan = getState("betalaHuslan"); // Kolla om huslånet ska betalas
+    // 🔹 Hämta inkomst direkt från state.js
+    let inkomst = getState("totaltNetto");
 
+    // 🔹 Filtrera bort villkorade utgifter (t.ex. lån om huslånet är betalt)
+    const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
+
+    // 🔹 Räkna ut total utgift
+    const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
+    const skillnad = inkomst - totalUtgifter;
+    const täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
+
+    // 🔹 Bygg HTML
     container.innerHTML = `
-        <h3>Årlig utdelning</h3>
-        <p><strong>Totalt netto:</strong> <span id="inkomstBelopp">${formatNumber(getState("totaltNetto"))}</span></p>
+        <h3>Ekonomisk sammanfattning</h3>
+        <div class="summary">
+            <p><strong>Totalt netto:</strong> <span id="inkomstBelopp">${formatNumber(inkomst)}</span></p>
+            <p><strong>Totala utgifter:</strong> <span id="totalUtgifter">${formatNumber(totalUtgifter)}</span></p>
+            <p><strong>Täckning:</strong> <span id="inkomstTäckning">${Math.round(täckning)}%</span></p>
+            <p><strong>Skillnad:</strong> <span id="skillnad">${formatNumber(skillnad)}</span></p>
+        </div>
+
         <h3>Utgifter</h3>
-        <div id="utgifterContainer"></div>
+        <div class="expenses-list">
+            ${aktivaUtgifter.map((utgift, index) => `
+                <div class="expense-item">
+                    <span class="expense-name">${utgift.namn}</span>
+                    <span class="expense-amount">${formatNumber(utgift.belopp)}</span>
+                </div>
+            `).join("")}
+        </div>
     `;
-
-    const utgifterContainer = document.getElementById("utgifterContainer");
-
-    UTGIFTER.forEach((utgift, index) => {
-        if (utgift.kräverHuslan && betalaHuslan) return; // Döljer "Lån och amortering" om huslånet är betalt
-
-        const inputGroup = document.createElement("div");
-        inputGroup.className = "input-group";
-        inputGroup.innerHTML = `
-            <label>${utgift.namn}:</label>
-            <input type="number" id="kostnad${index}" value="${utgift.belopp}">
-        `;
-        utgifterContainer.appendChild(inputGroup);
-    });
 }
 
-function uppdateraUtgifter(inkomst) {
-    const beloppEl = document.getElementById("inkomstBelopp");
-    if (beloppEl) beloppEl.textContent = formatNumber(inkomst);
+/**
+ * Uppdaterar endast summeringarna utan att bygga om UI.
+ */
+function uppdateraUtgifter(nyInkomst) {
+    const totalUtgifter = UTGIFTER.filter(u => !u.villkor || u.villkor()).reduce((sum, u) => sum + u.belopp, 0);
+    const skillnad = nyInkomst - totalUtgifter;
+    const täckning = totalUtgifter > 0 ? (nyInkomst / totalUtgifter) * 100 : 0;
+
+    document.getElementById("inkomstBelopp").textContent = formatNumber(nyInkomst);
+    document.getElementById("totalUtgifter").textContent = formatNumber(totalUtgifter);
+    document.getElementById("inkomstTäckning").textContent = Math.round(täckning) + "%";
+    document.getElementById("skillnad").textContent = formatNumber(skillnad);
 }
 
-onStateChange("totaltNetto", uppdateraUtgifter);
+// 🔹 Skapa UI vid sidladdning
 document.addEventListener("DOMContentLoaded", skapaUtgifterUI);
 
+// 🔹 Lyssna på förändringar av `totaltNetto` och uppdatera summeringen
+onStateChange("totaltNetto", uppdateraUtgifter);
+
+// ✅ Exportera funktionerna
 export { skapaUtgifterUI, uppdateraUtgifter };
