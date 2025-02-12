@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>3:12 Utdelningskalkylator – Fungerande Exitruta & Popups</title>
+  <title>3:12 Utdelningskalkylator</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -39,51 +39,10 @@
   </div>
 </div>
 
-
-
-<!-- Popup Huslån -->
-<div class="overlay" id="overlayHuslan">
-  <div class="popup">
-    <span class="closePopup" onclick="closePopup('overlayHuslan')">×</span>
-    <h4>Huslån</h4>
-    <input type="text" id="huslanInput" style="width:120px;">
-    <p>Här kan du ange ditt huslån.</p>
-  </div>
-</div>
-
-<!-- Popup 3:12 -->
-<div class="overlay" id="overlay312">
-  <div class="popup">
-    <span class="closePopup" onclick="closePopup('overlay312')">×</span>
-    <h4>Eget 3:12-gränsvärde</h4>
-    <input type="number" id="gransvardeInput" style="width:120px;">
-    <p>Anpassa ditt 3:12-gränsvärde här.</p>
-  </div>
-</div>
-
-<!-- Popup IBB -->
-<div class="overlay" id="overlayIBB">
-  <div class="popup">
-    <span class="closePopup" onclick="closePopup('overlayIBB')">×</span>
-    <h4>IBB</h4>
-    <input type="number" id="ibbInput" style="width:120px;">
-    <p>Justera inkomstbasbeloppet (IBB).</p>
-  </div>
-</div>
-
-<!-- Skript -->
 <script type="module" src="./js/state.js"></script>
 <script type="module" src="./js/main.js"></script>
 <script type="module" src="./js/exitberakning.js"></script>
-<script type="module" src="./js/huslanmodul.js"></script>
 <script type="module" src="./js/investera.js"></script> <!-- ✅ Lade till utdelningsmodulen -->
-
-<script>
-  // Funktion för att stänga popups
-  function closePopup(id) {
-      document.getElementById(id).style.display = "none";
-  }
-</script>
 
 </body>
 </html>
