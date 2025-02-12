@@ -4,12 +4,11 @@ import { formatNumber } from "./main.js";
 document.addEventListener("DOMContentLoaded", () => {
     const START_VARDE = 6855837;
     const START_VARDE_DALIGT = 3000000;
-    let huslan = 2020500; // Standard huslån
+    let huslan = 2020500;
 
     const resultContainer = document.getElementById("resultFörsäljning");
     if (!resultContainer) return;
 
-    // ✅ Generera UI
     resultContainer.innerHTML = `
         <div class="box">
             <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
@@ -42,43 +41,62 @@ document.addEventListener("DOMContentLoaded", () => {
     const exitBeloppEl     = document.getElementById("exitBelopp");
     const huslanDetaljerEl = document.getElementById("huslanDetaljer");
 
-    // ✅ Sätt startvärdet i UI direkt, innan första beräkningen
+    // ✅ Sätt startvärde i UI direkt vid sidladdning
+    console.log("🔎 [Debug] startvärde innan UI:", START_VARDE);
     nuvardeEl.textContent = formatNumber(START_VARDE);
 
     function uppdateraBeräkningar() {
-        const multipel = parseFloat(multipelEl.value) || 1;
-        const skattLåg  = 0.20;
-        const skattHög  = 0.50;
-        const belopp312 = 684166;
-        const betalaHuslan = betalaHuslanEl.checked;
+        console.log("🔎 [Debug] Kör uppdateraBeräkningar");
 
-        // 🔹 Kolla om "Dåligt nuvärde" är ikryssad
-        let startVarde = daligtNuvardeEl.checked ? START_VARDE_DALIGT : START_VARDE;
+        // 🔹 Kolla om "Dåligt nuvärde" är ikryssat
+        const ärDåligt = daligtNuvardeEl.checked;
+        const faktiskStartvarde = ärDåligt ? START_VARDE_DALIGT : START_VARDE;
+        console.log("🔎 [Debug] ärDåligt?", ärDåligt, " => startvärde=", faktiskStartvarde);
 
         // 🔹 Utskrift av startvärde i UI
-        nuvardeEl.textContent = formatNumber(startVarde);
+        nuvardeEl.textContent = formatNumber(faktiskStartvarde);
 
-        let forsPris = startVarde * multipel;
-        let exitKapital = forsPris;
+        // 🔹 Hämta multipel
+        const multipel = parseFloat(multipelEl.value) || 1;
+        console.log("🔎 [Debug] multipel =", multipel);
+        multipelValueEl.textContent = multipel.toFixed(1);
 
-        let nettoLåg = belopp312 * (1 - skattLåg);
-        let lanEfterLågSkatt = huslan - nettoLåg;
-        let bruttoHögBehov = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
+        // 🔹 Beräkna exitKapital
+        let försäljningspris = faktiskStartvarde * multipel;
+        let exitKapital = försäljningspris;
+        console.log("🔎 [Debug] försäljningspris =", försäljningspris);
+
+        // 🔹 Låneberäkning
+        const belopp312 = 684166;
+        const skattLåg  = 0.20;
+        const skattHög  = 0.50;
+
+        let nettoLåg          = belopp312 * (1 - skattLåg);
+        let lanEfterLågSkatt  = huslan - nettoLåg;
+        let bruttoHögBehov    = lanEfterLågSkatt > 0 ? lanEfterLågSkatt / (1 - skattHög) : 0;
         let totaltBruttoFörLån = belopp312 + bruttoHögBehov;
 
-        if (betalaHuslan) {
+        console.log("🔎 [Debug] lanEfterLågSkatt =", lanEfterLågSkatt);
+        console.log("🔎 [Debug] totaltBruttoFörLån =", totaltBruttoFörLån);
+
+        if (betalaHuslanEl.checked) {
             exitKapital -= totaltBruttoFörLån;
+            console.log("🔎 [Debug] Huslån draget => exitKapital =", exitKapital);
         }
 
-        updateState("exitVarde", exitKapital);
-        updateState("betalaHuslan", betalaHuslan);
+        console.log("🔎 [Debug] Slutligt exitKapital =", exitKapital);
 
-        exitTitleEl.textContent = betalaHuslan
+        // 🔹 Sätt i state
+        updateState("exitVarde", exitKapital);
+        updateState("betalaHuslan", betalaHuslanEl.checked);
+
+        // 🔹 Visa exit
+        exitTitleEl.textContent = betalaHuslanEl.checked
             ? "Exitbelopp efter huslånsbetalning 🏡"
             : "Exitbelopp";
         exitBeloppEl.textContent = formatNumber(exitKapital);
 
-        huslanDetaljerEl.innerHTML = betalaHuslan
+        huslanDetaljerEl.innerHTML = betalaHuslanEl.checked
             ? `
             <p>Huslån: <span id="huslanValue" style="cursor:pointer; text-decoration:underline;">${formatNumber(huslan)}</span></p>
             <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoFörLån)}</p>
@@ -86,20 +104,21 @@ document.addEventListener("DOMContentLoaded", () => {
             <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt > 0 ? lanEfterLågSkatt : 0)}</p>
             `
             : "";
+
+        console.log("🔎 [Debug] Utskrift klar!");
     }
 
     multipelEl.addEventListener("input", () => {
-        multipelValueEl.textContent = parseFloat(multipelEl.value).toFixed(1);
         uppdateraBeräkningar();
     });
 
     betalaHuslanEl.addEventListener("change", uppdateraBeräkningar);
     daligtNuvardeEl.addEventListener("change", uppdateraBeräkningar);
 
-    // 🏁 Initiera beräkning vid sidladdning
+    console.log("🔎 [Debug] Initierar => betalaHuslanEl.checked =", betalaHuslanEl.checked);
     betalaHuslanEl.checked = true;
     uppdateraBeräkningar();
 });
 
-// ✅ Exporterar funktionen
+// ✅ Export
 export function uppdateraBeräkningar() {}
