@@ -37,9 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const exitBeloppEl     = document.getElementById("exitBelopp");
     const huslanDetaljerEl = document.getElementById("huslanDetaljer");
 
-    // ✅ Sätt startvärde i UI direkt vid sidladdning
-    console.log("🔎 [Debug] startvärde innan UI:", START_VARDE);
-    nuvardeEl.textContent = formatNumber ? formatNumber(START_VARDE) : START_VARDE;
+
+        nuvardeEl.textContent = formatNumber ? formatNumber(startVarde) : startVarde;
 
     function uppdateraBeräkningar() {
         console.log("🔎 [Debug] Kör uppdateraBeräkningar");
