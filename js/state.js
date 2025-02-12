@@ -13,14 +13,23 @@ const State = {
 const observers = {};
 
 /**
- * Uppdaterar en variabel i `State` och meddelar eventuella lyssnare
+ * Uppdaterar en variabel i `State` och meddelar eventuella lyssnare.
+ * Förhindrar onödiga uppdateringar genom att kolla om värdet faktiskt ändrats.
  * @param {string} key - Nyckeln i State som ska uppdateras
  * @param {any} value - Värdet som ska sättas
  */
 function updateState(key, value) {
     if (State.hasOwnProperty(key)) {
+        const oldValue = State[key];
+
+        // 🔄 **Undvik onödiga uppdateringar**
+        if (JSON.stringify(oldValue) === JSON.stringify(value)) {
+            console.log(`⏭️ [State] Skippade uppdatering: '${key}' har redan värdet:`, value);
+            return;
+        }
+
         State[key] = value;
-        console.log(`🔄 [State] Uppdaterar ${key}:`, value);
+        console.log(`🔄 [State] Uppdaterar '${key}':`, `Från: ${oldValue} → Till: ${value}`);
 
         // 🔥 Notifiera eventlyssnare om värdet ändras
         if (observers[key]) {
@@ -32,7 +41,7 @@ function updateState(key, value) {
 }
 
 /**
- * Lägger till en eventlyssnare för en specifik state-variabel
+ * Lägger till en eventlyssnare för en specifik state-variabel.
  * @param {string} key - State-nyckeln man vill lyssna på
  * @param {function} callback - Funktionen som körs när `key` uppdateras
  */
@@ -41,6 +50,7 @@ function onStateChange(key, callback) {
         observers[key] = [];
     }
     observers[key].push(callback);
+    console.log(`👂 [State] Lyssnar på ändringar i: '${key}'`);
 }
 
 /**
@@ -49,7 +59,9 @@ function onStateChange(key, callback) {
  * @returns {any} Värdet från `State` eller `null` om nyckeln saknas
  */
 function getState(key) {
-    return State.hasOwnProperty(key) ? State[key] : null;
+    const value = State.hasOwnProperty(key) ? State[key] : null;
+    console.log(`📥 [State] Hämtar '${key}':`, value);
+    return value;
 }
 
 // ✅ Exportera funktionerna
