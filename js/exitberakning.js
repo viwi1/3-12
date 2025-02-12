@@ -28,7 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 <label for="betalaHuslan">🏡 Betala av huslånet direkt vid exit</label>
             </div>
             <p class="result-title"><strong id="exitTitle">Exitbelopp</strong></p>
-            <p id="exitBelopp"></p>
+            <p id="exitBelopp" style="color: green; font-weight: bold;"></p>
+            <hr>
             <div id="huslanDetaljer"></div>
         </div>
     `;
@@ -45,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function uppdateraBeräkningar() {
         const multipel = parseFloat(multipelEl.value) || 1;
-        const spara312 = getState("spara312");
+        const spara312 = getState("belopp312");
         const skattLåg = getState("skattUtdelningLåg");
         const skattHög = getState("skattUtdelningHög");
         const betalaHuslan = betalaHuslanEl.checked;
