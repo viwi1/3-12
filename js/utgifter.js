@@ -15,14 +15,16 @@ const UTGIFTER = [
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
 
-// 🔹 Hämta initial inkomst från state
-let inkomst = getState("totaltNetto") || 0;
+
 
 // 🔹 Kör UI direkt vid sidladdning
 document.addEventListener("DOMContentLoaded", () => {
     skapaUtgifterUI();
     uppdateraUtgifter(inkomst);
 });
+
+// 🔹 Hämta initial inkomst från state
+let inkomst = getState("totaltNetto") || 0;
 
 // 🔹 Vänta på att `totaltNetto` uppdateras innan vi ritar om UI
 onStateChange("totaltNetto", (nyInkomst) => {
