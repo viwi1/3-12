@@ -34,14 +34,17 @@ function skapaUtgifterUI() {
     // Rensa tidigare innehåll om det finns
     container.innerHTML = "";
 
-    let inkomstSektion = document.createElement("div");
-    inkomstSektion.className = "input-group";
-    inkomstSektion.innerHTML = `
-        <label for="inkomstSlider">Ange inkomst per år:</label>
-        <input type="range" id="inkomstSlider" min="0" max="2000000" step="10000" value="${inkomst}">
-        <span id="inkomstBelopp">${formatNumber(inkomst)}</span>
-    `;
-    container.appendChild(inkomstSektion);
+let inkomst = getState("totaltNetto") || 0; // Hämta senaste värdet från state
+
+let inkomstSektion = document.createElement("div");
+inkomstSektion.className = "input-group";
+inkomstSektion.innerHTML = `
+    <label for="inkomstSlider">Ange inkomst per år:</label>
+    <input type="range" id="inkomstSlider" min="0" max="2000000" step="10000" value="${inkomst}">
+    <span id="inkomstBelopp">${formatNumber(inkomst)}</span>
+`;
+container.appendChild(inkomstSektion);
+
 
     let summering = document.createElement("div");
     summering.innerHTML = `
