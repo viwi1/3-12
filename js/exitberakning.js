@@ -2,8 +2,7 @@ import { updateState } from "./state.js";
 import { formatNumber } from "./main.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-    const START_VARDE = 6855837;
-    const START_VARDE_DALIGT = 3000000;
+
     let huslan = 2020500;
 
     const resultContainer = document.getElementById("resultFörsäljning");
@@ -12,10 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     resultContainer.innerHTML = `
         <div class="box">
             <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde"></span></p>
-            <div class="checkbox-container">
-                <input type="checkbox" id="daligtNuvarde">
-                <label for="daligtNuvarde">3 000 000 kr</label>
-            </div>
             <div class="slider-container">
                 <label for="multipel">Multipel:</label>
                 <input type="range" id="multipel" min="1.1" max="4" step="0.1" value="1.5">
@@ -48,13 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function uppdateraBeräkningar() {
         console.log("🔎 [Debug] Kör uppdateraBeräkningar");
 
-        // 🔹 Kolla om "Dåligt nuvärde" är ikryssat
-        const ärDåligt = daligtNuvardeEl.checked;
-        const faktiskStartvarde = ärDåligt ? START_VARDE_DALIGT : START_VARDE;
-        console.log("🔎 [Debug] ärDåligt?", ärDåligt, " => startvärde=", faktiskStartvarde);
-
         // 🔹 Utskrift av startvärde i UI
-        nuvardeEl.textContent = formatNumber ? formatNumber(faktiskStartvarde) : faktiskStartvarde;
+        nuvardeEl.textContent = formatNumber ? formatNumber(startVarde) : startVarde;
 
         // 🔹 Hämta multipel
         const multipel = parseFloat(multipelEl.value) || 1;
