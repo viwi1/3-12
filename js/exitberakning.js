@@ -1,5 +1,5 @@
 import { updateState } from "./state.js";
-import { formatNumber } from "./main.js"; // ✅ Se till att formatNumber importeras korrekt
+import { formatNumber } from "./main.js"; // ✅ Importera korrekt
 
 document.addEventListener("DOMContentLoaded", () => {
     let startVarde = 6855837;
