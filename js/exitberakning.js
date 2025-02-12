@@ -71,3 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     uppdateraBeräkningar();
 });
+
+// ✅ Exportera den riktiga funktionen
+export { uppdateraBeräkningar };
+
