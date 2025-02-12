@@ -31,7 +31,7 @@ function beräknaInvestering() {
     const bruttoHög = totalAvkastning > belopp312 ? totalAvkastning - belopp312 : 0;
     const nettoLåg = bruttoLåg * (1 - skattLåg);
     const nettoHög = bruttoHög * (1 - skattHög);
-    const totaltNetto = nettoLåg + nettoHög;
+    const totaltNetto = nettoLåg + nettoHög;  // 🔥 Här skapas `totaltNetto`
 
     investeratBeloppEl.textContent = formatNumber(investeratBelopp);
     bruttoEl.textContent = formatNumber(totalAvkastning);
@@ -41,10 +41,9 @@ function beräknaInvestering() {
     overGransvardeNettoEl.textContent = formatNumber(nettoHög);
     totaltNettoEl.textContent = formatNumber(totaltNetto);
 
-    // 🔥 Uppdatera state så att utgifter.js får rätt inkomstvärde
+    // 🔥 Uppdatera state SISTA STEGET
     updateState("totaltNetto", totaltNetto);
-
-    document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
+    console.log("🚀 [Debug] Uppdaterar state: totaltNetto =", totaltNetto);
 }
 
 function öppnaPopupBelopp312() {
@@ -55,9 +54,6 @@ function öppnaPopupBelopp312() {
         beräknaInvestering();
     }
 }
-
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
     const resultContainer = document.getElementById("resultInvestera");
@@ -92,8 +88,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     beräknaInvestering();
 });
-
-console.log("🚀 [Debug] Skickar till state: totaltNetto =", totaltNetto);
-updateState("totaltNetto", totaltNetto);
 
 export { beräknaInvestering };
