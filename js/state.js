@@ -24,9 +24,6 @@ const State = {
 function updateState(key, value) {
     if (State.hasOwnProperty(key)) {
         State[key] = value;
-    } else {
-        console.warn(`⚠️  State-nyckeln '${key}' finns inte.`);
-    
     }
 }
 
