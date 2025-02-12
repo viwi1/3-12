@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ Sätt startvärde i UI direkt vid sidladdning
     console.log("🔎 [Debug] startvärde innan UI:", START_VARDE);
-    nuvardeEl.textContent = formatNumber(START_VARDE);
+    nuvardeEl.textContent = formatNumber ? formatNumber(START_VARDE) : START_VARDE;
 
     function uppdateraBeräkningar() {
         console.log("🔎 [Debug] Kör uppdateraBeräkningar");
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("🔎 [Debug] ärDåligt?", ärDåligt, " => startvärde=", faktiskStartvarde);
 
         // 🔹 Utskrift av startvärde i UI
-        nuvardeEl.textContent = formatNumber(faktiskStartvarde);
+        nuvardeEl.textContent = formatNumber ? formatNumber(faktiskStartvarde) : faktiskStartvarde;
 
         // 🔹 Hämta multipel
         const multipel = parseFloat(multipelEl.value) || 1;
@@ -87,21 +87,25 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("🔎 [Debug] Slutligt exitKapital =", exitKapital);
 
         // 🔹 Sätt i state
-        updateState("exitVarde", exitKapital);
-        updateState("betalaHuslan", betalaHuslanEl.checked);
+        if (updateState) {
+            updateState("exitVarde", exitKapital);
+            updateState("betalaHuslan", betalaHuslanEl.checked);
+        } else {
+            console.warn("⚠️ [Varning] updateState är inte tillgänglig!");
+        }
 
         // 🔹 Visa exit
         exitTitleEl.textContent = betalaHuslanEl.checked
             ? "Exitbelopp efter huslånsbetalning 🏡"
             : "Exitbelopp";
-        exitBeloppEl.textContent = formatNumber(exitKapital);
+        exitBeloppEl.textContent = formatNumber ? formatNumber(exitKapital) : exitKapital;
 
         huslanDetaljerEl.innerHTML = betalaHuslanEl.checked
             ? `
-            <p>Huslån: <span id="huslanValue" style="cursor:pointer; text-decoration:underline;">${formatNumber(huslan)}</span></p>
-            <p><strong>Bruttobelopp för lån:</strong> ${formatNumber(totaltBruttoFörLån)}</p>
-            <p>- ${formatNumber(belopp312)} (20% skatt) → Netto: ${formatNumber(nettoLåg)}</p>
-            <p>- Resterande (50% skatt): ${formatNumber(bruttoHögBehov)} → Netto: ${formatNumber(lanEfterLågSkatt > 0 ? lanEfterLågSkatt : 0)}</p>
+            <p>Huslån: <span id="huslanValue" style="cursor:pointer; text-decoration:underline;">${formatNumber ? formatNumber(huslan) : huslan}</span></p>
+            <p><strong>Bruttobelopp för lån:</strong> ${formatNumber ? formatNumber(totaltBruttoFörLån) : totaltBruttoFörLån}</p>
+            <p>- ${formatNumber ? formatNumber(belopp312) : belopp312} (20% skatt) → Netto: ${formatNumber ? formatNumber(nettoLåg) : nettoLåg}</p>
+            <p>- Resterande (50% skatt): ${formatNumber ? formatNumber(bruttoHögBehov) : bruttoHögBehov} → Netto: ${formatNumber ? formatNumber(lanEfterLågSkatt > 0 ? lanEfterLågSkatt : 0) : lanEfterLågSkatt}</p>
             `
             : "";
 
