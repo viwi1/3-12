@@ -19,9 +19,12 @@ const UTGIFTER = [
 const BELÖPP_312 = getState("belopp312") || 221650;
 
 // 🎯 Hämta initial inkomst från investeringsmodulen
-let inkomst = getState("totaltNetto") || 100000; // 🔥 Fallback-värde
+let inkomst = getState("totaltNetto");
+if (!inkomst || inkomst === 0) {
+    inkomst = 100000; // 🔥 Standardvärde om inget finns i state
+}
 
-// 🎯 Uppdatera UI
+// ✅ **Se till att funktionen finns innan export**
 function uppdateraUtgifter(inkomst) {
     if (!document.getElementById("inkomstBelopp")) return; // 🔥 Stoppar felet om element saknas
 
@@ -40,7 +43,7 @@ function uppdateraUtgifter(inkomst) {
 
 // 🎯 Skapa UI
 function skapaUtgifterUI() {
-    let container = document.getElementById("expensesContainer");
+    let container = document.getElementById("expenses"); // 🛠 FIX: Använd rätt ID
     if (!container) return;
 
     let inkomstSektion = document.createElement("div");
@@ -71,5 +74,5 @@ function skapaUtgifterUI() {
 // 🎯 Initiera vid sidladdning
 document.addEventListener("DOMContentLoaded", skapaUtgifterUI);
 
-// 🎯 Exportera funktioner
+// ✅ **Exportera endast om funktionen är definierad**
 export { skapaUtgifterUI, uppdateraUtgifter };
