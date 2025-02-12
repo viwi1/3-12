@@ -39,7 +39,7 @@ function skapaUtgifterUI() {
     if (!container) return;
 
     container.innerHTML = `
-        <h3>Summeringar</h3>
+        <h3>Utgifter</h3>
         <div class="summary">
             <p><strong>Total inkomst:</strong> <span id="totalInkomst">${formatNumber(inkomst)} kr</span></p>
             <p><strong>Totala utgifter:</strong> <span id="totalUtgifter">0 kr</span></p>
