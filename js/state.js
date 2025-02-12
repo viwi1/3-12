@@ -35,5 +35,15 @@ function getState(key) {
     return State.hasOwnProperty(key) ? State[key] : null;
 }
 
+utgifter.js:20 🔍 [Debug] Hämtar 'totaltNetto' från state.js: 0
+utgifter.js:24  ⚠️ [Warning] Inkomst saknas i state, sätter till standardvärde: 100000
+(anonymous) @ utgifter.js:24
+investera.js:46 🚀 [Debug] Uppdaterar state: totaltNetto = 913345.5300000001
+utgifter.js:36 ✅ [Debug] 'expenses' container hittad, bygger UI...
+utgifter.js:89 🔄 [Debug] Uppdaterar utgifter med inkomst: 100000
+favicon.ico:1 
+            
+            
+            GET http://viktorwilson.se/favicon.ico 404 (Not Found)
 // 🎯 Exporterar funktionerna
 export { State, updateState, getState };
