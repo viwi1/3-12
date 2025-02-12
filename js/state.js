@@ -6,12 +6,12 @@ const State = {
     // 🔹 Exitvärde efter multipel och ev. huslånsavdrag
     exitVarde: 0,
 
-    // 🔹 3:12-gränsbelopp (beräknas som IBB * 2.75)
-    belopp312: 80600 * 2.75, 
-
-    // 🔹 3:12-gränsbelopp (beräknas som IBB * 2.75)
+    // 🔹 Sparat 3:12-belopp för huslånebetalning
     spara312: 684166, 
     
+    // 🔹 Årligt 3:12-belopp för utdelning
+    belopp312: 221650, 
+
     // 🔹 Skattesatser för utdelning
     skattUtdelningLåg: 0.20,
     skattUtdelningHög: 0.50
