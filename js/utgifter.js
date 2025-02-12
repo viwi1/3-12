@@ -21,18 +21,18 @@ function skapaUtgifterUI() {
     const container = document.getElementById("expenses");
     if (!container) return;
 
-    // 🔹 Hämta inkomst direkt från state.js
     let inkomst = getState("totaltNetto");
+    let betalaHuslan = getState("betalaHuslan");
 
-    // 🔹 Filtrera bort villkorade utgifter (t.ex. lån om huslånet är betalt)
+    // 🔹 Filtrera bort villkorade utgifter
     const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
 
-    // 🔹 Räkna ut total utgift
+    // 🔹 Beräkna total utgift och täckning
     const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = inkomst - totalUtgifter;
     const täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
 
-    // 🔹 Bygg HTML
+    // 🔹 Skapa UI
     container.innerHTML = `
         <h3>Ekonomisk sammanfattning</h3>
         <div class="summary">
@@ -44,7 +44,7 @@ function skapaUtgifterUI() {
 
         <h3>Utgifter</h3>
         <div class="expenses-list">
-            ${aktivaUtgifter.map((utgift, index) => `
+            ${aktivaUtgifter.map(utgift => `
                 <div class="expense-item">
                     <span class="expense-name">${utgift.namn}</span>
                     <span class="expense-amount">${formatNumber(utgift.belopp)}</span>
@@ -58,7 +58,9 @@ function skapaUtgifterUI() {
  * Uppdaterar endast summeringarna utan att bygga om UI.
  */
 function uppdateraUtgifter(nyInkomst) {
-    const totalUtgifter = UTGIFTER.filter(u => !u.villkor || u.villkor()).reduce((sum, u) => sum + u.belopp, 0);
+    const betalaHuslan = getState("betalaHuslan");
+    const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
+    const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = nyInkomst - totalUtgifter;
     const täckning = totalUtgifter > 0 ? (nyInkomst / totalUtgifter) * 100 : 0;
 
@@ -68,11 +70,14 @@ function uppdateraUtgifter(nyInkomst) {
     document.getElementById("skillnad").textContent = formatNumber(skillnad);
 }
 
+/**
+ * Lyssna på förändringar i både `totaltNetto` och `betalaHuslan`
+ */
+onStateChange("totaltNetto", uppdateraUtgifter);
+onStateChange("betalaHuslan", skapaUtgifterUI);
+
 // 🔹 Skapa UI vid sidladdning
 document.addEventListener("DOMContentLoaded", skapaUtgifterUI);
-
-// 🔹 Lyssna på förändringar av `totaltNetto` och uppdatera summeringen
-onStateChange("totaltNetto", uppdateraUtgifter);
 
 // ✅ Exportera funktionerna
 export { skapaUtgifterUI, uppdateraUtgifter };
