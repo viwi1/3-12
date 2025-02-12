@@ -26,6 +26,7 @@ function updateState(key, value) {
         State[key] = value;
     } else {
         console.warn(`⚠️  State-nyckeln '${key}' finns inte.`);
+    
     }
 }
 
