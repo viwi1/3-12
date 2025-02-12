@@ -1,52 +1,14 @@
 import { getState } from "./state.js";
 import { formatNumber } from "./main.js";
 
-function beräknaInvestering() {
-    const investeratBeloppEl = document.getElementById("investeratBelopp");
-    const avkastningEl = document.getElementById("avkastning");
-    const avkastningValueEl = document.getElementById("avkastningValue");
-    const bruttoEl = document.getElementById("brutto");
-    const inomGransvardeBruttoEl = document.getElementById("inomGransvardeBrutto");
-    const inomGransvardeNettoEl = document.getElementById("inomGransvardeNetto");
-    const overGransvardeBruttoEl = document.getElementById("overGransvardeBrutto");
-    const overGransvardeNettoEl = document.getElementById("overGransvardeNetto");
-    const totaltNettoEl = document.getElementById("totaltNetto");
-
-    if (!investeratBeloppEl) return; // 🔥 Stoppar felet om elementen saknas
-
-    const avkastningProcent = parseInt(avkastningEl.value, 10);
-    avkastningValueEl.textContent = avkastningProcent + "%";
-
-    const avkastning = avkastningProcent / 100;
-    const investeratBelopp = getState("exitVarde") || 0;
-
-    const totalAvkastning = investeratBelopp * avkastning;
-
-    const skattLåg = getState("skattUtdelningLåg");
-    const skattHög = getState("skattUtdelningHög");
-    const gränsvärde312 = getState("belopp312");
-
-    const bruttoLåg = Math.min(totalAvkastning, gränsvärde312);
-    const bruttoHög = totalAvkastning > gränsvärde312 ? totalAvkastning - gränsvärde312 : 0;
-    const nettoLåg = bruttoLåg * (1 - skattLåg);
-    const nettoHög = bruttoHög * (1 - skattHög);
-    const totaltNetto = nettoLåg + nettoHög;
-
-    investeratBeloppEl.textContent = formatNumber(investeratBelopp);
-    bruttoEl.textContent = formatNumber(totalAvkastning);
-    inomGransvardeBruttoEl.textContent = formatNumber(bruttoLåg);
-    inomGransvardeNettoEl.textContent = formatNumber(nettoLåg);
-    overGransvardeBruttoEl.textContent = formatNumber(bruttoHög);
-    overGransvardeNettoEl.textContent = formatNumber(nettoHög);
-    totaltNettoEl.textContent = formatNumber(totaltNetto);
-}
-
-// ✅ Flytta DOMContentLoaded utanför funktionen
 document.addEventListener("DOMContentLoaded", () => {
     const resultContainer = document.getElementById("resultInvestera");
     if (!resultContainer) return;
 
-    // 🎯 Generera UI direkt i DOM
+    // 🎯 Standardvärde för 3:12-beloppet
+    let belopp312 = 221650; 
+
+    // ✅ Generera UI direkt i DOM
     resultContainer.innerHTML = `
         <div class="box">
             <p class="result-title">Investera</p>
@@ -60,9 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <hr>
             <p>Brutto: <span id="brutto"></span></p>
             <p>
-                Inom gränsvärde (20% skatt): 
-                <span id="inomGransvardeBrutto"></span>
-                → Netto: <span id="inomGransvardeNetto"></span>
+                <span style="cursor:pointer; text-decoration:underline;" id="belopp312Value">${formatNumber(belopp312)}</span> (20% skatt) → 
+                Netto: <span id="inomGransvardeNetto"></span>
             </p>
             <p>
                 Över gränsvärde (50% skatt): 
@@ -72,10 +33,58 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     `;
 
+    function beräknaInvestering() {
+        const investeratBeloppEl = document.getElementById("investeratBelopp");
+        const avkastningEl = document.getElementById("avkastning");
+        const avkastningValueEl = document.getElementById("avkastningValue");
+        const bruttoEl = document.getElementById("brutto");
+        const inomGransvardeBruttoEl = document.getElementById("belopp312Value"); // 🔥 Popup-klickbar
+        const inomGransvardeNettoEl = document.getElementById("inomGransvardeNetto");
+        const overGransvardeBruttoEl = document.getElementById("overGransvardeBrutto");
+        const overGransvardeNettoEl = document.getElementById("overGransvardeNetto");
+        const totaltNettoEl = document.getElementById("totaltNetto");
+
+        if (!investeratBeloppEl) return;
+
+        const avkastningProcent = parseInt(avkastningEl.value, 10);
+        avkastningValueEl.textContent = avkastningProcent + "%";
+
+        const avkastning = avkastningProcent / 100;
+        const investeratBelopp = getState("exitVarde") || 0;
+
+        const totalAvkastning = investeratBelopp * avkastning;
+
+        const skattLåg = getState("skattUtdelningLåg");
+        const skattHög = getState("skattUtdelningHög");
+
+        const bruttoLåg = Math.min(totalAvkastning, belopp312);
+        const bruttoHög = totalAvkastning > belopp312 ? totalAvkastning - belopp312 : 0;
+        const nettoLåg = bruttoLåg * (1 - skattLåg);
+        const nettoHög = bruttoHög * (1 - skattHög);
+        const totaltNetto = nettoLåg + nettoHög;
+
+        investeratBeloppEl.textContent = formatNumber(investeratBelopp);
+        bruttoEl.textContent = formatNumber(totalAvkastning);
+        inomGransvardeBruttoEl.textContent = formatNumber(belopp312);
+        inomGransvardeNettoEl.textContent = formatNumber(nettoLåg);
+        overGransvardeBruttoEl.textContent = formatNumber(bruttoHög);
+        overGransvardeNettoEl.textContent = formatNumber(nettoHög);
+        totaltNettoEl.textContent = formatNumber(totaltNetto);
+    }
+
+    function öppnaPopupBelopp312() {
+        let nyttBelopp312 = prompt("Ange nytt 3:12-belopp:", belopp312);
+        if (nyttBelopp312 !== null) {
+            belopp312 = parseInt(nyttBelopp312, 10) || belopp312;
+            beräknaInvestering();
+        }
+    }
+
     // ✅ Lägg till event listeners
     document.getElementById("avkastning").addEventListener("input", beräknaInvestering);
     document.getElementById("betalaHuslan").addEventListener("change", beräknaInvestering);
     document.getElementById("multipel").addEventListener("input", beräknaInvestering);
+    document.getElementById("belopp312Value").addEventListener("click", öppnaPopupBelopp312);
 
     // 🏗 Initiera beräkningar vid sidladdning
     beräknaInvestering();
