@@ -15,13 +15,15 @@
 <div id="resultInvestera"></div>
 
 <!-- 🆕 Kollapsbar Modul -->
-<div class="collapsible-module">
+<div class="box collapsible-module">
     <div class="module-header" onclick="toggleModule('modul1')">
-        <h3 id="modul1-title">Klicka för att expandera</h3>
+        <h3 id="modul1-title">Exitbelopp efter huslånsbetalning 🏡</h3>
+        <span id="modul1-value">16 937 011 kr</span>
+        <button class="toggle-btn">+</button>
     </div>
     <div id="modul1-content" class="module-content">
         <p class="module-text">Detta är brödtexten över rubriken.</p>
-        <h3>Rubrik på modulen</h3>
+        <h3>Exitbelopp efter huslånsbetalning 🏡</h3>
         <p class="module-text">Detta är brödtexten under rubriken.</p>
     </div>
 </div>
@@ -40,12 +42,20 @@
 <script>
   function toggleModule(moduleId) {
       const content = document.getElementById(moduleId + "-content");
+      const btn = document.querySelector(`#${moduleId} .toggle-btn`);
       if (content.style.display === "none" || content.style.display === "") {
           content.style.display = "block";
+          btn.textContent = "-";
       } else {
           content.style.display = "none";
+          btn.textContent = "+";
       }
   }
+
+  // Dölj modulinnehåll från start
+  document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("modul1-content").style.display = "none";
+  });
 </script>
 
 </body>
