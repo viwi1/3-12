@@ -1,7 +1,9 @@
 import { formatNumber } from "./main.js";
 import { getState, updateState, onStateChange } from "./state.js";
 
-// 🎯 Lista med utgifter
+/**
+ * Lista med utgifter (ej ändrad)
+ */
 const UTGIFTER = [
     { namn: "BRF Avgift", belopp: 95580 },
     { namn: "Hemförsäkring Dina försäkringar", belopp: 3420 },
@@ -15,40 +17,38 @@ const UTGIFTER = [
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
 
-// 🔍 Hämta befintligt totaltNetto från `state.js`
+/**
+ * Init: Hämta startvärde. Om 0 → invänta uppdatering från investera.js
+ */
 let inkomst = getState("totaltNetto");
 console.log("🔍 [Debug] Hämtar 'totaltNetto' från state.js:", inkomst);
 
-// 🛑 Om `inkomst` är 0 → Vänta på uppdatering
 if (!inkomst || inkomst === 0) {
     console.warn("⚠️ [Warning] Väntar på att 'totaltNetto' ska uppdateras...");
 } else {
-    // ✅ Om vi redan har ett värde > 0, skapar vi UI direkt
+    // 🟢 Skapa UI direkt om vi redan har ett värde
     skapaUtgifterUI(inkomst);
 }
 
-// 🏁 När `totaltNetto` uppdateras i `state.js`, skapa/uppdatera UI
+// 🎯 När `totaltNetto` uppdateras i state.js → uppdatera UI
 onStateChange("totaltNetto", (nyInkomst) => {
-    console.log("✅ [Debug] 'totaltNetto' uppdaterat, startar UI:", nyInkomst);
-    skapaUtgifterUI(nyInkomst);
+    console.log("🔄 [Debug] onStateChange: 'totaltNetto' uppdaterat =", nyInkomst);
+    uppdateraUtgifter(nyInkomst);
 });
 
 /**
- * Bygger huvudsakliga UI:t för utgiftskollen
- * @param {number} inkomst - Det värde på "totaltNetto" vi vill använda
+ * Bygger huvudsakliga UI:t för utgiftskollen EN gång
+ * @param {number} inkomst - Värdet på "totaltNetto"
  */
 function skapaUtgifterUI(inkomst) {
     const container = document.getElementById("expenses");
-    
     if (!container) {
         console.error("❌ [Error] 'expenses' container saknas i DOM!");
         return;
     }
 
     console.log("✅ [Debug] Skapar utgifter-UI med inkomst:", inkomst);
-
-    // Rensa tidigare innehåll (om vi redan byggt UI en gång)
-    container.innerHTML = "";
+    container.innerHTML = ""; // Rensa tidigare innehåll om nåt finns
 
     // 🔹 Inkomstsektionen (slider)
     const inkomstSektion = document.createElement("div");
@@ -70,21 +70,22 @@ function skapaUtgifterUI(inkomst) {
     `;
     container.appendChild(summering);
 
-    // 🔹 Eventlyssnare på slider (ändra inkomst)
+    // 🔹 Lyssnare på slider
     document.getElementById("inkomstSlider").addEventListener("input", (e) => {
-        uppdateraUtgifter(parseInt(e.target.value, 10));
+        const nyttVärde = parseInt(e.target.value, 10);
+        uppdateraUtgifter(nyttVärde);
     });
 
-    // 🔹 Sista steget: Uppdatera UI med de nuvarande värdena
+    // 🔹 Första uppdateringen av UI
     uppdateraUtgifter(inkomst);
 }
 
 /**
- * Uppdaterar alla delar av UI baserat på inkomst
- * @param {number} inkomst - Värdet på "totaltNetto" vi visar
+ * Uppdaterar siffrorna i UI. Skriver till state om inkomst har ändrats.
+ * @param {number} inkomst - Värdet på "totaltNetto" (inkomst)
  */
 function uppdateraUtgifter(inkomst) {
-    console.log("🔄 [Debug] Uppdaterar utgifter med inkomst:", inkomst);
+    console.log("🔄 [Debug] uppdateraUtgifter(", inkomst, ")");
 
     const inkomstBeloppEl = document.getElementById("inkomstBelopp");
     const totalInkomstEl  = document.getElementById("totalInkomst");
@@ -92,26 +93,30 @@ function uppdateraUtgifter(inkomst) {
     const inkomstTäckningEl = document.getElementById("inkomstTäckning");
 
     if (!inkomstBeloppEl || !totalInkomstEl || !totalUtgifterEl || !inkomstTäckningEl) {
-        console.warn("⚠️ [Warning] Något UI-element saknas, kan ej uppdatera utgifter!");
+        console.warn("⚠️ [Warning] UI-element saknas, kan ej uppdatera utgifter!");
         return;
     }
 
-    // 🔹 Visa valt inkomst-värde
+    // ✅ Visa valt inkomst-värde
     inkomstBeloppEl.textContent = formatNumber(inkomst);
     totalInkomstEl.textContent = formatNumber(inkomst);
 
-    // 🔹 Räkna ut total utgifter
+    // ✅ Räkna ut total utgifter
     const totalUtgifter = UTGIFTER.reduce((sum, u) => sum + u.belopp, 0);
     totalUtgifterEl.textContent = formatNumber(totalUtgifter);
 
-    // 🔹 Räkna ut täckning
+    // ✅ Räkna ut täckning
     let täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
     inkomstTäckningEl.textContent = Math.round(täckning) + "%";
 
-    // 🔥 Uppdatera "totaltNetto" i state så att andra moduler ser det nya värdet
-    console.log("🚀 [Debug] updateState('totaltNetto',", inkomst, ")");
-    updateState("totaltNetto", inkomst);
+    // 🔥 Uppdatera "totaltNetto" i state om värdet faktiskt ändrats
+    const gammaltVärde = getState("totaltNetto");
+    if (gammaltVärde !== inkomst) {
+        console.log("🚀 [Debug] updateState('totaltNetto', ", inkomst, ")");
+        updateState("totaltNetto", inkomst);
+    } else {
+        console.log("⚠️ [Info] 'totaltNetto' är redan ", inkomst, ", ingen uppdatering.");
+    }
 }
 
-// ✅ Exportera våra två funktioner
 export { skapaUtgifterUI, uppdateraUtgifter };
