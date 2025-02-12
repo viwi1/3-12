@@ -1,6 +1,6 @@
 import { formatNumber } from "./main.js";
 
-// 🎯 Standardutgifter (med lån och amortering kombinerade)
+// 🎯 Standardutgifter
 let expenses = [
     { name: "BRF Avgift", value: 95580 },
     { name: "Hemförsäkring Dina försäkringar", value: 3420 },
@@ -66,14 +66,33 @@ function updateExpenses(income) {
 
 // 🎯 Skapa UI för utgifter
 function createExpensesUI() {
-    let expensesContainer = document.getElementById("expenses");
-    
+    let expensesContainer = document.getElementById("expensesContainer");
+    if (!expensesContainer) return;
+
+    let incomeGroup = document.createElement("div");
+    incomeGroup.className = "input-group";
+    incomeGroup.innerHTML = `
+        <label for="income">Ange inkomst per år:</label>
+        <input type="range" id="income" min="0" max="1000000" step="10000" value="0">
+        <span id="income-display">0 kr</span>
+    `;
+    expensesContainer.appendChild(incomeGroup);
+
+    let summary = document.createElement("div");
+    summary.innerHTML = `
+        <h3>Summeringar</h3>
+        <p>Total inkomst: <span id="totalIncome">0 kr</span></p>
+        <p>Totala utgifter: <span id="totalCost">0 kr</span></p>
+        <p>Inkomst täckning: <span id="coverage">0%</span></p>
+    `;
+    expensesContainer.appendChild(summary);
+
     expenses.forEach((expense, index) => {
         let inputGroup = document.createElement("div");
         inputGroup.className = "input-group";
         inputGroup.innerHTML = `
             <label>${expense.name}:</label>
-            <input type="number" id="cost${index}" value="${expense.value}" oninput="updateBars()">
+            <input type="number" id="cost${index}" value="${expense.value}" oninput="updateExpenses(document.getElementById('income').value)">
         `;
         expensesContainer.appendChild(inputGroup);
 
@@ -89,9 +108,16 @@ function createExpensesUI() {
         expensesContainer.appendChild(barInfo);
     });
 
+    document.getElementById("income").addEventListener("input", () => {
+        updateExpenses(document.getElementById("income").value);
+    });
+
     // 🔄 Initiera första uppdateringen
     updateExpenses(0);
 }
+
+// 🎯 Initiera vid sidladdning
+document.addEventListener("DOMContentLoaded", createExpensesUI);
 
 // 🎯 Exportera funktioner
 export { createExpensesUI, updateExpenses };
