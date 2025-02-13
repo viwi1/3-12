@@ -41,7 +41,7 @@ function skapaUtgifterUI() {
                 <span id="inkomstTäckning" class="${getTäckningsfärg(täckning, checkboxChecked)}">${Math.round(täckning)}%</span>
             </p>
             <p id="sparasNästaÅrContainer" style="display: ${checkboxChecked ? "none" : "block"}">
-                <strong>Sparas till nästa år:</strong> <span id="sparasNästaÅr">${formatNumber(totalUtgifter)}</span>
+                <strong>Sparas till nästa år:</strong> <span id="sparasNästaÅr">${formatNumber(skillnad)}</span>
             </p>
         </div> 
 
