@@ -10,39 +10,34 @@ const UTGIFTER = [
     { namn: "Flexen", belopp: 196442 },
     { namn: "Klarna - presenter och skoj", belopp: 60000 },
     { namn: "Resa", belopp: 100000 },
-    { namn: "Lån och amortering", belopp: 115245, villkor: () => !getState("betalaHuslan") },
+    { namn: "🏡 Lån och amortering", belopp: 115245, villkor: () => !getState("betalaHuslan") },
     { namn: "Lån och amortering CSN", belopp: 8748 }
 ];
 
-/**
- * Skapar UI för utgifter och sammanfattning.
- */
 function skapaUtgifterUI() {
     const container = document.getElementById("expenses");
     if (!container) return;
 
     let inkomst = getState("totaltNetto");
-    let betalaHuslan = getState("betalaHuslan");
 
-    // 🔹 Filtrera bort villkorade utgifter
     const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
-
-    // 🔹 Beräkna total utgift, täckning och skillnad
     const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = inkomst - totalUtgifter;
-    const roligPengar = skillnad > 0 ? skillnad * 0.5 : 0;
-    const sparasNästaÅr = skillnad > 0 ? skillnad * 0.5 : 0;
     const täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
-
-    // 🔹 Skapa UI
+    
     container.innerHTML = `
         <h2>Ekonomiskt oberoende</h2>
         <div class="summary">
-            <p><strong>Totalt netto:</strong> <span id="inkomstBelopp">${formatNumber(inkomst)}</span></p>
-            <p><strong>Totala utgifter:</strong> <span id="totalUtgifter">${formatNumber(totalUtgifter)}</span></p>
+            <p><strong>Total avkastning:</strong> <span id="inkomstBelopp" class="green">${formatNumber(inkomst)}</span></p>
+            <p><strong>Totala utgifter:</strong> <span id="totalUtgifter" class="red">${formatNumber(totalUtgifter)}</span></p>
+            <p><strong>Resultat:</strong> <span id="skillnad" class="black">${formatNumber(skillnad)}</span></p>
+            
+            <label>
+                <input type="checkbox" id="tackaUtgifter" checked> Täck utgifter med ett års investeringstillväxt
+            </label>
+
             <p><strong>Täckning:</strong> <span id="inkomstTäckning">${Math.round(täckning)}%</span></p>
-            <p><strong>Roliga pengar:</strong> <span id="roligaPengar">${formatNumber(roligPengar)}</span></p>
-            <p><strong>Sparas till nästa år:</strong> <span id="sparasNästaÅr">${formatNumber(sparasNästaÅr)}</span></p>
+            <p id="sparasNästaÅrContainer"><strong>Sparas till nästa år:</strong> <span id="sparasNästaÅr">${formatNumber(totalUtgifter)}</span></p>
         </div>
 
         <h3>Utgifter</h3>
@@ -50,11 +45,9 @@ function skapaUtgifterUI() {
     `;
 
     skapaUtgiftsposter();
+    document.getElementById("tackaUtgifter").addEventListener("change", uppdateraUtgifter);
 }
 
-/**
- * Skapar individuella utgiftsposter i UI.
- */
 function skapaUtgiftsposter() {
     const utgifterList = document.getElementById("utgifterList");
     if (!utgifterList) return;
@@ -74,30 +67,36 @@ function skapaUtgiftsposter() {
     });
 }
 
-/**
- * Uppdaterar summeringarna utan att bygga om UI.
- */
-function uppdateraUtgifter(nyInkomst) {
+function uppdateraUtgifter() {
+    let nyInkomst = getState("totaltNetto");
     const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
     const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = nyInkomst - totalUtgifter;
-    const roligPengar = skillnad > 0 ? skillnad * 0.5 : 0;
-    const sparasNästaÅr = skillnad > 0 ? skillnad * 0.5 : 0;
     const täckning = totalUtgifter > 0 ? (nyInkomst / totalUtgifter) * 100 : 0;
+
+    const tackaUtgifterChecked = document.getElementById("tackaUtgifter").checked;
+    const sparasContainer = document.getElementById("sparasNästaÅrContainer");
 
     document.getElementById("inkomstBelopp").textContent = formatNumber(nyInkomst);
     document.getElementById("totalUtgifter").textContent = formatNumber(totalUtgifter);
+    document.getElementById("skillnad").textContent = formatNumber(skillnad);
     document.getElementById("inkomstTäckning").textContent = Math.round(täckning) + "%";
-    document.getElementById("roligaPengar").textContent = formatNumber(roligPengar);
-    document.getElementById("sparasNästaÅr").textContent = formatNumber(sparasNästaÅr);
+    
+    if (tackaUtgifterChecked) {
+        document.getElementById("inkomstTäckning").classList.add("green");
+        document.getElementById("inkomstTäckning").textContent = Math.round(täckning * 2) + "%";
+        sparasContainer.style.display = "none";
+    } else {
+        document.getElementById("inkomstTäckning").classList.remove("green");
+        document.getElementById("sparasNästaÅr").textContent = formatNumber(totalUtgifter);
+        sparasContainer.style.display = "block";
+    }
 }
 
-// 🔹 Lyssna på förändringar i både `totaltNetto` och `betalaHuslan`
 onStateChange("totaltNetto", uppdateraUtgifter);
 onStateChange("betalaHuslan", skapaUtgifterUI);
 
-// 🔹 Skapa UI vid sidladdning
 document.addEventListener("DOMContentLoaded", skapaUtgifterUI);
 
-// ✅ Exportera funktionerna
 export { skapaUtgifterUI, uppdateraUtgifter };
+
