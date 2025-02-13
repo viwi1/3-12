@@ -19,12 +19,14 @@ function skapaUtgifterUI() {
     if (!container) return;
 
     let inkomst = getState("totaltNetto");
-
     const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
     const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = inkomst - totalUtgifter;
-    const täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
     
+    // 🔹 Initialt läge för checkbox
+    const checkboxChecked = true; // Checkbox är tickad från start
+    const täckning = checkboxChecked ? (inkomst / totalUtgifter) * 200 : (inkomst / totalUtgifter) * 100;
+
     container.innerHTML = `
         <h2>Ekonomiskt oberoende</h2>
         <div class="summary">
@@ -33,10 +35,12 @@ function skapaUtgifterUI() {
             <p><strong>Resultat:</strong> <span id="skillnad" class="black">${formatNumber(skillnad)}</span></p>
             
             <label>
-                <input type="checkbox" id="tackaUtgifter" checked> Täck två års utgifter med ett års investeringstillväxt 
+                <input type="checkbox" id="tackaUtgifter" ${checkboxChecked ? "checked" : ""}> Täck två års utgifter med ett års investeringstillväxt 
             </label>
             <p><strong>Täckning:</strong> <span id="inkomstTäckning">${Math.round(täckning)}%</span></p>
-            <p id="sparasNästaÅrContainer"><strong>Sparas till nästa år:</strong> <span id="sparasNästaÅr">${formatNumber(totalUtgifter)}</span></p>
+            <p id="sparasNästaÅrContainer" style="display: ${checkboxChecked ? "none" : "block"}">
+                <strong>Sparas till nästa år:</strong> <span id="sparasNästaÅr">${formatNumber(totalUtgifter)}</span>
+            </p>
         </div> 
 
         <h3>Utgifter</h3>
@@ -71,22 +75,29 @@ function uppdateraUtgifter() {
     const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
     const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = nyInkomst - totalUtgifter;
-    const täckning = totalUtgifter > 0 ? (nyInkomst / totalUtgifter) * 100 : 0;
-
+    
     const tackaUtgifterChecked = document.getElementById("tackaUtgifter").checked;
     const sparasContainer = document.getElementById("sparasNästaÅrContainer");
-
+    
+    const täckning = tackaUtgifterChecked ? (nyInkomst / totalUtgifter) * 200 : (nyInkomst / totalUtgifter) * 100;
+    
     document.getElementById("inkomstBelopp").textContent = formatNumber(nyInkomst);
     document.getElementById("totalUtgifter").textContent = formatNumber(totalUtgifter);
     document.getElementById("skillnad").textContent = formatNumber(skillnad);
     document.getElementById("inkomstTäckning").textContent = Math.round(täckning) + "%";
     
-    if (tackaUtgifterChecked) {
+    // 🔹 Ändra färg på täckningsgraden baserat på checkbox och täckning
+    if ((tackaUtgifterChecked && täckning >= 200) || (!tackaUtgifterChecked && täckning >= 100)) {
         document.getElementById("inkomstTäckning").classList.add("green");
-        document.getElementById("inkomstTäckning").textContent = Math.round(täckning * 2) + "%";
+        document.getElementById("inkomstTäckning").classList.remove("red");
+    } else {
+        document.getElementById("inkomstTäckning").classList.add("red");
+        document.getElementById("inkomstTäckning").classList.remove("green");
+    }
+
+    if (tackaUtgifterChecked) {
         sparasContainer.style.display = "none";
     } else {
-        document.getElementById("inkomstTäckning").classList.remove("green");
         document.getElementById("sparasNästaÅr").textContent = formatNumber(totalUtgifter);
         sparasContainer.style.display = "block";
     }
@@ -98,4 +109,3 @@ onStateChange("betalaHuslan", skapaUtgifterUI);
 document.addEventListener("DOMContentLoaded", skapaUtgifterUI);
 
 export { skapaUtgifterUI, uppdateraUtgifter };
-
