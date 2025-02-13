@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ Skapa UI direkt i DOM
     resultContainer.innerHTML = `
-        <div class="box">
+        <div class="container">
             <p><strong>Startvärde på bolaget:</strong> <span id="nuvarde">${formatNumber(START_VARDE)}</span></p>
             <div class="checkbox-container">
                 <input type="checkbox" id="daligtNuvarde">
