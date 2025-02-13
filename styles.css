@@ -1,34 +1,37 @@
-/* 🔹 Grundinställningar */
+/* 🔹 Grundinställningar (Nattläge) */
 body {
     font-family: Arial, sans-serif;
-    max-width: 800px;
+    max-width: 90%;
     margin: auto;
     padding: 20px;
-    background-color: #f4f4f4;
+    background-color: #121212; /* Mörk bakgrund */
+    color: #e0e0e0; /* Ljus text */
 }
 
+/* 🔹 Huvudcontainer */
 .container {
-    width: auto;
-    margin: 0 auto;
-    background: white;
-    padding: 100px;
+    width: fit-content;
+    max-width: 90%;
+    margin: 20px auto; /* Ger plats mellan containrarna */
+    background: #1e1e1e; /* Mörkgrå bakgrund */
+    padding: 5px;
     border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
 }
 
 /* 🔹 Rubriker */
 h1, h2, h3 {
-    color: #333;
+    color: #ffffff;
     margin-bottom: 10px;
 }
 
 /* 🔹 Summeringssektion */
 .summary {
-    background: #f8f8f8;
+    background: #222;
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 20px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.1);
 }
 
 .summary p {
@@ -43,16 +46,16 @@ h1, h2, h3 {
 #expenses {
     margin-top: 20px;
     padding: 20px;
-    background: #fff;
+    background: #1e1e1e;
     border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
 }
 
 /* 🔹 Utgiftslista */
 #utgifterList {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px; /* Ger avstånd mellan posterna */
 }
 
 /* 🔹 Utgiftspost */
@@ -60,40 +63,40 @@ h1, h2, h3 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
+    background: #2a2a2a;
     padding: 12px;
     border-radius: 5px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.05);
-    border-bottom: 1px solid #ddd;
+    box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid #444;
 }
 
 .expense-name {
     font-size: 16px;
     font-weight: bold;
-    color: #333;
+    color: #ffffff;
 }
 
 .expense-amount {
     font-weight: bold;
     font-size: 16px;
-    color: #444;
+    color: #bbbbbb;
 }
 
 /* 🔹 Kollapsbar Modul */
 .collapsible-module {
-    border: 1px solid #ccc;
+    border: 1px solid #444;
     padding: 10px;
-    background: #fff;
+    background: #1e1e1e;
     border-radius: 5px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    margin-bottom: 15px;
+    box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px; /* Ger plats mellan moduler */
 }
 
 .module-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #f4f4f4;
+    background: #2a2a2a;
     padding: 12px;
     border-radius: 5px;
     font-size: 18px;
@@ -102,10 +105,11 @@ h1, h2, h3 {
     border: none;
     width: 100%;
     text-align: left;
+    color: #ffffff;
 }
 
 .module-header:hover {
-    background: #e0e0e0;
+    background: #333;
 }
 
 .module-title {
@@ -116,7 +120,7 @@ h1, h2, h3 {
 .module-value {
     font-weight: bold;
     font-size: 18px;
-    color: #333;
+    color: #ffffff;
 }
 
 .toggle-btn {
@@ -125,32 +129,27 @@ h1, h2, h3 {
     background: none;
     border: none;
     cursor: pointer;
-    color: #555;
+    color: #ffffff;
 }
 
 /* 🔹 Modulens innehåll */
 .module-content {
     padding: 12px;
     display: none;
-}
-
-.module-text {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 10px;
+    color: #bbbbbb;
 }
 
 /* 🔹 Färgade texter */
 .green {
-    color: green;
+    color: #4caf50; /* Grön för godkänd */
 }
 
 .red {
-    color: red;
+    color: #f44336; /* Röd för under gränsen */
 }
 
 .black {
-    color: black;
+    color: #e0e0e0;
 }
 
 /* 🔹 Checkbox-container */
