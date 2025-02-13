@@ -9,60 +9,18 @@ body {
 
 .container {
     width: fit-content;
-    max-width: 90%;  /* Anpassar sig till fönsterstorleken men begränsar bredden */
-    margin: 0 auto;  /* Centrerar containern */
+    max-width: 90%;
+    margin: 0 auto;
     background: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-
 /* 🔹 Rubriker */
 h1, h2, h3 {
     color: #333;
     margin-bottom: 10px;
-}
-
-/* 🔹 Formelement */
-.checkbox-container,
-.slider-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.slider-value {
-    width: 60px;
-    margin-left: 10px;
-    font-weight: bold;
-}
-
-/* 🔹 Modulboxar */
-.box {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin-top: 10px;
-    background: #fff;
-    border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* 🔹 Resultatruta */
-.result-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-/* 🔹 Utgifter */
-#expenses {
-    margin-top: 20px;
-    padding: 20px;
-    background: #fff;
-    border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* 🔹 Summeringssektion */
@@ -82,6 +40,15 @@ h1, h2, h3 {
     font-weight: bold;
 }
 
+/* 🔹 Utgifter */
+#expenses {
+    margin-top: 20px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
 /* 🔹 Utgiftslista */
 #utgifterList {
     display: flex;
@@ -90,7 +57,7 @@ h1, h2, h3 {
 }
 
 /* 🔹 Utgiftspost */
-.utgift-item {
+.expense-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -101,13 +68,13 @@ h1, h2, h3 {
     border-bottom: 1px solid #ddd;
 }
 
-.utgift-item label {
+.expense-name {
     font-size: 16px;
     font-weight: bold;
     color: #333;
 }
 
-.utgift-belopp {
+.expense-amount {
     font-weight: bold;
     font-size: 16px;
     color: #444;
@@ -171,6 +138,27 @@ h1, h2, h3 {
 .module-text {
     font-size: 16px;
     color: #555;
+    margin-bottom: 10px;
+}
+
+/* 🔹 Färgade texter */
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
+.black {
+    color: black;
+}
+
+/* 🔹 Checkbox-container */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 10px;
 }
 
