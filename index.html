@@ -16,13 +16,15 @@
 
 <!-- 🆕 Kollapsbar Modul -->
 <div class="box collapsible-module">
-    <div class="module-header" onclick="toggleModule('modul1')">
-        <h3 id="modul1-title">Exitbelopp efter huslånsbetalning 🏡</h3>
+    <button class="module-header" onclick="toggleModule('modul1')">
+        <span id="modul1-title">Exitbelopp efter huslånsbetalning 🏡</span>
         <span id="modul1-value">16 937 011 kr</span>
-        <button class="toggle-btn">+</button>
-    </div>
+        <span class="toggle-btn">+</span>
+    </button>
     <div id="modul1-content" class="module-content">
         <p class="module-text">Detta är brödtexten över rubriken.</p>
+        <h3 id="modul1-title-expanded">Exitbelopp efter huslånsbetalning 🏡</h3>
+        <span id="modul1-value-expanded">16 937 011 kr</span>
         <p class="module-text">Detta är brödtexten under rubriken.</p>
     </div>
 </div>
