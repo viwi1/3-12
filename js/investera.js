@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 🔹 Dynamiskt skapa HTML
     resultContainer.innerHTML = `
-        <div class="box">
+        <div class="container">
             <p class="result-title">Investera</p>
             <p><strong>Investerat belopp:</strong> <span id="investeratBelopp"></span></p>
             <div class="slider-container">
