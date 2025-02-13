@@ -1,3 +1,4 @@
+/* 🔹 Grundinställningar */
 body {
     font-family: Arial, sans-serif;
     max-width: 800px;
@@ -13,20 +14,18 @@ body {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* 🔹 Rubriker */
 h1, h2, h3 {
     color: #333;
-}
-
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     margin-bottom: 10px;
 }
 
+/* 🔹 Formelement */
+.checkbox-container,
 .slider-container {
     display: flex;
     align-items: center;
+    gap: 10px;
     margin-bottom: 10px;
 }
 
@@ -36,20 +35,24 @@ h1, h2, h3 {
     font-weight: bold;
 }
 
+/* 🔹 Modulboxar */
 .box {
     border: 1px solid #ccc;
     padding: 15px;
     margin-top: 10px;
     background: #fff;
     border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* 🔹 Resultatruta */
 .result-title {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 5px;
 }
 
+/* 🔹 Utgifter */
 #expenses {
     margin-top: 20px;
     padding: 20px;
@@ -58,7 +61,7 @@ h1, h2, h3 {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* 🔹 Grundläggande layout */
+/* 🔹 Summeringssektion */
 .summary {
     background: #f8f8f8;
     padding: 15px;
@@ -70,6 +73,9 @@ h1, h2, h3 {
 .summary p {
     margin: 8px 0;
     font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
 }
 
 /* 🔹 Utgiftslista */
@@ -81,27 +87,100 @@ h1, h2, h3 {
 
 /* 🔹 Utgiftspost */
 .utgift-item {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
-    padding: 10px;
+    background: #fff;
+    padding: 12px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.05);
     border-bottom: 1px solid #ddd;
 }
 
 .utgift-item label {
     font-size: 16px;
-}
-
-.utgift-item input {
-    width: 100px;
-    padding: 5px;
-    font-size: 16px;
-    text-align: right;
+    font-weight: bold;
+    color: #333;
 }
 
 .utgift-belopp {
     font-weight: bold;
     font-size: 16px;
     color: #444;
+}
+
+/* 🔹 Kollapsbar Modul */
+.collapsible-module {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.module-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f4f4f4;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.module-header:hover {
+    background: #e0e0e0;
+}
+
+.module-title {
+    flex: 1;
+    text-align: left;
+}
+
+.module-value {
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+}
+
+.toggle-btn {
+    font-size: 20px;
+    font-weight: bold;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+}
+
+/* 🔹 Modulens innehåll */
+.module-content {
+    padding: 12px;
+    display: none;
+}
+
+.module-text {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+/* 🔹 Förbättrad knappstil */
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #007BFF;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
 }
