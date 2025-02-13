@@ -16,10 +16,12 @@
 
 <!-- 🆕 Kollapsbar Modul -->
 <div class="box collapsible-module">
-    <div class="module-header" onclick="toggleModule('modul1')">
+    <div class="module-toggle" onclick="toggleModule('modul1')">
+        <button class="toggle-btn">+</button>
+    </div>
+    <div class="module-header">
         <span class="module-title">Exitbelopp efter huslånsbetalning 🏡</span>
         <span class="module-value">16 937 011 kr</span>
-        <button class="toggle-btn">+</button>
     </div>
     <div id="modul1-content" class="module-content">
         <p class="module-text">Detta är brödtexten över rubriken.</p>
@@ -43,7 +45,7 @@
 <script>
   function toggleModule(moduleId) {
       const content = document.getElementById(moduleId + "-content");
-      const btn = document.querySelector(`#${moduleId} .toggle-btn`);
+      const btn = document.querySelector(`.module-toggle .toggle-btn`);
       
       if (content.style.display === "none" || content.style.display === "") {
           content.style.display = "block";
