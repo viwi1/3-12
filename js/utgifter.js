@@ -22,10 +22,9 @@ function skapaUtgifterUI() {
     const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
     const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = inkomst - totalUtgifter;
-    
-    // 🔹 Initialt läge för checkbox
+
     const checkboxChecked = true; // Checkbox är tickad från start
-    const täckning = checkboxChecked ? (inkomst / totalUtgifter) * 200 : (inkomst / totalUtgifter) * 100;
+    const täckning = (inkomst / totalUtgifter) * 100; // %-sats ska alltid spegla ett års utgifter
 
     container.innerHTML = `
         <h2>Ekonomiskt oberoende</h2>
@@ -75,17 +74,17 @@ function uppdateraUtgifter() {
     const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
     const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = nyInkomst - totalUtgifter;
-    
+
     const tackaUtgifterChecked = document.getElementById("tackaUtgifter").checked;
     const sparasContainer = document.getElementById("sparasNästaÅrContainer");
-    
-    const täckning = tackaUtgifterChecked ? (nyInkomst / totalUtgifter) * 200 : (nyInkomst / totalUtgifter) * 100;
-    
+
+    const täckning = (nyInkomst / totalUtgifter) * 100; // %-sats ska alltid spegla ett års utgifter
+
     document.getElementById("inkomstBelopp").textContent = formatNumber(nyInkomst);
     document.getElementById("totalUtgifter").textContent = formatNumber(totalUtgifter);
     document.getElementById("skillnad").textContent = formatNumber(skillnad);
     document.getElementById("inkomstTäckning").textContent = Math.round(täckning) + "%";
-    
+
     // 🔹 Ändra färg på täckningsgraden baserat på checkbox och täckning
     if ((tackaUtgifterChecked && täckning >= 200) || (!tackaUtgifterChecked && täckning >= 100)) {
         document.getElementById("inkomstTäckning").classList.add("green");
