@@ -16,17 +16,15 @@
 
 <!-- 🆕 Kollapsbar Modul -->
 <div class="box collapsible-module">
-    <div class="module-toggle" onclick="toggleModule('modul1')">
-        <button class="toggle-btn">+</button>
-    </div>
-    <div class="module-header">
-        <span class="module-title">Exitbelopp efter huslånsbetalning 🏡</span>
-        <span class="module-value">16 937 011 kr</span>
-    </div>
+    <button class="module-header" onclick="toggleModule('modul1')">
+        <span id="modul1-title">Exitbelopp efter huslånsbetalning 🏡</span>
+        <span id="modul1-value">16 937 011 kr</span>
+        <span class="toggle-btn">+</span>
+    </button>
     <div id="modul1-content" class="module-content">
         <p class="module-text">Detta är brödtexten över rubriken.</p>
-        <h3 class="module-title">Exitbelopp efter huslånsbetalning 🏡</h3>
-        <span class="module-value">16 937 011 kr</span>
+        <h3 id="modul1-title-expanded">Exitbelopp efter huslånsbetalning 🏡</h3>
+        <span id="modul1-value-expanded">16 937 011 kr</span>
         <p class="module-text">Detta är brödtexten under rubriken.</p>
     </div>
 </div>
@@ -45,8 +43,7 @@
 <script>
   function toggleModule(moduleId) {
       const content = document.getElementById(moduleId + "-content");
-      const btn = document.querySelector(`.module-toggle .toggle-btn`);
-      
+      const btn = document.querySelector(`#${moduleId} .toggle-btn`);
       if (content.style.display === "none" || content.style.display === "") {
           content.style.display = "block";
           btn.textContent = "-";
