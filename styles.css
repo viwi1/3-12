@@ -1,20 +1,22 @@
 /* 🔹 Grundinställningar (Nattläge) */
 body {
     font-family: Arial, sans-serif;
-    max-width: 90%;
     margin: auto;
     padding: 20px;
     background-color: #121212; /* Mörk bakgrund */
     color: #e0e0e0; /* Ljus text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* 🔹 Huvudcontainer */
+/* 🔹 Huvudcontainer (Fast bredd, centrerad) */
 .container {
-    width: fit-content;
-    max-width: 90%;
+    width: 700px; /* Fast bredd */
+    max-width: 100%; /* Anpassar sig om skärmen är mindre */
     margin: 20px auto; /* Ger plats mellan containrarna */
     background: #1e1e1e; /* Mörkgrå bakgrund */
-    padding: 5px;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
 }
@@ -32,6 +34,7 @@ h1, h2, h3 {
     border-radius: 5px;
     margin-bottom: 20px;
     box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.1);
+    width: 100%;
 }
 
 .summary p {
@@ -44,6 +47,7 @@ h1, h2, h3 {
 
 /* 🔹 Utgifter */
 #expenses {
+    width: 100%;
     margin-top: 20px;
     padding: 20px;
     background: #1e1e1e;
@@ -55,7 +59,7 @@ h1, h2, h3 {
 #utgifterList {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Ger avstånd mellan posterna */
+    gap: 15px;
 }
 
 /* 🔹 Utgiftspost */
@@ -90,6 +94,7 @@ h1, h2, h3 {
     border-radius: 5px;
     box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.1);
     margin-bottom: 20px; /* Ger plats mellan moduler */
+    width: 100%;
 }
 
 .module-header {
