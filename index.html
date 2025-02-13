@@ -23,7 +23,7 @@
     </div>
     <div id="modul1-content" class="module-content">
         <p class="module-text">Detta är brödtexten över rubriken.</p>
-        <h3>Exitbelopp efter huslånsbetalning 🏡</h3>
+        <h3 id="modul1-title-copy"></h3> <!-- Använder samma text dynamiskt -->
         <p class="module-text">Detta är brödtexten under rubriken.</p>
     </div>
 </div>
@@ -52,9 +52,10 @@
       }
   }
 
-  // Dölj modulinnehåll från start
+  // Dölj modulinnehåll från start och sätt dynamisk titel
   document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("modul1-content").style.display = "none";
+      document.getElementById("modul1-title-copy").textContent = document.getElementById("modul1-title").textContent;
   });
 </script>
 
