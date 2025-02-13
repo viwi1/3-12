@@ -13,7 +13,6 @@ body {
 /* 🔹 Huvudcontainer (Fast bredd, centrerad) */
 .container {
     width: 700px; /* Fast bredd */
-    max-width: 100%; /* Anpassar sig om skärmen är mindre */
     margin: 20px auto; /* Ger plats mellan containrarna */
     background: #1e1e1e; /* Mörkgrå bakgrund */
     padding: 20px;
