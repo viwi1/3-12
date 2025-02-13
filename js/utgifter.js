@@ -23,7 +23,7 @@ function skapaUtgifterUI() {
     const aktivaUtgifter = UTGIFTER.filter(utgift => !utgift.villkor || utgift.villkor());
     const totalUtgifter = aktivaUtgifter.reduce((sum, u) => sum + u.belopp, 0);
     const skillnad = inkomst - totalUtgifter;
-    const täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0;
+    const täckning = totalUtgifter > 0 ? (inkomst / totalUtgifter) * 100 : 0; //Beror på checkboxen
     
     container.innerHTML = `
         <h2>Ekonomiskt oberoende</h2>
@@ -33,12 +33,11 @@ function skapaUtgifterUI() {
             <p><strong>Resultat:</strong> <span id="skillnad" class="black">${formatNumber(skillnad)}</span></p>
             
             <label>
-                <input type="checkbox" id="tackaUtgifter" checked> Täck utgifter med ett års investeringstillväxt
+                <input type="checkbox" id="tackaUtgifter" checked> Täck två års utgifter med ett års investeringstillväxt //Dubbelkolla att du räknar rätt
             </label>
-
-            <p><strong>Täckning:</strong> <span id="inkomstTäckning">${Math.round(täckning)}%</span></p>
-            <p id="sparasNästaÅrContainer"><strong>Sparas till nästa år:</strong> <span id="sparasNästaÅr">${formatNumber(totalUtgifter)}</span></p>
-        </div>
+            <p><strong>Täckning:</strong> <span id="inkomstTäckning">${Math.round(täckning)}%</span></p> //Grön om täckningen räcker beroende på checkboxens status
+            <p id="sparasNästaÅrContainer"><strong>Sparas till nästa år:</strong> <span id="sparasNästaÅr">${formatNumber(totalUtgifter)}</span></p> //Denna måste dubbelkolla checkboxen innan den laddas vid sidladdning.
+        </div> 
 
         <h3>Utgifter</h3>
         <div id="utgifterList" class="expenses-list"></div>
@@ -99,4 +98,3 @@ onStateChange("betalaHuslan", skapaUtgifterUI);
 document.addEventListener("DOMContentLoaded", skapaUtgifterUI);
 
 export { skapaUtgifterUI, uppdateraUtgifter };
-
