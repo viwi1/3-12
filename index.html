@@ -15,18 +15,17 @@
 <div id="resultInvestera"></div>
 
 <!-- 🆕 Kollapsbar Modul -->
-<div class="box collapsible-module">
-    <button class="module-header" onclick="toggleModule('modul1')">
-        <span class="toggle-btn">+</span>
-        <span class="module-title" id="modul1-title" data-collapsed-title="Exitbelopp efter huslånsbetalning 🏡 16 937 011 kr">
+<div class="ruta kollapsbar-modul">
+    <button class="modul-huvud" onclick="växlaModul('modul1')">
+        <span class="växla-knapp">+</span>
+        <span class="modul-rubrik" id="modul1-rubrik" data-rubrik="Exitbelopp efter huslånsbetalning 🏡">
             Exitbelopp efter huslånsbetalning 🏡
         </span>
     </button>
-    <div id="modul1-content" class="module-content">
-        <p class="module-text">Detta är brödtexten över rubriken.</p>
-        <h3 class="module-title-expanded" id="modul1-title-expanded"></h3>
-        <span class="module-value" id="modul1-value-expanded"></span>
-        <p class="module-text">Detta är brödtexten under rubriken.</p>
+    <div id="modul1-innehåll" class="modul-innehåll">
+        <p class="modul-text">Detta är brödtexten över rubriken.</p>
+        <h3 class="modul-rubrik-utökad"></h3>
+        <p class="modul-text">Detta är brödtexten under rubriken.</p>
     </div>
 </div>
 
@@ -42,28 +41,25 @@
 
 <!-- 🆕 Skript för kollapsbar modul -->
 <script>
-  function toggleModule(moduleId) {
-      const content = document.getElementById(moduleId + "-content");
-      const btn = document.querySelector(`#${moduleId} .toggle-btn`);
-      const titleEl = document.getElementById(moduleId + "-title");
-      const isExpanded = content.style.display === "block";
+  function växlaModul(modulId) {
+      const innehåll = document.getElementById(modulId + "-innehåll");
+      const knapp = document.querySelector(`#${modulId} .växla-knapp`);
+      const rubrik = document.getElementById(modulId + "-rubrik");
 
-      if (!isExpanded) {
-          // Kopiera rubrik och värde till expanderad vy
-          document.getElementById(moduleId + "-title-expanded").textContent = titleEl.textContent;
-          document.getElementById(moduleId + "-value-expanded").textContent = titleEl.getAttribute("data-collapsed-title").split(" ").slice(-2).join(" "); // Hämtar beloppet
+      const ärÖppen = innehåll.style.display === "block";
+
+      innehåll.style.display = ärÖppen ? "none" : "block";
+      knapp.textContent = ärÖppen ? "+" : "-";
+
+      // Flytta rubriken till den expanderade delen
+      if (!ärÖppen) {
+          document.querySelector(`#${modulId}-innehåll .modul-rubrik-utökad`).textContent = rubrik.dataset.rubrik;
       }
-
-      content.style.display = isExpanded ? "none" : "block";
-      btn.textContent = isExpanded ? "+" : "-";
-
-      // Uppdatera titeln i stängt läge
-      titleEl.textContent = isExpanded ? titleEl.getAttribute("data-collapsed-title") : titleEl.getAttribute("data-collapsed-title").split(" ")[0];
   }
 
   // Dölj modulinnehåll vid sidladdning
   document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("modul1-content").style.display = "none";
+      document.getElementById("modul1-innehåll").style.display = "none";
   });
 </script>
 
