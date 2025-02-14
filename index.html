@@ -18,13 +18,10 @@
 <div class="ruta kollapsbar-modul">
     <button class="modul-huvud" onclick="växlaModul('modul1')">
         <span class="växla-knapp">+</span>
-        <span class="modul-rubrik" id="modul1-rubrik" data-rubrik="Exitbelopp efter huslånsbetalning 🏡">
-            Exitbelopp efter huslånsbetalning 🏡
-        </span>
+        <span class="modul-rubrik" id="modul1-rubrik"></span>
     </button>
     <div id="modul1-innehåll" class="modul-innehåll">
-        <p class="modul-text">Detta är brödtexten över rubriken.</p>
-        <h3 class="modul-rubrik-utökad"></h3>
+        <p class="modul-text">Detta är brödtexten <span class="rubrik-text">Exitbelopp efter huslånsbetalning 🏡</span> som även blir rubriken.</p>
         <p class="modul-text">Detta är brödtexten under rubriken.</p>
     </div>
 </div>
@@ -44,22 +41,21 @@
   function växlaModul(modulId) {
       const innehåll = document.getElementById(modulId + "-innehåll");
       const knapp = document.querySelector(`#${modulId} .växla-knapp`);
-      const rubrik = document.getElementById(modulId + "-rubrik");
+      const rubrikText = document.querySelector(`#${modulId}-innehåll .rubrik-text`);
 
       const ärÖppen = innehåll.style.display === "block";
-
       innehåll.style.display = ärÖppen ? "none" : "block";
       knapp.textContent = ärÖppen ? "+" : "-";
 
-      // Flytta rubriken till den expanderade delen
       if (!ärÖppen) {
-          document.querySelector(`#${modulId}-innehåll .modul-rubrik-utökad`).textContent = rubrik.dataset.rubrik;
+          document.getElementById(modulId + "-rubrik").textContent = rubrikText.textContent;
       }
   }
 
-  // Dölj modulinnehåll vid sidladdning
+  // Dölj modulinnehåll vid sidladdning och hämta rubriken
   document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("modul1-innehåll").style.display = "none";
+      document.getElementById("modul1-rubrik").textContent = document.querySelector(`#modul1-innehåll .rubrik-text`).textContent;
   });
 </script>
 
