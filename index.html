@@ -21,7 +21,10 @@
         <span class="modul-rubrik" id="modul1-rubrik"></span>
     </button>
     <div id="modul1-innehåll" class="modul-innehåll">
-        <p class="modul-text">Detta är brödtexten <span class="rubrik-text">Exitbelopp efter huslånsbetalning 🏡</span> som även blir rubriken.</p>
+        <p class="modul-text">
+            <span class="rubrik-text">Exitbelopp efter huslånsbetalning 🏡</span> 
+            Detta är brödtexten över rubriken.
+        </p>
         <p class="modul-text">Detta är brödtexten under rubriken.</p>
     </div>
 </div>
@@ -42,20 +45,26 @@
       const innehåll = document.getElementById(modulId + "-innehåll");
       const knapp = document.querySelector(`#${modulId} .växla-knapp`);
       const rubrikText = document.querySelector(`#${modulId}-innehåll .rubrik-text`);
+      const rubrikElement = document.getElementById(modulId + "-rubrik");
 
       const ärÖppen = innehåll.style.display === "block";
       innehåll.style.display = ärÖppen ? "none" : "block";
       knapp.textContent = ärÖppen ? "+" : "-";
 
       if (!ärÖppen) {
-          document.getElementById(modulId + "-rubrik").textContent = rubrikText.textContent;
+          rubrikElement.textContent = rubrikText.textContent;
+          rubrikText.style.display = "none"; // Dölj rubrik-texten i brödtexten
+      } else {
+          rubrikText.style.display = "inline"; // Visa rubrik-texten igen vid stängning
       }
   }
 
   // Dölj modulinnehåll vid sidladdning och hämta rubriken
   document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("modul1-innehåll").style.display = "none";
-      document.getElementById("modul1-rubrik").textContent = document.querySelector(`#modul1-innehåll .rubrik-text`).textContent;
+      const rubrikText = document.querySelector(`#modul1-innehåll .rubrik-text`);
+      document.getElementById("modul1-rubrik").textContent = rubrikText.textContent;
+      rubrikText.style.display = "none"; // Dölj rubrik-texten vid sidladdning
   });
 </script>
 
