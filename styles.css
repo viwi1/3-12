@@ -10,12 +10,13 @@ body {
     align-items: center;
 }
 
-/* 🔹 Huvudcontainer (Fast bredd, centrerad) */
+/* 🔹 Huvudcontainer (Optimerad för iPhone) */
 .container {
-    width: 700px; /* Fast bredd */
+    width: 90%; /* Anpassar sig till mobilskärmar */
+    max-width: 700px; /* Begränsar bredden på större skärmar */
     margin: 20px auto; /* Ger plats mellan containrarna */
     background: #1e1e1e; /* Mörkgrå bakgrund */
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
 }
@@ -24,31 +25,34 @@ body {
 h1, h2, h3 {
     color: #ffffff;
     margin-bottom: 10px;
+    font-size: 1.2em; /* Anpassad för iPhone */
+    text-align: center;
 }
 
 /* 🔹 Summeringssektion */
 .summary {
     background: #222;
-    padding: 15px;
+    padding: 12px;
     border-radius: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.1);
     width: 100%;
 }
 
 .summary p {
-    margin: 8px 0;
-    font-size: 16px;
+    margin: 6px 0;
+    font-size: 14px;
     display: flex;
     justify-content: space-between;
     font-weight: bold;
+    flex-wrap: wrap; /* Säkerställer att text inte klipps på små skärmar */
 }
 
 /* 🔹 Utgifter */
 #expenses {
     width: 100%;
-    margin-top: 20px;
-    padding: 20px;
+    margin-top: 15px;
+    padding: 15px;
     background: #1e1e1e;
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
@@ -58,7 +62,7 @@ h1, h2, h3 {
 #utgifterList {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
 /* 🔹 Utgiftspost */
@@ -67,32 +71,35 @@ h1, h2, h3 {
     justify-content: space-between;
     align-items: center;
     background: #2a2a2a;
-    padding: 12px;
+    padding: 10px;
     border-radius: 5px;
     box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.05);
     border-bottom: 1px solid #444;
+    font-size: 14px; /* Mindre textstorlek för mobil */
 }
 
 .expense-name {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     color: #ffffff;
+    flex: 1;
 }
 
 .expense-amount {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 14px;
     color: #bbbbbb;
+    text-align: right;
 }
 
 /* 🔹 Kollapsbar Modul */
 .collapsible-module {
     border: 1px solid #444;
-    padding: 10px;
+    padding: 8px;
     background: #1e1e1e;
     border-radius: 5px;
     box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.1);
-    margin-bottom: 20px; /* Ger plats mellan moduler */
+    margin-bottom: 15px;
     width: 100%;
 }
 
@@ -101,9 +108,9 @@ h1, h2, h3 {
     align-items: center;
     justify-content: space-between;
     background: #2a2a2a;
-    padding: 12px;
+    padding: 10px;
     border-radius: 5px;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     border: none;
@@ -116,19 +123,8 @@ h1, h2, h3 {
     background: #333;
 }
 
-.module-title {
-    flex: 1;
-    text-align: left;
-}
-
-.module-value {
-    font-weight: bold;
-    font-size: 18px;
-    color: #ffffff;
-}
-
 .toggle-btn {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     background: none;
     border: none;
@@ -138,9 +134,10 @@ h1, h2, h3 {
 
 /* 🔹 Modulens innehåll */
 .module-content {
-    padding: 12px;
+    padding: 10px;
     display: none;
     color: #bbbbbb;
+    font-size: 14px;
 }
 
 /* 🔹 Färgade texter */
@@ -160,21 +157,63 @@ h1, h2, h3 {
 .checkbox-container {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 10px;
+    font-size: 14px;
 }
 
 /* 🔹 Förbättrad knappstil */
 button {
-    padding: 10px 15px;
+    padding: 8px 12px;
     border: none;
     border-radius: 5px;
     background: #007BFF;
     color: white;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
 }
 
 button:hover {
     background: #0056b3;
+}
+
+/* 🔹 Responsiv design för iPhone och små skärmar */
+@media screen and (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        width: 95%;
+        padding: 12px;
+    }
+
+    .summary p {
+        font-size: 13px;
+        flex-direction: column;
+    }
+
+    .expense-item {
+        font-size: 13px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .expense-amount {
+        text-align: left;
+        margin-top: 5px;
+    }
+
+    .module-header {
+        font-size: 13px;
+    }
+
+    .module-content {
+        font-size: 13px;
+    }
+
+    button {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
 }
