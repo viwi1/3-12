@@ -19,24 +19,18 @@ body {
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
 }
 
-/* 🔹 Rubriker */
-h1, h2, h3 {
-    color: #ffffff;
-    margin-bottom: 10px;
-}
-
 /* 🔹 Kollapsbar Modul */
 .kollapsbar-modul {
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
     margin-bottom: 15px;
 }
 
-/* 🔹 Gemensam stil för både stängd och öppen version */
+/* 🔹 Stängd och öppen version har samma stil */
 .modul-innehall {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     background: #333;
     padding: 15px;
     border-radius: 8px;
@@ -46,9 +40,7 @@ h1, h2, h3 {
 
 /* 🔹 Stängd version (default) */
 .stangd-lage {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
     cursor: pointer;
 }
 
@@ -58,7 +50,9 @@ h1, h2, h3 {
 
 /* 🔹 Öppen version */
 .oppnad-lage {
-    display: none; /* Dold som default */
+    display: none;
+    flex-direction: column;
+    background: #2a2a2a;
 }
 
 /* 🔹 Kollaps-knapp */
@@ -76,8 +70,8 @@ h1, h2, h3 {
     color: #ff9800;
 }
 
-/* 🔹 Modulrubrik */
-.modul-rubrik {
+/* 🔹 Modulrubrik (samma stil för öppet och stängt) */
+.rubrik {
     font-size: 18px;
     font-weight: bold;
     color: #ffffff;
