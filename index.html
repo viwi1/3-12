@@ -16,14 +16,12 @@
 
 <!-- KOLLAPSERBAR MODUL: stängd + öppen version -->
 <div class="kollapsbar-modul" id="modul1">
-  <!-- Stängd version (visas default) -->
-  <div class="stangd-lage" id="modul1-stangd" onclick="toggleModule('modul1')">
+  <div class="modul-innehall" id="modul1-stangd" onclick="toggleModule('modul1')">
     <button class="kollaps-knapp">+</button>
     <span id="modul1-stangd-rubrik"></span>
   </div>
 
-  <!-- Öppen version (dold default) -->
-  <div class="oppnad-lage" id="modul1-oppnad" style="display: none;">
+  <div class="modul-innehall" id="modul1-oppnad" style="display: none;">
     <button class="kollaps-knapp" onclick="toggleModule('modul1')">-</button>
     <p>
       Detta är extra information som visas ovanför rubriken när modulen är expanderad.<br>
