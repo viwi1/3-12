@@ -1,230 +1,61 @@
-/* 🔹 Grundinställningar */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #121212; /* Mörkt tema */
-    color: #ffffff;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3:12 Utdelningskalkylator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-/* 🔹 Containrar */
-.container {
-    width: 100%;
-    max-width: 700px;
-    margin: 20px auto;
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
-}
+<!-- Exitruta -->
+<div id="resultFörsäljning"></div>
 
-/* 🔹 Rubriker */
-h1, h2, h3 {
-    color: #ffffff;
-    text-align: center;
-}
+<!-- Investera -->
+<div id="resultInvestera"></div>
 
-/* 🔹 Summeringssektion */
-.summary {
-    background: #222;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+<!-- KOLLAPSERBAR MODUL -->
+<div class="kollapsbar-modul" id="modul1">
+  <div class="modul-huvud">
+    <button class="kollaps-knapp" onclick="toggleModule('modul1')">+</button>
+  </div>
+  <div class="modul-innehall" id="modul1-innehall">
+    <p>Text ovan</p>
+    <span id="modul1-rubrik">Exitbelopp efter huslånsbetalning 🏡</span>
+    <p>Text under</p>
+  </div>
+</div>
 
-.summary p {
-    margin: 0;
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    flex-wrap: wrap;
-}
+<!-- Utgifter -->
+<div id="expenses"></div>
 
-/* 🔹 Utgifter */
-#expenses {
-    width: 100%;
-    max-width: 700px;
-    margin: 20px auto;
-    padding: 15px;
-    background: #1e1e1e;
-    border-radius: 8px;
-    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+<!-- Moduler och logik -->
+<script type="module" src="./js/state.js"></script>
+<script type="module" src="./js/main.js"></script>
+<script type="module" src="./js/exitberakning.js"></script>
+<script type="module" src="./js/investera.js"></script>
+<script type="module" src="./js/utgifter.js"></script>
 
-/* 🔹 Utgiftslista */
-#utgifterList {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+<!-- Kollaps-funktionalitet -->
+<script>
+  function toggleModule(modulId) {
+    const innehall = document.getElementById(modulId + '-innehall');
+    const knapp = document.querySelector(`#${modulId} .kollaps-knapp`);
+    const isOpen = innehall.style.display === 'block';
 
-/* 🔹 Utgiftspost */
-.expense-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #2a2a2a;
-    padding: 12px;
-    border-radius: 5px;
-    box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid #444;
-    font-size: 14px;
-}
-
-.expense-name {
-    font-size: 14px;
-    font-weight: bold;
-    color: #ffffff;
-    flex: 1;
-}
-
-.expense-amount {
-    font-weight: bold;
-    font-size: 14px;
-    color: #bbbbbb;
-    text-align: right;
-}
-
-/* 🔹 Kollapsbar Modul */
-.collapsible-module {
-    border: 1px solid #ccc;
-    padding: 10px;
-    background: #1e1e1e;
-    border-radius: 5px;
-    box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.1);
-    margin-bottom: 15px;
-}
-
-.module-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #2a2a2a;
-    padding: 12px;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-    width: 100%;
-    text-align: left;
-}
-
-.module-header:hover {
-    background: #3a3a3a;
-}
-
-.module-value {
-    font-weight: bold;
-    font-size: 18px;
-    color: #ffffff;
-}
-
-.toggle-btn {
-    font-size: 20px;
-    font-weight: bold;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #ffffff;
-}
-
-/* 🔹 Modulens innehåll */
-.module-content {
-    padding: 12px;
-    display: none;
-}
-
-.module-text {
-    font-size: 14px;
-    color: #cccccc;
-    margin-bottom: 10px;
-}
-
-/* 🔹 Färgade texter */
-.green {
-    color: #0f0;
-}
-
-.red {
-    color: #f00;
-}
-
-.black {
-    color: #bbb;
-}
-
-/* 🔹 Checkbox-container */
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-/* 🔹 Förbättrad knappstil */
-button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background: #007BFF;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #0056b3;
-}
-
-/* 🔹 Mobilanpassning */
-@media screen and (max-width: 480px) {
-    .container, #expenses {
-        width: 95%;
-        padding: 12px;
+    if (!isOpen) {
+      innehall.style.display = 'block';
+      knapp.textContent = '-';
+    } else {
+      innehall.style.display = 'none';
+      knapp.textContent = '+';
     }
+  }
 
-    .summary {
-        padding: 10px;
-    }
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('modul1-innehall').style.display = 'none';
+  });
+</script>
 
-    .summary p {
-        font-size: 13px;
-        flex-direction: column;
-    }
-
-    .expense-item {
-        font-size: 13px;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .expense-amount {
-        text-align: left;
-        margin-top: 5px;
-    }
-
-    .module-header {
-        font-size: 14px;
-        padding: 10px;
-    }
-
-    .module-value {
-        font-size: 16px;
-    }
-
-    .toggle-btn {
-        font-size: 18px;
-    }
-}
+</body>
+</html>
