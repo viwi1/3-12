@@ -8,7 +8,7 @@ body {
     color: #f0f0f0;
 }
 
-/* 🔹 Centrera innehållet och ge det en tydlig ram */
+/* 🔹 Centrera innehållet */
 .container {
     width: 90%;
     max-width: 700px;
@@ -31,19 +31,25 @@ h1, h2, h3 {
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
     margin-bottom: 15px;
-    padding: 15px;
 }
 
-/* 🔹 Stängd version */
+/* 🔹 Gemensam stil för både stängd och öppen version */
+.modul-innehall {
+    display: flex;
+    flex-direction: column;
+    background: #333;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+}
+
+/* 🔹 Stängd version (default) */
 .stangd-lage {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #333;
-    padding: 15px;
-    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
 }
 
 .stangd-lage:hover {
@@ -52,10 +58,7 @@ h1, h2, h3 {
 
 /* 🔹 Öppen version */
 .oppnad-lage {
-    background: #2a2a2a;
-    padding: 20px;
-    border-radius: 8px;
-    display: none; /* Dold default */
+    display: none; /* Dold som default */
 }
 
 /* 🔹 Kollaps-knapp */
@@ -66,15 +69,15 @@ h1, h2, h3 {
     font-weight: bold;
     color: #ffffff;
     cursor: pointer;
+    align-self: flex-start;
 }
 
 .kollaps-knapp:hover {
     color: #ff9800;
 }
 
-/* 🔹 Modulrubrik (både i stängt & öppet läge) */
-#modul1-stangd-rubrik,
-#modul1-oppnad-rubrik {
+/* 🔹 Modulrubrik */
+.modul-rubrik {
     font-size: 18px;
     font-weight: bold;
     color: #ffffff;
@@ -85,7 +88,7 @@ h1, h2, h3 {
     font-size: 16px;
     line-height: 1.5;
     color: #cccccc;
-    margin-bottom: 15px;
+    margin-top: 10px;
 }
 
 /* 🔹 Utgifter */
@@ -132,8 +135,7 @@ h1, h2, h3 {
         padding: 15px;
     }
 
-    .stangd-lage,
-    .oppnad-lage {
+    .modul-innehall {
         padding: 12px;
     }
 
