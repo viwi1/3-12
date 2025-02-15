@@ -18,12 +18,13 @@
 <div class="kollapsbar-modul" id="modul1">
   <!-- Stängd version (visas default) -->
   <div class="stangd-lage" id="modul1-stangd" onclick="toggleModule('modul1')">
-    <span id="modul1-stangd-rubrik"></span>
     <button class="kollaps-knapp">+</button>
+    <span id="modul1-stangd-rubrik"></span>
   </div>
 
   <!-- Öppen version (dold default) -->
   <div class="oppnad-lage" id="modul1-oppnad" style="display: none;">
+    <button class="kollaps-knapp" onclick="toggleModule('modul1')">-</button>
     <p>
       Detta är extra information som visas ovanför rubriken när modulen är expanderad.<br>
       Här kan du lägga till detaljerad beskrivning eller extra förklaringar.<br>
@@ -35,7 +36,6 @@
       Detta är extra information som visas under rubriken när modulen är expanderad.<br>
       Det kan vara viktiga punkter eller vidare läsning.
     </p>
-    <button class="kollaps-knapp" onclick="toggleModule('modul1')">-</button>
   </div>
 </div>
 
