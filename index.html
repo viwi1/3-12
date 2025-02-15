@@ -14,20 +14,20 @@
 <!-- Investera -->
 <div id="resultInvestera"></div>
 
-<!-- KOLLAPSERBAR MODUL: stängd + öppen version -->
+<!-- KOLLAPSERBAR MODUL -->
 <div class="kollapsbar-modul" id="modul1">
-  <div class="modul-innehall" id="modul1-stangd" onclick="toggleModule('modul1')">
-    <button class="kollaps-knapp">+</button>
-    <span id="modul1-stangd-rubrik"></span>
+  <div class="modul-innehall stangd-lage" id="modul1-stangd">
+    <button class="kollaps-knapp" onclick="toggleModule('modul1')">+</button>
+    <span class="stangd-rubrik"></span>
   </div>
 
-  <div class="modul-innehall" id="modul1-oppnad" style="display: none;">
+  <div class="modul-innehall oppnad-lage" id="modul1-oppnad" style="display: none;">
     <button class="kollaps-knapp" onclick="toggleModule('modul1')">-</button>
     <p>
       Detta är extra information som visas ovanför rubriken när modulen är expanderad.<br>
       Här kan du lägga till detaljerad beskrivning eller extra förklaringar.<br>
       <br>
-      <span id="modul1-oppnad-rubrik">Exitbelopp efter huslånsbetalning 🏡</span><br>
+      <span class="oppnad-rubrik">Exitbelopp efter huslånsbetalning 🏡</span><br>
       <br>
       Här kan du lägga till en sammanfattning av vad beloppet innebär eller andra viktiga detaljer.<br>
       <br>
@@ -40,41 +40,12 @@
 <!-- Utgifter -->
 <div id="expenses"></div>
 
-<!-- Moduler och logik -->
+<!-- Skript -->
 <script type="module" src="./js/state.js"></script>
 <script type="module" src="./js/main.js"></script>
 <script type="module" src="./js/exitberakning.js"></script>
 <script type="module" src="./js/investera.js"></script>
 <script type="module" src="./js/utgifter.js"></script>
-
-<!-- Kollaps-funktionalitet -->
-<script>
-  function toggleModule(modulId) {
-    const stangd = document.getElementById(modulId + '-stangd');
-    const oppnad = document.getElementById(modulId + '-oppnad');
-    const isOpen = oppnad.style.display === 'block';
-
-    if (!isOpen) {
-      // Öppna modulen
-      stangd.style.display = 'none';
-      oppnad.style.display = 'block';
-    } else {
-      // Stäng modulen
-      oppnad.style.display = 'none';
-      stangd.style.display = 'block';
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Kopiera rubriken från öppen del till stängd del
-    const rubrikOpen = document.getElementById('modul1-oppnad-rubrik').textContent;
-    document.getElementById('modul1-stangd-rubrik').textContent = rubrikOpen;
-
-    // Se till att modulen är stängd från början
-    document.getElementById('modul1-oppnad').style.display = 'none';
-    document.getElementById('modul1-stangd').style.display = 'block';
-  });
-</script>
 
 </body>
 </html>
