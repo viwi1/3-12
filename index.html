@@ -1,4 +1,4 @@
-n<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
@@ -18,20 +18,20 @@ n<!DOCTYPE html>
 <div class="kollapsbar-modul" id="modul1">
   <div class="modul-innehall stangd-lage" id="modul1-stangd">
     <button class="kollaps-knapp" onclick="toggleModule('modul1')">+</button>
-    <span class="stangd-rubrik"></span>
+    <span class="rubrik"></span>
   </div>
 
   <div class="modul-innehall oppnad-lage" id="modul1-oppnad" style="display: none;">
     <button class="kollaps-knapp" onclick="toggleModule('modul1')">-</button>
     <p>
-       Maine funkar! Detta är extra information som visas ovanför rubriken när modulen är expanderad.<br>
+      📌 Detta är extra information som visas ovanför rubriken när modulen är expanderad.<br>
       Här kan du lägga till detaljerad beskrivning eller extra förklaringar.<br>
       <br>
-      <span class="oppnad-rubrik">Exitbelopp efter huslånsbetalning 🏡</span><br>
+      <span class="rubrik">Exitbelopp efter huslånsbetalning 🏡</span><br>
       <br>
       Här kan du lägga till en sammanfattning av vad beloppet innebär eller andra viktiga detaljer.<br>
       <br>
-      Detta är extra information som visas under rubriken när modulen är expanderad.<br>
+      📌 Detta är extra information som visas under rubriken när modulen är expanderad.<br>
       Det kan vara viktiga punkter eller vidare läsning.
     </p>
   </div>
@@ -46,6 +46,33 @@ n<!DOCTYPE html>
 <script type="module" src="./js/exitberakning.js"></script>
 <script type="module" src="./js/investera.js"></script>
 <script type="module" src="./js/utgifter.js"></script>
+
+<!-- Kollaps-funktionalitet -->
+<script>
+  function toggleModule(modulId) {
+    const stangd = document.getElementById(modulId + '-stangd');
+    const oppnad = document.getElementById(modulId + '-oppnad');
+    const isOpen = oppnad.style.display === 'block';
+
+    if (!isOpen) {
+      stangd.style.display = 'none';
+      oppnad.style.display = 'block';
+    } else {
+      oppnad.style.display = 'none';
+      stangd.style.display = 'flex';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Kopiera rubriken från öppen del till stängd del
+    const rubrikText = document.querySelector('.rubrik').textContent;
+    document.querySelectorAll('.rubrik').forEach(el => el.textContent = rubrikText);
+
+    // Se till att modulen är stängd från början
+    document.getElementById('modul1-oppnad').style.display = 'none';
+    document.getElementById('modul1-stangd').style.display = 'flex';
+  });
+</script>
 
 </body>
 </html>
